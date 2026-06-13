@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Logg inn - Cosplay for alle</title>
+    <link rel="stylesheet" href="medlem.css">
+    <!-- Tema-veksler (Laster tidlig for å unngå flash) -->
+    <script src="theme-switcher.js"></script>
+    <link rel="icon" type="image/png" href="Media/Logo/Sort.png">
+</head>
+
+<body>
+
+    <div class="login-layout">
+        <!-- Venstre side: Bilde/Stemning -->
+        <div class="login-visual">
+            <div class="login-visual-content">
+                <h1>Skap noe varig</h1>
+                <p class="text-lg">Velkommen til medlemssidene for Cosplay for alle.</p>
+            </div>
+        </div>
+
+        <!-- Høyre side: Skjema -->
+        <div class="login-form-section" style="position: relative;">
+
+            <div class="login-wrapper">
+                <div class="mb-6 text-center">
+                    <a href="index.html" class="login-logo">
+                        <img src="Media/Logo/Sort.png" alt="Cosplay for alle Logo" class="logo-light-only">
+                        <img src="Media/Logo/Hvit.png" alt="Cosplay for alle Logo" class="logo-dark-only hidden">
+                    </a>
+                    <h2>Velkommen tilbake</h2>
+                    <p>Logg inn for å få tilgang til verkstedet</p>
+                </div>
+
+                <form id="login-form">
+                    <div class="form-group">
+                        <label for="login-email" class="form-label">E-postadresse</label>
+                        <input type="email" id="login-email" class="form-input" placeholder="din@epost.no" required>
+                    </div>
+
+                    <div class="form-group">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                            <label for="login-password" class="form-label" style="margin-bottom: 0;">Passord</label>
+                            <button type="button" id="forgot-password-btn" class="btn-ghost text-sm text-primary"
+                                style="padding: 0;">Glemt passord?</button>
+                        </div>
+                        <input type="password" id="login-password" class="form-input" placeholder="••••••••" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary btn-full">Logg inn</button>
+
+                    <p id="login-error" class="form-error"></p>
+                    <p id="login-success" class="form-error" style="color: var(--color-success);"></p>
+                </form>
+
+                <div class="mt-4 text-center">
+                    <p class="text-sm">Ikke medlem ennå? <a href="kontakt.html">Kontakt oss</a></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Mandatory TOS & Privacy Modal -->
+    <div id="tos-modal" class="hidden modal-container">
+        <div id="tos-modal-overlay" class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-800">
+            <div class="card-header" style="text-align: center; border-bottom: 2px solid var(--color-bg-section);">
+                <h2 style="margin: 0; font-size: 1.5rem;">Velkommen til Cosplay for alle</h2>
+                <p class="text-xs text-muted mt-1">Vennligst les og godta våre vilkår for å fortsette</p>
+            </div>
+            <div class="card-body" style="padding: 2rem; line-height: 1.6; font-size: 0.95rem;">
+                <div id="tos-content" class="text-left">
+                    <h3 style="font-size: 1.25rem; margin-top: 0;">Brukervilkår og Personvernerklæring for Cosplay for alle
+                    </h3>
+                    <p class="text-xs text-muted mb-6">Sist oppdatert: 4. februar 2026</p>
+
+                    <p>Dette er en juridisk bindende avtale mellom deg som medlem og Cosplay for alle. Brukerkontoer i våre
+                        systemer opprettes kun av administrator eller styret. For å få tilgang til din tildelte konto og
+                        bruke våre tjenester, må du lese og erklære deg enig i samtlige punkter nedenfor ved første
+                        pålogging.</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">1. Opprettelse av konto og Aldersgrense</h4>
+                    <p><strong>1.1 Administrasjonsstyrt opprettelse</strong><br>
+                        Brukerkontoer på denne plattformen opprettes ikke av brukeren selv, men tildeles av Cosplay for alles
+                        administratorer eller styret etter godkjent medlemskap eller avtale.</p>
+
+                    <p><strong>1.2 Alderskrav og Samtykke</strong><br>
+                        Over 18 år: Administrator oppretter konto for myndige personer etter avtale.<br>
+                        Under 18 år: Dersom styret oppretter en konto for en person under 18 år, skal det foreligge et
+                        signert samtykkeskjema fra foresatte i Cosplay for alles arkiv før kontoen aktiveres.</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">2. Personvernerklæring (GDPR)</h4>
+                    <p>Vi behandler dine data i tråd med personvernforordningen (GDPR). Siden kontoen din er opprettet
+                        av en tredjepart (admin), er det avgjørende at du godkjenner denne behandlingen ved første
+                        pålogging.</p>
+
+                    <p><strong>2.1 Data som behandles</strong><br>
+                        Identitetsdata: Fullt navn og e-postadresse (tildelt av admin).<br>
+                        Tidslinje: Registreringsdato (startdato) og utmeldingsdato (sluttdato).<br>
+                        Brukerinnhold: Bilder du laster opp, kommentarer og prosjektbeskrivelser.</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">2.2 Sletteprosedyre og "Soft Delete" (30-dagers regelen)</h4>
+                    <p>Når et medlemskap avsluttes, eller styret bestemmer at en konto skal slettes, trer følgende
+                        prosess i kraft:<br>
+                        - Låst tilstand (30 dager): Alle data lagres i sin helhet i 30 dager etter deaktivering.
+                        Brukeren mister tilgangen umiddelbart.<br>
+                        - Permanent sletting: Etter 30 dager slettes alle personlige filer, bilder og innstillinger
+                        permanent fra aktive systemer.<br>
+                        - Sikkerhetsarkiv: Navn, e-post, startdato og sluttdato flyttes til et lukket arkiv for å
+                        forhindre misbruk (svartelisting).</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">3. Brukergenerert innhold og Promotering</h4>
+                    <p>Cosplay for alle er en plattform for å fremme kreativitet. For at fellesskapet skal vokse, trenger vi
+                        rettigheter til å vise frem arbeidet som lastes opp på siden.</p>
+
+                    <p><strong>3.1 Opphavsrett</strong><br>
+                        Du beholder eierskapet til bildene du laster opp til din konto.</p>
+
+                    <p><strong>3.2 Global Lisens for Promotering</strong><br>
+                        Ved å laste opp bilder til systemet, gir du Cosplay for alle en uinnskrenket og vederlagsfri rett til
+                        å bruke dette innholdet til promotering av fellesskapet. Dette inkluderer bruk på nettsider,
+                        sosiale medier (Instagram, Facebook, TikTok) og markedsføring.</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">4. Sikkerhet og Styrets fullmakter</h4>
+                    <p>Eierskap til konto: Kontoen er Cosplay for alles eiendom og tildeles brukeren for personlig bruk.<br>
+                        Utestengelse: Styret eller administrator har fullmakt til å låse eller slette kontoer
+                        umiddelbart ved brudd på retningslinjer eller "dum oppførsel".</p>
+
+                    <h4 class="font-semibold mt-4 mb-2">5. Aksept av vilkår ved første pålogging</h4>
+                    <p>Ved å trykke på "Jeg godtar" og logge inn på din tildelte konto, bekrefter du at informasjonen er
+                        korrekt, at du er over 18 år (eller har samtykke), at du forstår sletterutinen og at du gir
+                        tillatelse til promotering av dine bilder.</p>
+                </div>
+            </div>
+            <div class="card-footer"
+                style="padding: 1.5rem; display: flex; flex-direction: column; gap: 1rem; align-items: center; border-top: 2px solid var(--color-bg-section);">
+                <div style="display: flex; align-items: center; gap: 0.75rem; margin-bottom: 0.5rem;">
+                    <input type="checkbox" id="tos-checkbox" style="width: 20px; height: 20px; cursor: pointer;">
+                    <label for="tos-checkbox" style="font-weight: 600; cursor: pointer;">Jeg har lest og godtar
+                        Brukervilkår og Personvernerklæring</label>
+                </div>
+                <div style="display: flex; gap: 1rem; width: 100%; max-width: 500px;">
+                    <button id="decline-tos-btn" class="btn btn-secondary" style="flex: 1; padding: 1rem;">Nekt og logg
+                        ut</button>
+                    <button id="accept-tos-btn" class="btn btn-primary" style="flex: 2; padding: 1rem;" disabled>Jeg
+                        godtar og vil fortsette</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Alert/Message Modal -->
+    <div id="message-modal" class="hidden modal-container" style="z-index: 3000;">
+        <div id="message-modal-overlay" class="modal-overlay"></div>
+        <div class="card"
+            style="position: relative; width: 100%; max-width: 400px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
+            <div class="card-body text-center" style="padding: 2.5rem 2rem;">
+                <p id="message-modal-text" class="mb-8 text-lg" style="line-height: 1.5;"></p>
+                <div style="display: flex; justify-content: center;">
+                    <button id="message-modal-close" class="btn btn-primary"
+                        style="min-width: 120px; padding: 0.8rem 2rem;">Lukk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Custom Confirm Modal -->
+    <div id="confirm-modal" class="hidden modal-container" style="z-index: 3100;">
+        <div id="confirm-modal-overlay" class="modal-overlay"></div>
+        <div class="card"
+            style="position: relative; width: 100%; max-width: 450px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
+            <div class="card-body text-center" style="padding: 2.5rem 2rem;">
+                <p id="confirm-modal-text" class="mb-8 text-lg" style="line-height: 1.5;"></p>
+                <div style="display: flex; justify-content: center; gap: 1rem;">
+                    <button id="confirm-modal-cancel" class="btn btn-secondary"
+                        style="flex: 1; padding: 0.8rem 1rem;">Avbryt</button>
+                    <button id="confirm-modal-ok" class="btn btn-primary" style="flex: 1; padding: 0.8rem 1rem;">Gå
+                        videre</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Dark Mode Floating Button -->
+    <button class="theme-toggle" aria-label="Bytt tema">
+        <svg class="moon-icon" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+    </button>
+
+    <!-- script -->
+    <script type="module" src="script.js"></script>
+</body>
+
+</html>

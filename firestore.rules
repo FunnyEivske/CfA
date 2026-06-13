@@ -1,0 +1,122 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // --- Hjelpefunksjoner ---
+    function isSignedIn() {
+      return request.auth != null;
+    }
+    
+    function isOwner(userId) {
+      return isSignedIn() && request.auth.uid == userId;
+    }
+    
+    // Sjekker om brukeren har admin-rolle i databasen
+    function isAdmin() {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', null) == 'admin';
+    }
+
+    function isContributor() {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', null) == 'contributor';
+    }
+
+    function isSecretary() {
+      return isSignedIn() && 
+        exists(/databases/$(database)/documents/users/$(request.auth.uid)) &&
+        get(/databases/$(database)/documents/users/$(request.auth.uid)).data.get('role', null) == 'sekretær';
+    }
+    match /users/{userId} {
+      // Alle innloggede kan liste brukere
+      allow list: if isSignedIn();
+      // Eier kan alltid lese sitt eget dokument, andre kan lese hvis aktiv eller admin
+      allow get: if isOwner(userId) || (resource != null && resource.data.get('status', 'active') == 'active') || isAdmin();
+      
+      // Eier kan endre navn/bilde, men IKKE sin egen rolle og IKKE hvis de er under sletting
+      allow create: if isOwner(userId) && (!request.resource.data.keys().hasAny(['role']) || request.resource.data.role == 'member');
+      allow update: if isOwner(userId) && 
+                      (resource.data.get('status', 'active') == 'active') &&
+                      !request.resource.data.diff(resource.data).affectedKeys().hasAny(['role', 'status', 'deletionRequestedAt']);
+      allow delete: if isOwner(userId) && (resource.data.get('status', 'active') == 'active');
+      
+      
+      // Admin kan endre alt, inkludert roller og slettestatus
+      allow write: if isAdmin(); 
+
+      // Personlig galleri
+      match /gallery_images/{imageId} {
+        // Enklere regler for å unngå permission denied ved login
+        allow read: if isSignedIn() && (isOwner(userId) || isAdmin());
+        allow write: if (isOwner(userId) && get(/databases/$(database)/documents/users/$(userId)).data.get('status', 'active') == 'active') || isAdmin();
+      }
+
+      // Notifikasjoner (Flyttet hit, under users/{userId})
+      match /notifications/{notificationId} {
+        // En bruker kan lese og slette sine egne notifikasjoner
+        allow read, delete: if isOwner(userId);
+        // En bruker kan markere sine egne notifikasjoner som lest
+        allow update: if isOwner(userId) && request.resource.data.diff(resource.data).affectedKeys().hasOnly(['read']);
+        // Andre (innloggede) kan opprette en notifikasjon (f.eks ved tagging)
+        allow create: if isSignedIn();
+      }
+    }
+
+    // --- Innhold på siden (Offentlig Galleri osv) ---
+    match /site_content/{document=**} {
+      allow read: if true;
+      allow write: if isAdmin(); 
+    }
+
+    // --- Arkiv (Kun Admin) ---
+    match /archive/{docId} {
+      allow read, write: if isAdmin();
+    }
+    
+    // --- Feed ---
+    match /artifacts/{appId}/public/data/feed/{postId} {
+      allow read: if isSignedIn(); // Only members/admins
+      allow create: if isAdmin() || isSecretary() || isContributor();
+      allow update, delete: if isAdmin();      // Kommentarer
+      match /comments/{commentId} {
+        allow read: if isSignedIn();
+        allow create: if isSignedIn();
+        allow update, delete: if isSignedIn() && (isAdmin() || request.auth.uid == resource.data.userId);
+      }
+
+      // Reaksjoner (tommel opp)
+      match /reactions/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // --- Arrangementer ---
+    match /artifacts/{appId}/public/data/arrangements/{arrangementId} {
+      allow read: if isSignedIn() || resource.data.visibility == 'public';
+      allow create: if isAdmin() || isSecretary() || isContributor();
+      allow update, delete: if isAdmin();
+
+      // RSVP
+      match /rsvp/{userId} {
+        allow read: if isSignedIn();
+        allow write: if isSignedIn() && request.auth.uid == userId;
+      }
+    }
+
+    // --- Dokumenter ---
+    // Allow access to old documents structure for migration/deletion
+    match /documents/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+
+    // Allow access to new subcollection structure
+    match /documents/{category}/items/{docId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin() || (category == 'referater' && (isSecretary() || isContributor()));
+    }
+  }
+}

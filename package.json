@@ -1,0 +1,19 @@
+{
+  "name": "cfa",
+  "version": "1.0.0",
+  "description": "Cosplay for alle (CfA) website",
+  "main": "feed.js",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "vite build",
+    "preview": "vite preview"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "firebase-tools": "^15.10.0",
+    "vite": "^7.3.1"
+  }
+}

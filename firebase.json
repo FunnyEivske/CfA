@@ -1,0 +1,65 @@
+{
+    "functions": [
+        {
+            "source": "functions",
+            "codebase": "default",
+            "ignore": [
+                "node_modules",
+                ".git",
+                "firebase-debug.log",
+                "firebase-adminsdk-*.json"
+            ]
+        }
+    ],
+    "firestore": {
+        "rules": "firestore.rules",
+        "indexes": "firestore.indexes.json"
+    },
+    "hosting": {
+        "site": "cosplay-for-all-cfa",
+        "public": ".",
+        "cleanUrls": true,
+        "ignore": [
+            "firebase.json",
+            "**/.*",
+            ".git/**",
+            "node_modules/**",
+            "functions/**",
+            "package.json",
+            "package-lock.json",
+            "task.md",
+            "implementation_plan.md",
+            "deploy_log.txt",
+            "deploy_result.txt",
+            "README.md",
+            "firestore.rules",
+            "firestore.indexes.json"
+        ],
+        "headers": [
+            {
+                "source": "**/*.@(html|js)",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "text/html; charset=utf-8"
+                    }
+                ]
+            },
+            {
+                "source": "**/*.js",
+                "headers": [
+                    {
+                        "key": "Content-Type",
+                        "value": "application/javascript; charset=utf-8"
+                    }
+                ]
+            }
+        ],
+        "rewrites": [
+            {
+                "source": "/",
+                "destination": "/index.html"
+            }
+        ]
+    }
+}
