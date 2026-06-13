@@ -971,6 +971,27 @@ if (document.getElementById('feed-container')) {
             setupPostTagging();
         }
 
+        const newPostBtn = document.getElementById('new-post-btn');
+        if (newPostBtn) {
+            newPostBtn.addEventListener('click', () => {
+                editingPostId = null;
+                if (newPostForm) newPostForm.reset();
+                if (typeof postQuill !== 'undefined' && postQuill) postQuill.root.innerHTML = '';
+                const pic = document.getElementById('post-image-preview-container');
+                if (pic) pic.classList.add('hidden');
+                const pimg = document.getElementById('post-image-preview');
+                if (pimg) pimg.src = '';
+                const pudz = document.getElementById('post-upload-drop-zone');
+                if (pudz) pudz.classList.remove('hidden');
+                postImageOffset = 0;
+                const pm = document.getElementById('post-modal');
+                const mt = pm ? pm.querySelector('h3') : null;
+                if (mt) mt.textContent = 'Nytt innlegg';
+                const psb = document.getElementById('post-submit-button');
+                if (psb) psb.textContent = 'Publiser';
+            });
+        }
+
         // --- GLAZE POST INITIALIZATION ---
         const newGlazePostBtn = document.getElementById('new-glaze-post-btn');
         const glazePostModal = document.getElementById('glaze-post-modal');

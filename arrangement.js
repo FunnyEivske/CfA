@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', () => {
             
             debounceTimer = setTimeout(async () => {
                 try {
-                    const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=no&limit=5`);
+                    const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&limit=5`);
                     if (!response.ok) throw new Error('Network response was not ok');
                     const data = await response.json();
                     
@@ -125,6 +125,25 @@ const newEventBtn = document.getElementById('new-event-btn');
 const newEventForm = document.getElementById('new-event-form');
 const eventError = document.getElementById('event-error');
 const eventSubmitButton = document.getElementById('event-submit-button');
+
+if (newEventBtn) {
+    newEventBtn.addEventListener('click', () => {
+        editingEventId = null;
+        if (newEventForm) newEventForm.reset();
+        if (typeof eventQuill !== 'undefined' && eventQuill) eventQuill.root.innerHTML = '';
+        const pic = document.getElementById('event-image-preview-wrapper');
+        if (pic) pic.classList.add('hidden');
+        const pimg = document.getElementById('event-image-preview');
+        if (pimg) pimg.src = '';
+        const pudz = document.getElementById('event-upload-drop-zone');
+        if (pudz) pudz.classList.remove('hidden');
+        eventImageOffset = 0;
+        const modal = document.getElementById('event-modal');
+        const mt = modal ? modal.querySelector('h3') : null;
+        if (mt) mt.textContent = 'Nytt arrangement';
+        if (eventSubmitButton) eventSubmitButton.textContent = 'Publiser arrangement';
+    });
+}
 
 const upcomingEventsContainer = document.getElementById('upcoming-events-container');
 const pastEventsContainer = document.getElementById('past-events-container');
