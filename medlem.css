@@ -12,29 +12,29 @@
   --font-display: 'Playfair Display', serif;
 
   /* --- Ny Fargepalett --- */
-  --palette-autumn-ember: #b45309;
-  --palette-burnt-caramel: #bd6829;
-  --palette-shadow-grey: #292524;
-  --palette-gunmetal: #3f3f46;
-  --palette-white: #fefefe;
+  --palette-deep-maroon: #7E1C38;
+  --palette-pastel-pink: #FFCDD2;
+  --palette-charcoal-grey: #3C3C40;
+  --palette-cream-ivory: #FFF1E1;
+  --palette-pure-white: #FFFFFF;
 
   /* --- Funksjonelle Variabler --- */
-  --color-primary: var(--palette-autumn-ember);
-  --color-primary-hover: var(--palette-burnt-caramel);
+  --color-primary: var(--palette-deep-maroon);
+  --color-primary-hover: var(--palette-pastel-pink);
 
-  --color-bg-body: #f5f5f4;
-  --color-bg-surface: #ffffff;
-  --color-bg-subtle: #fafaf9;
-  --color-bg-dark: var(--palette-shadow-grey);
-  --color-bg-header: rgba(255, 255, 255, 0.9);
+  --color-bg-body: var(--palette-cream-ivory);
+  --color-bg-surface: var(--palette-pure-white);
+  --color-bg-subtle: #FFF9F2;
+  --color-bg-dark: var(--palette-charcoal-grey);
+  --color-bg-header: rgba(255, 241, 225, 0.9);
 
-  --color-text-main: #1c1917;
-  --color-text-muted: #57534e;
-  --color-text-light: #fafaf9;
-  --color-text-inverse: #ffffff;
+  --color-text-main: var(--palette-charcoal-grey);
+  --color-text-muted: #5A5A5E;
+  --color-text-light: #FFF9F2;
+  --color-text-inverse: var(--palette-pure-white);
 
-  --color-border: #e7e5e4;
-  --color-border-dark: #d6d3d1;
+  --color-border: #E8D9CC;
+  --color-border-dark: #D4BFA9;
 
   --color-error: #dc2626;
   --color-success: #16a34a;
@@ -56,23 +56,23 @@
 
 /* --- Dark Mode Overrides --- */
 [data-theme="dark"] {
-  --color-bg-body: var(--palette-shadow-grey);
-  --color-bg-surface: var(--palette-gunmetal);
-  --color-bg-subtle: #1c1917;
+  --color-bg-body: var(--palette-charcoal-grey);
+  --color-bg-surface: #2B2B2E;
+  --color-bg-subtle: #323236;
   /* Darker than body */
 
-  --color-text-main: var(--palette-white);
-  --color-text-muted: #a1a1aa;
+  --color-text-main: var(--palette-cream-ivory);
+  --color-text-muted: #FFCDD2;
 
-  --color-border: #52525b;
+  --color-border: #4D4D52;
   /* zinc-600 */
-  --color-border-dark: #71717a;
+  --color-border-dark: #64646A;
   /* zinc-500 */
 
-  --color-bg-white: var(--palette-shadow-grey);
-  --color-bg-header: rgba(41, 37, 36, 0.9);
+  --color-bg-white: var(--palette-charcoal-grey);
+  --color-bg-header: rgba(60, 60, 64, 0.9);
 
-  --color-bg-input: #18181b;
+  --color-bg-input: #1F1F22;
   /* Darker background for inputs */
 }
 
@@ -360,6 +360,8 @@ p {
 
 .btn-primary {
   background-color: var(--color-primary);
+  border: none !important;
+  outline: none !important;
   color: white;
   box-shadow: var(--shadow-md);
 }
@@ -734,7 +736,7 @@ p {
 
 .login-visual {
   display: none;
-  background-image: url('Media/Bilder/Login_New.png');
+  background-image: url('https://picsum.photos/seed/cfa41/1024/1024');
   /* Bytt bilde */
   /* Keramikk-bilde */
   background-size: cover;

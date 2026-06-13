@@ -2,7 +2,7 @@
     // 1. Initialiser tema umiddelbart for å unngå FOUC
     const savedTheme = localStorage.getItem('theme');
     const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-    const isDark = savedTheme === 'dark' || (!savedTheme && systemPrefersDark);
+    const isDark = savedTheme === 'dark'; // Alltid light mode som standard hvis ikke lagret som 'dark'
 
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
 

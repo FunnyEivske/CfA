@@ -9,21 +9,30 @@ import {
 const arrangementsPath = `/artifacts/${appId}/public/data/arrangements`;
 const eventsContainer = document.getElementById('public-events-container');
 
-function formatDate(timestamp) {
-    if (!timestamp) return 'Ingen dato';
+function formatDate(timestamp, endTimestamp = null) {
+    if (!timestamp) return '';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleString('nb-NO', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+    let dateString = date.toLocaleString('nb-NO', options);
+    
+    if (endTimestamp) {
+        const endDate = endTimestamp.toDate ? endTimestamp.toDate() : new Date(endTimestamp);
+        if (date.getFullYear() === endDate.getFullYear() && date.getMonth() === endDate.getMonth() && date.getDate() === endDate.getDate()) {
+            const endOptions = { hour: '2-digit', minute: '2-digit' };
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', endOptions);
+        } else {
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', options);
+        }
+    }
+    return dateString;
 }
 
 function sanitizeHTML(str) {
     if (!str) return '';
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(str);
+    }
+    // Fallback
     return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -81,7 +90,7 @@ function renderEvents(events) {
             <div class="kurs-card-content">
                 <h3>${sanitizeHTML(event.title)}</h3>
                 <p style="font-size: 0.9rem; color: var(--color-primary); font-weight: 500; margin-bottom: 0.5rem;">
-                    📅 ${formatDate(event.date)}<br>
+                    📅 ${formatDate(event.date, event.endDate)}<br>
                     📍 ${sanitizeHTML(event.location)}
                 </p>
                 <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">

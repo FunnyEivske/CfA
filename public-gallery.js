@@ -11,7 +11,7 @@ const homepageGalleryTeaser = document.getElementById('homepage-gallery-teaser')
 // --- CACHING HJELPEFUNKSJONER ---
 function getCachedGallery() {
     try {
-        const cached = localStorage.getItem('public_gallery');
+        const cached = localStorage.getItem('cfa_public_gallery');
         return cached ? JSON.parse(cached) : null;
     } catch (e) {
         console.error("Error reading cached gallery:", e);
@@ -21,7 +21,7 @@ function getCachedGallery() {
 
 function setCachedGallery(images) {
     try {
-        localStorage.setItem('public_gallery', JSON.stringify(images));
+        localStorage.setItem('cfa_public_gallery', JSON.stringify(images));
     } catch (e) {
         console.error("Error writing cached gallery:", e);
     }

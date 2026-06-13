@@ -144,20 +144,24 @@ function formatTimestamp(timestamp) {
  */
 function sanitizeHTML(str) {
     if (!str) return '';
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(str);
+    }
+    // Fallback
     return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
 // --- CACHING HJELPEFUNKSJONER ---
 function getCachedFeed() {
     try {
-        const cached = localStorage.getItem('site_feed');
+        const cached = localStorage.getItem('cfa_site_feed');
         return cached ? JSON.parse(cached) : null;
     } catch (e) { return null; }
 }
 
 function setCachedFeed(posts) {
     try {
-        localStorage.setItem('site_feed', JSON.stringify(posts));
+        localStorage.setItem('cfa_site_feed', JSON.stringify(posts));
     } catch (e) { }
 }
 
@@ -445,7 +449,7 @@ async function handleEditPost(postId) {
             document.getElementById('glaze-post-content').value = postData.content || '';
             
             const glazeModalTitle = document.getElementById('glaze-post-modal') ? document.getElementById('glaze-post-modal').querySelector('h3') : null;
-            if (glazeModalTitle) glazeModalTitle.textContent = 'Rediger glasur-innlegg';
+            if (glazeModalTitle) glazeModalTitle.textContent = 'Rediger prosjekt-innlegg';
             const glazePostSubmitBtn = document.getElementById('glaze-post-submit-button');
             if (glazePostSubmitBtn) glazePostSubmitBtn.textContent = 'Lagre endringer';
 
@@ -682,7 +686,7 @@ async function handleGlazePostSubmit(e) {
 
         if (editingGlazePostId) {
             await updateDoc(doc(db, feedCollectionPath, editingGlazePostId), postData);
-            showCustomAlert("Glasur-innlegget ble oppdatert!");
+            showCustomAlert("Prosjekt-innlegget ble oppdatert!");
         } else {
             postData.authorId = authState.user.uid;
             postData.authorName = authorName;
@@ -695,8 +699,8 @@ async function handleGlazePostSubmit(e) {
             const newPostRef = await addDoc(feedCollectionRef, postData);
             postId = newPostRef.id;
             
-            await notifyMentionedUsers(content, postId, `${feedCollectionPath}/${postId}`, `${authorName} publiserte en ny glasur-test`);
-            showCustomAlert("Glasur-innlegget ble publisert!");
+            await notifyMentionedUsers(content, postId, `${feedCollectionPath}/${postId}`, `${authorName} publiserte en prosjekt-oppdatering`);
+            showCustomAlert("Prosjekt-innlegget ble publisert!");
         }
 
         // Reset form
@@ -983,7 +987,7 @@ if (document.getElementById('feed-container')) {
                 if (glazePostForm) glazePostForm.reset();
                 
                 const glazeModalTitle = glazePostModal ? glazePostModal.querySelector('h3') : null;
-                if (glazeModalTitle) glazeModalTitle.textContent = 'Nytt glasur-innlegg';
+                if (glazeModalTitle) glazeModalTitle.textContent = 'Nytt prosjekt-innlegg';
                 const glazePostSubmitBtn = document.getElementById('glaze-post-submit-button');
                 if (glazePostSubmitBtn) glazePostSubmitBtn.textContent = 'Publiser';
                 

@@ -283,10 +283,10 @@ function initUI() {
     btnRetningslinjer = document.getElementById('btn-retningslinjer');
     btnVedtekter = document.getElementById('btn-vedtekter');
     documentsModalTitle = document.getElementById('documents-modal-title');
-    retningslinjerTabs = document.getElementById('retningslinjer-tabs');
-    tabFire = document.getElementById('tab-fire');
-    tabGlaze = document.getElementById('tab-glaze');
-    tabWorkshop = document.getElementById('tab-workshop');
+    
+    
+    
+    
     documentsListContainer = document.getElementById('documents-list-container');
     adminAddDocBtn = document.getElementById('admin-add-doc-btn');
     docEntryModal = document.getElementById('doc-entry-modal');
@@ -404,8 +404,6 @@ function attachEventListeners() {
     btnReferater?.addEventListener('click', () => openDocumentsModal('referater'));
     btnRetningslinjer?.addEventListener('click', () => openDocumentsModal('retningslinjer'));
     btnVedtekter?.addEventListener('click', () => openDocumentsModal('vedtekter'));
-
-    setupRetningslinjerTabs();
 
     adminAddDocBtn?.addEventListener('click', () => openDocEntryModal());
     closeDocEntryModalBtn?.addEventListener('click', closeDocEntryModal);
@@ -568,6 +566,25 @@ function attachEventListeners() {
 
 // Initialize Quill
 let quill;
+
+let postQuill;
+if (typeof Quill !== 'undefined' && document.getElementById('post-quill-editor')) {
+    postQuill = new Quill('#post-quill-editor', {
+        theme: 'snow',
+        placeholder: 'Skriv innholdet her...',
+        modules: {
+            toolbar: [
+                ['bold', 'italic', 'underline', 'strike'],
+                ['blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'header': [1, 2, 3, false] }],
+                ['link'],
+                ['clean']
+            ]
+        }
+    });
+}
+
 if (typeof Quill !== 'undefined' && docQuillEditor) {
     quill = new Quill('#doc-quill-editor', {
         theme: 'snow',
@@ -1720,8 +1737,8 @@ function updateUI(user, profile) {
             profileRoleText.textContent = 'Sekretær';
         } else if (authState.role === 'styremedlem') {
             profileRoleText.textContent = 'Styremedlem';
-        } else if (authState.role === 'glazeMaster') {
-            profileRoleText.textContent = 'Glasur/Brann';
+        } else if (authState.role === 'workshopManager') {
+            profileRoleText.textContent = 'Workshop-ansvarlig';
         } else {
             profileRoleText.textContent = 'Medlem';
         }
@@ -1793,8 +1810,8 @@ function updateUI(user, profile) {
         updateScrollLock();
 
         const isAdmin = authState.role === 'admin' || authState.role === 'sekretær' || authState.role === 'contributor';
-        const isGlazeMaster = authState.role === 'admin' || authState.role === 'glazeMaster';
-        const canPublish = isAdmin || isGlazeMaster;
+        const isWorkshopManager = authState.role === 'admin' || authState.role === 'workshopManager';
+        const canPublish = isAdmin || isWorkshopManager;
 
         // Oppdater tittel basert på rolle
         if (publishCardTitle) {
@@ -1804,9 +1821,9 @@ function updateUI(user, profile) {
         // Vis/skjul knapper basert på tilgang
         if (newPostBtn) newPostBtn.classList.toggle('hidden', !isAdmin);
         if (newEventBtn) newEventBtn.classList.toggle('hidden', !isAdmin);
-        if (newGlazePostBtn) newGlazePostBtn.classList.toggle('hidden', !isGlazeMaster);
+        if (newGlazePostBtn) newGlazePostBtn.classList.toggle('hidden', !isWorkshopManager);
         
-        const showSeparator = isAdmin || isGlazeMaster;
+        const showSeparator = isAdmin || isWorkshopManager;
         if (adminPublishSeparator) adminPublishSeparator.classList.toggle('hidden', !showSeparator);
     }
 
@@ -2994,7 +3011,7 @@ async function initiateSoftDelete(userId) {
 // --- DOCUMENTS LOGIC ---
 
 let currentDocCategory = 'referater';
-let currentRetningslinjeType = 'brann'; // Default sub-tab
+let currentRetningslinjeType = '3dprint'; // Default sub-tab
 
 function closeDocumentsModal() {
     toggleModal(documentsModal, false);
@@ -3018,7 +3035,7 @@ function openDocumentsModal(category = 'referater') {
     }
 
     // Reset UI based on category
-    if (retningslinjerTabs) retningslinjerTabs.classList.add('hidden');
+    
     if (documentsModalTitle) documentsModalTitle.textContent = 'Dokumenter';
 
     const headerControls = document.getElementById('documents-header-controls');
@@ -3043,7 +3060,7 @@ function openDocumentsModal(category = 'referater') {
         }
     } else if (category === 'retningslinjer') {
         if (documentsModalTitle) documentsModalTitle.textContent = 'Retningslinjer';
-        if (retningslinjerTabs) retningslinjerTabs.classList.remove('hidden');
+        
         if (adminAddDocBtn) adminAddDocBtn.innerText = '+ Rediger liste';
         if (headerControls) {
             headerControls.style.display = 'grid';
@@ -3051,8 +3068,8 @@ function openDocumentsModal(category = 'referater') {
         }
 
         // Reset to first tab if needed, or keep current
-        if (!currentRetningslinjeType) currentRetningslinjeType = 'brann';
-        updateRetningslinjerTabsUI();
+        if (!currentRetningslinjeType) currentRetningslinjeType = '3dprint';
+        
     }
 
     loadDocumentsList(category);
@@ -3061,7 +3078,7 @@ function openDocumentsModal(category = 'referater') {
 function updateRetningslinjerTabsUI() {
     [tabFire, tabGlaze, tabWorkshop].forEach(tab => {
         if (!tab) return;
-        if (tab.id === `tab-${currentRetningslinjeType === 'brann' ? 'fire' : currentRetningslinjeType === 'glasur' ? 'glaze' : 'workshop'}`) {
+        if (tab.id === `tab-${currentRetningslinjeType === '3dprint' ? 'fire' : currentRetningslinjeType === 'symaskin' ? 'glaze' : 'workshop'}`) {
             tab.classList.add('active');
         } else {
             tab.classList.remove('active');
@@ -3098,23 +3115,6 @@ function setupMembersTabs() {
     });
 }
 
-function setupRetningslinjerTabs() {
-    const tabs = [
-        { btn: tabFire, type: 'brann' },
-        { btn: tabGlaze, type: 'glasur' },
-        { btn: tabWorkshop, type: 'verksted' }
-    ];
-
-    tabs.forEach(t => {
-        if (t.btn) {
-            t.btn.addEventListener('click', () => {
-                currentRetningslinjeType = t.type;
-                updateRetningslinjerTabsUI();
-                loadDocumentsList('retningslinjer');
-            });
-        }
-    });
-}
 
 async function loadDocumentsList(category) {
     if (!documentsListContainer) return;
@@ -3465,22 +3465,7 @@ async function openDocEntryModal(id = null, data = null) {
             docEntryContentInput.value = data.content || '';
         }
         if (data.type) docEntryTypeInput.value = data.type;
-    } else if (!isRetningslinje) {
-        docEntryDateInput.value = new Date().toISOString().split('T')[0];
-    }
-
-    // Set default type if retningslinjer
-    if (isRetningslinje) {
-        docEntryTypeInput.value = currentRetningslinjeType;
-        if (docTypeDisplay) {
-            docTypeDisplay.innerText = currentRetningslinjeType;
-            docTypeDisplay.classList.remove('hidden');
-        }
-        if (docEntryTypeInput) docEntryTypeInput.classList.add('hidden');
-    } else {
-        if (docTypeDisplay) docTypeDisplay.classList.add('hidden');
-        if (docEntryTypeInput) docEntryTypeInput.classList.remove('hidden');
-    }
+    } else if (docEntryTypeGroup) docEntryTypeGroup.classList.add('hidden');
 
     if (id && !isRetningslinje) deleteDocEntryBtn.classList.remove('hidden');
     else deleteDocEntryBtn.classList.add('hidden');
@@ -3512,7 +3497,7 @@ async function handleDocEntrySubmit(e) {
     const id = docEntryIdInput.value;
     const category = docEntryCategoryInput.value;
     const isRetningslinje = category === 'retningslinjer';
-    const isReferatEllerVedtekt = category === 'referater' || category === 'vedtekter';
+    const isReferatEllerVedtekt = category === 'referater' || category === 'vedtekter' || category === 'retningslinjer';
 
     let points = [];
     if (isRetningslinje) {

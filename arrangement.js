@@ -19,6 +19,101 @@ import {
 } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
 // --- UI-ELEMENTER ---
+let eventQuill;
+document.addEventListener('DOMContentLoaded', () => {
+    if (typeof Quill !== 'undefined' && document.getElementById('event-quill-editor')) {
+        eventQuill = new Quill('#event-quill-editor', {
+            theme: 'snow',
+            placeholder: 'Beskrivelse av convention...',
+            modules: {
+                toolbar: [
+                    ['bold', 'italic', 'underline', 'strike'],
+                    ['blockquote'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'header': [1, 2, 3, false] }],
+                    ['link'],
+                    ['clean']
+                ]
+            }
+        });
+    }
+
+    // --- LOCATION AUTOCOMPLETE (Photon / OpenStreetMap) ---
+    const locationInput = document.getElementById('event-location');
+    const autocompleteResults = document.getElementById('location-autocomplete-results');
+    
+    if (locationInput && autocompleteResults) {
+        let debounceTimer;
+        
+        locationInput.addEventListener('input', (e) => {
+            clearTimeout(debounceTimer);
+            const query = e.target.value.trim();
+            
+            if (query.length < 3) {
+                autocompleteResults.innerHTML = '';
+                autocompleteResults.classList.add('hidden');
+                return;
+            }
+            
+            debounceTimer = setTimeout(async () => {
+                try {
+                    const response = await fetch(`https://photon.komoot.io/api/?q=${encodeURIComponent(query)}&lang=no&limit=5`);
+                    if (!response.ok) throw new Error('Network response was not ok');
+                    const data = await response.json();
+                    
+                    autocompleteResults.innerHTML = '';
+                    
+                    if (data.features && data.features.length > 0) {
+                        data.features.forEach(feature => {
+                            const props = feature.properties;
+                            // Bygg adresse-streng
+                            const name = props.name || '';
+                            const street = props.street ? `${props.street} ${props.housenumber || ''}`.trim() : '';
+                            const city = props.city || props.town || props.village || '';
+                            const postcode = props.postcode || '';
+                            
+                            let displayText = name;
+                            if (street && name !== street) displayText += `, ${street}`;
+                            if (postcode || city) displayText += `, ${postcode} ${city}`.trim();
+                            
+                            const div = document.createElement('div');
+                            div.className = 'autocomplete-item';
+                            div.style.padding = '0.5rem 1rem';
+                            div.style.cursor = 'pointer';
+                            div.style.borderBottom = '1px solid var(--color-border)';
+                            div.innerText = displayText;
+                            
+                            div.addEventListener('mouseenter', () => div.style.backgroundColor = 'var(--color-bg-body)');
+                            div.addEventListener('mouseleave', () => div.style.backgroundColor = 'transparent');
+                            
+                            div.addEventListener('click', () => {
+                                locationInput.value = displayText;
+                                autocompleteResults.innerHTML = '';
+                                autocompleteResults.classList.add('hidden');
+                            });
+                            
+                            autocompleteResults.appendChild(div);
+                        });
+                        autocompleteResults.classList.remove('hidden');
+                    } else {
+                        autocompleteResults.classList.add('hidden');
+                    }
+                } catch (error) {
+                    console.error('Error fetching location autocomplete:', error);
+                    autocompleteResults.classList.add('hidden');
+                }
+            }, 300);
+        });
+        
+        // Lukk autocomplete ved klikk utenfor
+        document.addEventListener('click', (e) => {
+            if (!locationInput.contains(e.target) && !autocompleteResults.contains(e.target)) {
+                autocompleteResults.classList.add('hidden');
+            }
+        });
+    }
+
+});
 const postsSection = document.getElementById('posts-section');
 const eventsSection = document.getElementById('events-section');
 const tabPosts = document.getElementById('tab-posts');
@@ -66,21 +161,30 @@ function switchTab(tab) {
 }
 
 // --- HJELPEFUNKSJONER ---
-function formatDate(timestamp) {
-    if (!timestamp) return 'Ingen dato';
+function formatDate(timestamp, endTimestamp = null) {
+    if (!timestamp) return '';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleString('nb-NO', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+    let dateString = date.toLocaleString('nb-NO', options);
+    
+    if (endTimestamp) {
+        const endDate = endTimestamp.toDate ? endTimestamp.toDate() : new Date(endTimestamp);
+        if (date.getFullYear() === endDate.getFullYear() && date.getMonth() === endDate.getMonth() && date.getDate() === endDate.getDate()) {
+            const endOptions = { hour: '2-digit', minute: '2-digit' };
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', endOptions);
+        } else {
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', options);
+        }
+    }
+    return dateString;
 }
 
 function sanitizeHTML(str) {
     if (!str) return '';
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(str);
+    }
+    // Fallback
     return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -151,6 +255,7 @@ async function handleEditEvent(eventId) {
         // Fyll ut skjemaet
         document.getElementById('event-title').value = eventData.title || '';
         document.getElementById('event-description').value = eventData.description || '';
+            if (eventQuill) eventQuill.root.innerHTML = eventData.description || '';
         document.getElementById('event-location').value = eventData.location || '';
         document.getElementById('event-visibility').value = eventData.visibility || 'internal';
         const allowRegistrationCheckbox = document.getElementById('event-allow-registration');
@@ -167,6 +272,18 @@ async function handleEditEvent(eventId) {
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             document.getElementById('event-date').value = `${year}-${month}-${day}T${hours}:${minutes}`;
+            if (eventData.endDate) {
+                const eDate = eventData.endDate.toDate();
+                const eYear = eDate.getFullYear();
+                const eMonth = String(eDate.getMonth() + 1).padStart(2, '0');
+                const eDay = String(eDate.getDate()).padStart(2, '0');
+                const eHours = String(eDate.getHours()).padStart(2, '0');
+                const eMinutes = String(eDate.getMinutes()).padStart(2, '0');
+                document.getElementById('event-end-date').value = `${eYear}-${eMonth}-${eDay}T${eHours}:${eMinutes}`;
+            } else {
+                document.getElementById('event-end-date').value = '';
+            }
+
         }
 
         const modalTitle = document.getElementById('event-modal')?.querySelector('h3');
@@ -211,8 +328,9 @@ async function handleEventSubmit(e) {
     }
 
     const title = document.getElementById('event-title').value;
-    const description = document.getElementById('event-description').value;
+    const description = eventQuill ? eventQuill.root.innerHTML.trim() : document.getElementById('event-description').value;
     const dateVal = document.getElementById('event-date').value;
+    const endDateVal = document.getElementById('event-end-date').value;
     const location = document.getElementById('event-location').value;
     const visibility = document.getElementById('event-visibility').value;
     const allowRegistration = document.getElementById('event-allow-registration').checked;
@@ -244,6 +362,7 @@ async function handleEventSubmit(e) {
             title,
             description,
             date: Timestamp.fromDate(new Date(dateVal)),
+            ...(endDateVal ? { endDate: Timestamp.fromDate(new Date(endDateVal)) } : {}),
             location: location || 'Ikke oppgitt',
             visibility: visibility || 'internal',
             allowRegistration: allowRegistration,
@@ -343,7 +462,7 @@ function renderUpcomingEvents(events) {
                 <div class="event-meta">
                     <div class="event-meta-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M19 4H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V6c0-1.1-.9-2-2-2zM16 2v4M8 2v4M3 10h18" /></svg>
-                        <span>${formatDate(event.date)}</span>
+                        <span>${formatDate(event.date, event.endDate)}</span>
                     </div>
                     <div class="event-meta-item">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z" /><circle cx="12" cy="10" r="3" /></svg>
@@ -400,7 +519,7 @@ function renderPastEvents(events) {
             <img src="${event.imageUrl || 'https://via.placeholder.com/60'}" class="past-event-img" alt="${event.title}">
             <div class="past-event-info">
                 <h4>${sanitizeHTML(event.title)}</h4>
-                <p>${formatDate(event.date)}</p>
+                <p>${formatDate(event.date, event.endDate)}</p>
             </div>
             ${authState.role === 'admin' ? `
                 <button class="btn btn-ghost text-sm delete-event-btn" data-id="${event.id}">🗑️</button>

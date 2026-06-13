@@ -11,21 +11,30 @@ import { getAllCachedUsers } from './script.js';
 const arrangementsPath = `/artifacts/${appId}/public/data/arrangements`;
 const eventsContainer = document.getElementById('hva-skjer-events-container');
 
-function formatDate(timestamp) {
-    if (!timestamp) return 'Ingen dato';
+function formatDate(timestamp, endTimestamp = null) {
+    if (!timestamp) return '';
     const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    return date.toLocaleString('nb-NO', {
-        weekday: 'long',
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric',
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
+    let dateString = date.toLocaleString('nb-NO', options);
+    
+    if (endTimestamp) {
+        const endDate = endTimestamp.toDate ? endTimestamp.toDate() : new Date(endTimestamp);
+        if (date.getFullYear() === endDate.getFullYear() && date.getMonth() === endDate.getMonth() && date.getDate() === endDate.getDate()) {
+            const endOptions = { hour: '2-digit', minute: '2-digit' };
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', endOptions);
+        } else {
+            dateString += ' - ' + endDate.toLocaleString('nb-NO', options);
+        }
+    }
+    return dateString;
 }
 
 function sanitizeHTML(str) {
     if (!str) return '';
+    if (typeof DOMPurify !== 'undefined') {
+        return DOMPurify.sanitize(str);
+    }
+    // Fallback
     return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
 }
 
@@ -89,7 +98,7 @@ function renderEvents(events) {
             <div class="kurs-liste-item-text">
                 <h2>${sanitizeHTML(event.title)}</h2>
                 <p class="text-lg" style="color: var(--color-primary); font-weight: 500;">
-                    📅 ${formatDate(event.date)}<br>
+                    📅 ${formatDate(event.date, event.endDate)}<br>
                     📍 ${sanitizeHTML(event.location)}
                 </p>
                 <div class="text-lg" style="margin-bottom: 1.5rem; word-break: break-word;">

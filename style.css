@@ -12,38 +12,32 @@
   --font-display: 'Playfair Display', serif;
 
   /* --- Ny Fargepalett --- */
-  --palette-autumn-ember: #b45309;
-  /* Primær */
-  --palette-burnt-caramel: #bd6829;
-  /* Hover/Valgt */
-  --palette-shadow-grey: #292524;
-  /* Mørkest */
-  --palette-gunmetal: #3f3f46;
-  /* Sekundær mørk */
-  --palette-white: #fefefe;
-  /* Lysest */
+  --palette-deep-maroon: #7E1C38;
+  --palette-pastel-pink: #FFCDD2;
+  --palette-charcoal-grey: #3C3C40;
+  --palette-cream-ivory: #FFF1E1;
+  --palette-pure-white: #FFFFFF;
 
   /* --- Funksjonelle Variabler --- */
-  --color-primary: var(--palette-autumn-ember);
-  --color-primary-hover: var(--palette-burnt-caramel);
+  --color-primary: var(--palette-deep-maroon);
+  --color-primary-hover: var(--palette-pastel-pink);
 
-  --color-bg-page: var(--palette-white);
-  --color-bg-card: #ffffff;
-  --color-bg-section: #f5f5f4;
-  /* stone-100 */
-  --color-bg-white: var(--palette-white);
-  --color-bg-header: rgba(255, 255, 255, 0.9);
-  --color-bg-footer: var(--palette-shadow-grey);
+  --color-bg-page: var(--palette-cream-ivory);
+  --color-bg-card: var(--palette-pure-white);
+  --color-bg-section: #FFF9F2;
+  /* Light ivory */
+  --color-bg-white: var(--palette-pure-white);
+  --color-bg-header: rgba(255, 241, 225, 0.9);
+  --color-bg-footer: var(--palette-charcoal-grey);
 
-  --color-text-main: var(--palette-shadow-grey);
-  --color-text-muted: #57534e;
-  /* stone-600 */
-  --color-text-inverse: var(--palette-white);
-  --color-text-base: #1c1917;
-  --color-text-footer: #d6d3d1;
-  /* stone-300 */
+  --color-text-main: var(--palette-charcoal-grey);
+  --color-text-muted: #5A5A5E;
+  /* Lighter charcoal */
+  --color-text-inverse: var(--palette-pure-white);
+  --color-text-base: var(--palette-charcoal-grey);
+  --color-text-footer: var(--palette-cream-ivory);
 
-  --color-border: #d6d3d1;
+  --color-border: #E8D9CC;
   --color-error: #dc2626;
 
   /* Annet */
@@ -61,25 +55,25 @@
 
 /* --- Dark Mode Overrides --- */
 [data-theme="dark"] {
-  --color-bg-page: var(--palette-shadow-grey);
-  --color-bg-card: var(--palette-gunmetal);
-  --color-bg-section: #27272a;
+  --color-bg-page: var(--palette-charcoal-grey);
+  --color-bg-card: #2B2B2E; /* Darker charcoal for cards */
+  --color-bg-section: #323236; /* Medium charcoal */
   /* zinc-800 */
-  --color-bg-header: rgba(41, 37, 36, 0.9);
+  --color-bg-header: rgba(60, 60, 64, 0.9);
 
-  --color-text-main: var(--palette-white);
-  --color-text-muted: #a1a1aa;
+  --color-text-main: var(--palette-cream-ivory);
+  --color-text-muted: #FFCDD2; /* Pastel pink for muted text? Or lighter grey. Let's use light greyish pink */
   /* zinc-400 */
-  --color-text-inverse: var(--palette-white);
+  --color-text-inverse: var(--palette-charcoal-grey);
 
-  --color-border: #52525b;
+  --color-border: #4D4D52;
   /* zinc-600 - Increased contrast */
-  --color-bg-white: var(--palette-shadow-grey);
+  --color-bg-white: var(--palette-charcoal-grey);
   /* Changed to match page bg so cards stand out */
 
-  --color-bg-input: #18181b;
+  --color-bg-input: #1F1F22;
   /* zinc-900 - Darker background for inputs in dark mode */
-  --color-bg-footer: #171717;
+  --color-bg-footer: #1F1F22;
   /* Darker than page bg (#292524) */
 }
 

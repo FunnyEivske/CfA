@@ -12,17 +12,16 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="theme-switcher.js"></script>
     <link rel="icon" type="image/png" href="Media/Logo/Sort.png">
-</head>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+    </head>
 
 <body>
 
     <!-- Header -->
     <header class="header">
         <div class="container header-inner">
-            <a href="index.html" class="logo">
-                <img src="Media/Logo/Sort.png" alt="Cosplay for alle Logo" class="logo-light-only">
-                <img src="Media/Logo/Hvit.png" alt="Cosplay for alle Logo" class="logo-dark-only hidden">
-                <span>CfA</span>
+            <a href="index.html" class="logo" style="text-decoration: none;">
+                <h2 style="margin: 0; color: var(--color-primary); font-size: 1.5rem; font-weight: bold;">Cosplay for alle</h2>
             </a>
 
             <nav class="nav-desktop">
@@ -139,7 +138,7 @@
 
                 <div id="admin-publish-card" class="card hidden">
                     <div class="card-header">
-                        <h4 id="publish-card-title" class="text-lg">Nytt innlegg/arrangement</h4>
+                        <h4 id="publish-card-title" class="text-lg">Nytt innlegg / convention</h4>
                     </div>
                     <div class="card-body">
                         <button id="new-post-btn" class="btn btn-primary btn-full text-sm mb-2">
@@ -154,16 +153,9 @@
                                 stroke-width="2">
                                 <path d="M12 5v14M5 12h14" />
                             </svg>
-                            Nytt arrangement
+                            Ny convention
                         </button>
-                        <!-- Glaze Post Button -->
-                        <button id="new-glaze-post-btn" class="btn btn-accent btn-full text-sm mb-2">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M12 5v14M5 12h14" />
-                            </svg>
-                            Nytt glasur-innlegg
-                        </button>
+                        
                         <hr id="admin-publish-separator" class="hidden"
                             style="margin: 1rem 0; border: 0; border-top: 1px solid var(--color-border);">
                         <!-- Referater Button -->
@@ -203,15 +195,13 @@
                 <!-- Info-kort -->
                 <div class="card">
                     <div class="card-header">
-                        <h4 class="text-lg">Verkstedstatus</h4>
+                        <h4 class="text-lg">Workshop-status</h4>
                     </div>
                     <div class="card-body">
                         <div class="mb-4">
-                            <p id="workshop-custom-status" class="text-sm font-semibold text-primary mb-2"></p>
-                            <p class="text-sm font-medium">Åpningstider denne uken:</p>
+                            <p id="workshop-status-text" class="text-sm font-semibold text-primary mb-2"></p>
+                            <p class="text-sm font-medium">Laster åpningstider og status...</p>
                             <div id="workshop-hours-display" class="text-sm text-muted">
-                                <!-- Dynamisk innhold -->
-                                <p>Man-Fre: 10-20<br>Lør-Søn: 12-18</p>
                             </div>
                         </div>
                     </div>
@@ -221,10 +211,9 @@
             <div class="dashboard-main">
                 <div class="card mb-6">
                     <div class="card-body" style="padding: 0.75rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
                             <button id="tab-posts" class="btn btn-primary text-sm">Innlegg</button>
-                            <button id="tab-events" class="btn btn-secondary text-sm">Arrangementer</button>
-                            <button id="tab-glaze" class="btn btn-secondary text-sm">Glasur gruppe</button>
+                            <button id="tab-events" class="btn btn-secondary text-sm">Kommende Conventions</button>
                         </div>
                     </div>
                 </div>
@@ -250,14 +239,14 @@
                 <section id="events-section" class="hidden">
                     <div id="upcoming-events-container"
                         style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
-                        <div class="text-center py-10 text-muted">Laster arrangementer...</div>
+                        <div class="text-center py-10 text-muted">Laster conventions...</div>
                     </div>
 
                     <!-- Past Events (Archived) -->
                     <div id="past-events-wrapper" class="mt-10">
                         <button id="toggle-past-events" class="btn btn-ghost text-sm mb-4"
                             style="width: 100%; justify-content: space-between;">
-                            <span>Tidligere arrangementer</span>
+                            <span>Tidligere conventions</span>
                             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                 stroke-width="2">
                                 <path d="M19 9l-7 7-7-7" />
@@ -265,18 +254,12 @@
                         </button>
                         <div id="past-events-container" class="hidden"
                             style="display: flex; flex-direction: column; gap: 1rem; opacity: 0.7;">
-                            <!-- Tidligere arrangementer her -->
+                            <!-- Tidligere conventions her -->
                         </div>
                     </div>
                 </section>
 
-                <!-- Glasur Gruppe Section -->
-                <section id="glaze-section" class="hidden">
-                    <div id="glaze-feed-container"
-                        style="display: flex; flex-direction: column; gap: 1.5rem;">
-                        <div id="glaze-feed-loading" class="text-center py-10 text-muted">Laster glasur-gruppe...</div>
-                    </div>
-                </section>
+                
 
             </div>
             <aside class="dashboard-sidebar-right">
@@ -368,7 +351,7 @@
     <!-- Upload/Manage Gallery Modal -->
     <div id="upload-modal" class="hidden modal-container">
         <div id="upload-modal-overlay" class="modal-overlay"></div>
-        <div class="card modal-content maxWidth-800" style="height: 80vh;">
+        <div class="card modal-content maxWidth-800" style="max-height: 90vh; display: flex; flex-direction: column;">
             <div class="card-header">
                 <h3>Administrer bilder</h3>
             </div>
@@ -685,7 +668,10 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Innhold</label>
-                        <textarea id="post-content" class="form-input" style="min-height: 150px;" required></textarea>
+                        <div id="post-quill-container" class="mb-4">
+                            <div id="post-quill-editor" style="min-height: 150px; background: var(--color-bg-body); border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md);"></div>
+                            <textarea id="post-content" class="hidden"></textarea>
+                        </div>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Legg til bilde (Valgfritt)</label>
@@ -795,17 +781,29 @@
                     </div>
                     <div class="form-group">
                         <label class="form-label">Beskrivelse</label>
-                        <textarea id="event-description" class="form-input" style="min-height: 100px;"
-                            required></textarea>
+                        <div id="event-quill-container" class="mb-4">
+                            <div id="event-quill-editor" style="min-height: 150px; background: var(--color-bg-body); border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md);"></div>
+                            <textarea id="event-description" class="hidden"></textarea>
+                        </div>
                     </div>
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                    <div style="display: grid; grid-template-columns: 2fr 1fr; gap: 1rem;">
                         <div class="form-group">
                             <label class="form-label">Dato og tid</label>
-                            <input type="datetime-local" id="event-date" class="form-input" required>
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 1rem;">
+                                <div>
+                                    <label class="text-xs text-muted" style="display: block; margin-bottom: 0.25rem;">Startdato *</label>
+                                    <input type="datetime-local" id="event-date" class="form-input" required>
+                                </div>
+                                <div>
+                                    <label class="text-xs text-muted" style="display: block; margin-bottom: 0.25rem;">Sluttdato (Valgfritt)</label>
+                                    <input type="datetime-local" id="event-end-date" class="form-input">
+                                </div>
+                            </div>
                         </div>
-                        <div class="form-group">
+                        <div class="form-group" style="position: relative;">
                             <label class="form-label">Sted (Valgfritt)</label>
-                            <input type="text" id="event-location" class="form-input" placeholder="f.eks. Verkstedet">
+                            <input type="text" id="event-location" class="form-input" placeholder="f.eks. Oslo Konserthus eller Verkstedet" autocomplete="off">
+                            <div id="location-autocomplete-results" class="hidden" style="position: absolute; top: 100%; left: 0; right: 0; background: var(--color-bg-surface); border: 1px solid var(--color-border); border-radius: var(--radius-md); box-shadow: var(--shadow-lg); z-index: 50; max-height: 200px; overflow-y: auto; margin-top: 0.25rem;"></div>
                         </div>
                     </div>
                     <div class="form-group">
@@ -891,12 +889,7 @@
                     <div></div>
 
                     <!-- Center: Retningslinjer Sub-tabs -->
-                    <div id="retningslinjer-tabs" class="hidden"
-                        style="display: flex; gap: 0.5rem; justify-content: center;">
-                        <button id="tab-fire" class="tab-btn active">Brann</button>
-                        <button id="tab-glaze" class="tab-btn">Glasur</button>
-                        <button id="tab-workshop" class="tab-btn">Verksted</button>
-                    </div>
+                    
 
                     <!-- Right: Add Button -->
                     <div style="display: flex; justify-content: flex-end;">
@@ -939,16 +932,7 @@
                         <label class="form-label">Dato</label>
                         <input type="date" id="doc-entry-date" class="form-input" required>
                     </div>
-                    <div id="doc-entry-type-group" class="form-group hidden">
-                        <label class="form-label">Type retningslinje</label>
-                        <p id="doc-type-display" class="font-semibold text-primary"
-                            style="text-transform: capitalize; margin-bottom: 0.5rem;"></p>
-                        <select id="doc-entry-type" class="form-input hidden">
-                            <option value="verksted">Verksted</option>
-                            <option value="glasur">Glasur</option>
-                            <option value="brann">Brann</option>
-                        </select>
-                    </div>
+                    
                     <div class="form-group" id="doc-content-group">
                         <label class="form-label" id="doc-content-label">Innhold</label>
                         <p class="text-xs text-muted mb-2" id="doc-content-hint">Tips: Hver linje blir et eget punkt i
