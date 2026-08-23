@@ -1,0 +1,17 @@
+{
+  "welcome_title": "Welcome to Cosplay for All",
+  "welcome_subtitle": "We are a cosplay organization helping you create fun costumes, props, and much more!",
+  "nav_home": "Home",
+  "nav_events": "Conventions",
+  "nav_gallery": "Gallery",
+  "nav_about": "About Us",
+  "nav_contact": "Contact",
+  "nav_member": "Join Us",
+  "nav_member_page": "My Page",
+  "nav_login": "Log in",
+  "nav_logout": "Log out",
+  "btn_read_more": "Read more about us",
+  "no_posts": "No updates posted yet.",
+  "no_events": "No upcoming events at the moment.",
+  "no_images": "No images in the gallery yet."
+}

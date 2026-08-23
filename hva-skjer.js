@@ -1,121 +1,49 @@
-import { db, appId } from './firebase.js';
-import {
-    collection,
-    onSnapshot,
-    query,
-    where
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-import { parseMentionsForDisplay } from './tagging.js';
-import { getAllCachedUsers } from './script.js';
+import { EventAPI } from './api-client.js';
 
-const arrangementsPath = `/artifacts/${appId}/public/data/arrangements`;
-const eventsContainer = document.getElementById('hva-skjer-events-container');
-
-function formatDate(timestamp, endTimestamp = null) {
-    if (!timestamp) return '';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-    let dateString = date.toLocaleString('nb-NO', options);
-    
-    if (endTimestamp) {
-        const endDate = endTimestamp.toDate ? endTimestamp.toDate() : new Date(endTimestamp);
-        if (date.getFullYear() === endDate.getFullYear() && date.getMonth() === endDate.getMonth() && date.getDate() === endDate.getDate()) {
-            const endOptions = { hour: '2-digit', minute: '2-digit' };
-            dateString += ' - ' + endDate.toLocaleString('nb-NO', endOptions);
-        } else {
-            dateString += ' - ' + endDate.toLocaleString('nb-NO', options);
-        }
-    }
-    return dateString;
-}
-
-function sanitizeHTML(str) {
-    if (!str) return '';
-    if (typeof DOMPurify !== 'undefined') {
-        return DOMPurify.sanitize(str);
-    }
-    // Fallback
-    return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function setupPublicEventsListener() {
+export async function loadEventsPage() {
+    const eventsContainer = document.getElementById('hva-skjer-events-container');
     if (!eventsContainer) return;
 
-    const eventsRef = collection(db, arrangementsPath);
-    // Vi gjør filtrering på 'visibility' manuelt på klientsiden for å unngå 
-    // behov for compound index (som tar tid å generere).
-    const q = query(eventsRef, where("visibility", "==", "public"));
+    try {
+        const data = await EventAPI.getEvents();
+        eventsContainer.innerHTML = '';
 
-    onSnapshot(q, (snapshot) => {
-        const upcoming = [];
-        const now = new Date();
-        const todayStart = new Date(now);
-        todayStart.setHours(0, 0, 0, 0);
+        if (!data.events || data.events.length === 0) {
+            eventsContainer.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">Ingen kommende arrangementer for øyeblikket.</p>';
+            return;
+        }
 
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            const eventDate = data.date.toDate();
-            const event = { id: docSnap.id, ...data };
+        data.events.forEach(event => {
+            const card = document.createElement('article');
+            card.className = 'kurs-liste-item';
 
-            if (eventDate >= todayStart) {
-                upcoming.push(event);
-            }
-        });
+            const imageUrl = event.image_url || '';
+            const dateStr = new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
 
-        upcoming.sort((a, b) => a.date.toDate() - b.date.toDate());
-
-        renderEvents(upcoming);
-    }, (error) => {
-        console.error("Feil ved henting av arrangementer:", error);
-        eventsContainer.innerHTML = '<p class="text-center text-error" style="grid-column: 1/-1;">Kunne ikke laste arrangementer for øyeblikket.</p>';
-    });
-}
-
-function renderEvents(events) {
-    eventsContainer.innerHTML = '';
-    
-    if (events.length === 0) {
-        eventsContainer.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">Ingen kommende arrangementer for øyeblikket.</p>';
-        return;
-    }
-
-    events.forEach(event => {
-        const card = document.createElement('article');
-        card.className = 'kurs-liste-item';
-        
-        const imageUrl = event.imageUrl || '';
-        const hasImage = imageUrl.trim() !== '';
-        
-        // Use parseMentionsForDisplay on the description, replace newlines with <br>
-        const descriptionHtml = parseMentionsForDisplay(sanitizeHTML(event.description || '').replace(/\n/g, '<br>'), getAllCachedUsers()).html;
-
-        const imageHtml = hasImage 
-            ? `<div class="kurs-liste-item-image-container"><img src="${imageUrl}" alt="${sanitizeHTML(event.title)}" class="kurs-liste-item-image" style="object-position: 50% ${event.imageOffset || 0}%;"></div>` 
-            : `<div class="kurs-liste-item-image-container"><div class="kurs-liste-item-image" style="background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Intet bilde</span></div></div>`;
-
-        card.innerHTML = `
-            ${imageHtml}
-            <div class="kurs-liste-item-text">
-                <h2>${sanitizeHTML(event.title)}</h2>
-                <p class="text-lg" style="color: var(--color-primary); font-weight: 500;">
-                    📅 ${formatDate(event.date, event.endDate)}<br>
-                    📍 ${sanitizeHTML(event.location)}
-                </p>
-                <div class="text-lg" style="margin-bottom: 1.5rem; word-break: break-word;">
-                    ${descriptionHtml}
+            card.innerHTML = `
+                <div class="kurs-liste-item-image-container">
+                    ${imageUrl 
+                        ? `<img src="${imageUrl}" alt="${event.title}" class="kurs-liste-item-image">`
+                        : `<div class="kurs-liste-item-image" style="background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Intet bilde</span></div>`
+                    }
                 </div>
-                <!-- Viser evt. antall påmeldte e.l. her om ønskelig i fremtiden -->
-                <!-- <ul><li>...</li></ul> -->
-                
-                ${event.allowRegistration !== false ? `
-                <a href="kontakt.html" class="button button-secondary" style="margin-top: 1.5rem;">Ta kontakt for påmelding</a>
-                ` : ''}
-            </div>
-        `;
-        eventsContainer.appendChild(card);
-    });
+                <div class="kurs-liste-item-text">
+                    <h2>${event.title}</h2>
+                    <p class="text-lg" style="color: var(--color-primary); font-weight: 500;">
+                        📅 ${dateStr}<br>
+                        📍 ${event.location || ''}
+                    </p>
+                    <div class="text-lg" style="margin-bottom: 1.5rem; word-break: break-word;">
+                        ${event.description || ''}
+                    </div>
+                </div>
+            `;
+            eventsContainer.appendChild(card);
+        });
+    } catch (err) {
+        console.error("Feil ved henting av arrangementer:", err);
+        eventsContainer.innerHTML = '<p class="text-center text-error" style="grid-column: 1/-1;">Kunne ikke laste arrangementer.</p>';
+    }
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupPublicEventsListener();
-});
+document.addEventListener('DOMContentLoaded', loadEventsPage);

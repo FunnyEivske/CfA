@@ -8,10 +8,9 @@
     <!-- Felles stilark -->
     <link rel="stylesheet" href="style.css">
     <!-- Tema-veksler (Laster tidlig for å unngå flash) -->
-    <script src="theme-switcher.js"></script>
-    <link rel="icon" type="image/png" href="https://picsum.photos/seed/cfa13/32/32">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-    </head>
+    <script type="module" src="i18n.js"></script>
+    <script type="module" src="script.js"></script>
+</head>
 
 <body>
 
@@ -26,13 +25,14 @@
 
             <!-- Desktop-meny -->
             <div class="nav-menu-desktop">
-                <a href="om-oss.html" class="nav-link">Om oss</a>
-                <a href="hva-skjer.html" class="nav-link">Conventions</a>
-                <a href="galleri.html" class="nav-link">Galleri</a>
-                <a href="kontakt.html" class="nav-link">Kontakt</a>
-                <a id="member-link" href="medlem.html" class="nav-link-active hidden">Min side</a>
-                <a id="login-link" href="login.html" class="button button-primary">Logg inn</a>
-                <button id="logout-button" class="button button-secondary hidden">Logg ut</button>
+                <a href="om-oss.html" class="nav-link" data-i18n="nav_about">Om oss</a>
+                <a href="hva-skjer.html" class="nav-link" data-i18n="nav_events">Conventions</a>
+                <a href="galleri.html" class="nav-link" data-i18n="nav_gallery">Galleri</a>
+                <a href="kontakt.html" class="nav-link" data-i18n="nav_contact">Kontakt</a>
+                <a id="member-link" href="medlem.html" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
+                <a id="login-link" href="login.html" class="button button-primary" data-i18n="nav_login">Logg inn</a>
+                <button id="logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
+                <button id="lang-toggle-btn" class="button button-ghost" style="padding: 0.4rem 0.8rem; cursor: pointer;">🌐 NO / EN</button>
 
             </div>
 
@@ -220,7 +220,7 @@
         </div>
     </div>
 
-    <script type="module" src="firebase.js"></script>
+    <script type="module" src="i18n.js"></script>
     <script type="module" src="script.js"></script>
     <script type="module" src="public-gallery.js"></script>
     <script type="module" src="index-events.js"></script>

@@ -1,107 +1,48 @@
-import { db, appId } from './firebase.js';
-import {
-    collection,
-    onSnapshot,
-    query,
-    where
-} from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+import { EventAPI } from './api-client.js';
 
-const arrangementsPath = `/artifacts/${appId}/public/data/arrangements`;
-const eventsContainer = document.getElementById('public-events-container');
-
-function formatDate(timestamp, endTimestamp = null) {
-    if (!timestamp) return '';
-    const date = timestamp.toDate ? timestamp.toDate() : new Date(timestamp);
-    const options = { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' };
-    let dateString = date.toLocaleString('nb-NO', options);
-    
-    if (endTimestamp) {
-        const endDate = endTimestamp.toDate ? endTimestamp.toDate() : new Date(endTimestamp);
-        if (date.getFullYear() === endDate.getFullYear() && date.getMonth() === endDate.getMonth() && date.getDate() === endDate.getDate()) {
-            const endOptions = { hour: '2-digit', minute: '2-digit' };
-            dateString += ' - ' + endDate.toLocaleString('nb-NO', endOptions);
-        } else {
-            dateString += ' - ' + endDate.toLocaleString('nb-NO', options);
-        }
-    }
-    return dateString;
-}
-
-function sanitizeHTML(str) {
-    if (!str) return '';
-    if (typeof DOMPurify !== 'undefined') {
-        return DOMPurify.sanitize(str);
-    }
-    // Fallback
-    return str.replace(/</g, '&lt;').replace(/>/g, '&gt;');
-}
-
-function setupPublicEventsListener() {
+export async function loadPublicEvents() {
+    const eventsContainer = document.getElementById('public-events-container');
     if (!eventsContainer) return;
 
-    const eventsRef = collection(db, arrangementsPath);
-    // Kombinert spørring krever ofte index i Firestore, siden vi både filtrerer og sorterer
-    // For å unngå compund index feil frem til indeksen er generert, gjør vi filtreringen etter "visibility" manuelt på klientsiden i stedet.
-    const q = query(eventsRef, where("visibility", "==", "public"));
+    try {
+        const data = await EventAPI.getEvents();
+        eventsContainer.innerHTML = '';
 
-    onSnapshot(q, (snapshot) => {
-        const upcoming = [];
-        const now = new Date();
-        const todayStart = new Date(now);
-        todayStart.setHours(0, 0, 0, 0);
+        if (!data.events || data.events.length === 0) {
+            eventsContainer.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;" data-i18n="no_events">Ingen kommende arrangementer for øyeblikket.</p>';
+            return;
+        }
 
-        snapshot.forEach(docSnap => {
-            const data = docSnap.data();
-            const eventDate = data.date.toDate();
-            const event = { id: docSnap.id, ...data };
+        data.events.forEach(event => {
+            const card = document.createElement('a');
+            card.href = 'hva-skjer.html';
+            card.className = 'kurs-card';
 
-            if (eventDate >= todayStart) {
-                upcoming.push(event);
-            }
+            const imageUrl = event.image_url || '';
+            const dateStr = new Date(event.date).toLocaleDateString('nb-NO', { day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit' });
+
+            card.innerHTML = `
+                ${imageUrl 
+                    ? `<img src="${imageUrl}" alt="${event.title}" class="kurs-card-image">`
+                    : `<div class="kurs-card-image" style="background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Bilde mangler</span></div>`
+                }
+                <div class="kurs-card-content">
+                    <h3>${event.title}</h3>
+                    <p style="font-size: 0.9rem; color: var(--color-primary); font-weight: 500; margin-bottom: 0.5rem;">
+                        📅 ${dateStr}<br>
+                        📍 ${event.location || ''}
+                    </p>
+                    <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
+                        ${event.description || ''}
+                    </p>
+                </div>
+            `;
+            eventsContainer.appendChild(card);
         });
-
-        upcoming.sort((a, b) => a.date.toDate() - b.date.toDate());
-
-        renderEvents(upcoming);
-    }, (error) => {
-        console.error("Feil ved henting av arrangementer:", error);
-        eventsContainer.innerHTML = '<p class="text-center text-error" style="grid-column: 1/-1;">Kunne ikke laste arrangementer for øyeblikket.</p>';
-    });
-}
-
-function renderEvents(events) {
-    eventsContainer.innerHTML = '';
-    
-    if (events.length === 0) {
-        eventsContainer.innerHTML = '<p class="text-center text-muted" style="grid-column: 1/-1;">Ingen kommende arrangementer for øyeblikket.</p>';
-        return;
+    } catch (err) {
+        console.error("Feil ved henting av arrangementer:", err);
+        eventsContainer.innerHTML = '<p class="text-center text-error" style="grid-column: 1/-1;">Kunne ikke laste arrangementer.</p>';
     }
-
-    events.forEach(event => {
-        const card = document.createElement('a');
-        card.href = 'hva-skjer.html';
-        card.className = 'kurs-card'; // Gjenbruker eksisterende styling
-        
-        const imageUrl = event.imageUrl || '';
-        const hasImage = imageUrl.trim() !== '';
-        
-        card.innerHTML = `
-            ${hasImage ? `<img src="${imageUrl}" alt="${sanitizeHTML(event.title)}" class="kurs-card-image" style="object-position: 50% ${event.imageOffset || 0}%;">` : `<div class="kurs-card-image" style="background:var(--color-bg-alt);display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Intet bilde</span></div>`}
-            <div class="kurs-card-content">
-                <h3>${sanitizeHTML(event.title)}</h3>
-                <p style="font-size: 0.9rem; color: var(--color-primary); font-weight: 500; margin-bottom: 0.5rem;">
-                    📅 ${formatDate(event.date, event.endDate)}<br>
-                    📍 ${sanitizeHTML(event.location)}
-                </p>
-                <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0;">
-                    ${sanitizeHTML(event.description).replace(/\n/g, '<br>')}
-                </p>
-            </div>
-        `;
-        eventsContainer.appendChild(card);
-    });
 }
 
-document.addEventListener('DOMContentLoaded', () => {
-    setupPublicEventsListener();
-});
+document.addEventListener('DOMContentLoaded', loadPublicEvents);
