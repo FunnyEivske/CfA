@@ -63,8 +63,10 @@ function setupLoginForm() {
     if (loginForm) {
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
-            const email = loginForm.email.value.trim();
-            const password = loginForm.password.value.trim();
+            const emailInput = document.getElementById('login-email') || loginForm.email;
+            const passwordInput = document.getElementById('login-password') || loginForm.password;
+            const email = emailInput ? emailInput.value.trim() : '';
+            const password = passwordInput ? passwordInput.value.trim() : '';
             if (errorEl) errorEl.textContent = '';
 
             try {

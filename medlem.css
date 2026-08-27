@@ -26,7 +26,7 @@
   --color-bg-surface: var(--palette-pure-white);
   --color-bg-subtle: #FFF9F2;
   --color-bg-dark: var(--palette-charcoal-grey);
-  --color-bg-header: rgba(255, 241, 225, 0.9);
+  --color-bg-header: #FFFFFF;
 
   --color-text-main: var(--palette-charcoal-grey);
   --color-text-muted: #5A5A5E;
@@ -70,7 +70,7 @@
   /* zinc-500 */
 
   --color-bg-white: var(--palette-charcoal-grey);
-  --color-bg-header: rgba(60, 60, 64, 0.9);
+  --color-bg-header: #18181B;
 
   --color-bg-input: #1F1F22;
   /* Darker background for inputs */

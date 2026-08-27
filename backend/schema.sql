@@ -57,3 +57,11 @@ CREATE TABLE IF NOT EXISTS gallery (
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (uploader_id) REFERENCES users(id) ON DELETE SET NULL
 );
+
+-- Standard test-bruker for MySQL (Passord: 123456)
+INSERT IGNORE INTO users (id, email, password_hash, display_name, role, member_since)
+VALUES ('usr_admin', 'admin@cfa.no', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeFvX0pXjR9Q.Z/QyO8w5V9vP3J.p5q0K', 'Admin Cosplayer', 'admin', '2026-01-01');
+
+INSERT IGNORE INTO users (id, email, password_hash, display_name, role, member_since)
+VALUES ('usr_2', 'nora@cfa.no', '$2y$10$e0MYzXyjpJS7Pd0RVvHwHeFvX0pXjR9Q.Z/QyO8w5V9vP3J.p5q0K', 'Nora (Foam Smith)', 'medlem', '2026-02-15');
+

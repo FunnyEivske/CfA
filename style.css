@@ -17,9 +17,11 @@
   --palette-charcoal-grey: #3C3C40;
   --palette-cream-ivory: #FFF1E1;
   --palette-pure-white: #FFFFFF;
+  --palette-white: #FFFFFF;
 
   /* --- Funksjonelle Variabler --- */
   --color-primary: var(--palette-deep-maroon);
+  --color-primary-dark: #5c1429;
   --color-primary-hover: var(--palette-pastel-pink);
 
   --color-bg-page: var(--palette-cream-ivory);
@@ -27,7 +29,7 @@
   --color-bg-section: #FFF9F2;
   /* Light ivory */
   --color-bg-white: var(--palette-pure-white);
-  --color-bg-header: rgba(255, 241, 225, 0.9);
+  --color-bg-header: #FFFFFF;
   --color-bg-footer: var(--palette-charcoal-grey);
 
   --color-text-main: var(--palette-charcoal-grey);
@@ -59,7 +61,7 @@
   --color-bg-card: #2B2B2E; /* Darker charcoal for cards */
   --color-bg-section: #323236; /* Medium charcoal */
   /* zinc-800 */
-  --color-bg-header: rgba(60, 60, 64, 0.9);
+  --color-bg-header: #18181B;
 
   --color-text-main: var(--palette-cream-ivory);
   --color-text-muted: #FFCDD2; /* Pastel pink for muted text? Or lighter grey. Let's use light greyish pink */
@@ -426,11 +428,10 @@ p {
 */
 .main-header {
   background-color: var(--color-bg-header);
-  backdrop-filter: blur(10px);
   position: sticky;
   top: 0;
   z-index: 50;
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
   transition: background-color 0.3s ease;
 }
 
@@ -446,24 +447,24 @@ p {
   display: flex;
   align-items: center;
   gap: 0.75rem;
-  /* 12px */
   text-decoration: none;
 }
 
 .logo-img {
   height: 3rem;
-  /* 48px */
   width: 3rem;
-  /* 48px */
   border-radius: var(--border-radius-full);
   object-fit: cover;
 }
 
 .logo-text {
   font-size: 1.25rem;
-  /* 20px */
-  font-weight: 600;
-  color: var(--color-text-main);
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .logo-text {
+  color: var(--palette-cream-ivory);
 }
 
 /* Desktop-meny */
@@ -476,19 +477,47 @@ p {
 }
 
 .nav-link {
-  color: var(--color-text-muted);
+  color: var(--color-text-main);
   transition: var(--transition-all);
   font-weight: 500;
 }
 
 .nav-link:hover {
-  color: var(--color-primary-dark);
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--palette-pastel-pink);
 }
 
 /* Aktiv lenke (og medlemslenke) */
 .nav-link-active {
   color: var(--color-primary);
   font-weight: 600;
+}
+
+[data-theme="dark"] .nav-link-active {
+  color: var(--palette-pastel-pink);
+}
+
+/* Ghost Knapp (F.eks. Språkvelger) */
+.button-ghost {
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-full);
+}
+
+.button-ghost:hover {
+  background: rgba(126, 28, 56, 0.1);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .button-ghost:hover {
+  background: rgba(255, 205, 210, 0.15);
+  color: var(--palette-pastel-pink);
+  border-color: var(--palette-pastel-pink);
 }
 
 /* Mobilmeny-knapp */
@@ -659,23 +688,30 @@ p {
 .hero-overlay {
   position: absolute;
   inset: 0;
-  /* top, right, bottom, left = 0 */
-  background-color: rgba(0, 0, 0, 0.5);
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.65));
 }
 
 .hero-content {
   position: relative;
-  /* Over overlayen */
   max-width: 800px;
-  /* Økt fra 600px til 800px */
-  /* Sentrerer innholdet i hero selv om container er full bredde */
   margin-left: auto;
   margin-right: auto;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3rem 2rem;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
 }
 
 .hero-content h1,
-.hero-content p {
-  color: var(--palette-white);
+.hero-content h1 *,
+.hero-content p,
+.hero-content p * {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
 }
 
 

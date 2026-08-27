@@ -8,27 +8,20 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"
-        rel="stylesheet">
-    <!-- Felles stilark -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
-    <!-- Tema-veksler (Laster tidlig for å unngå flash) -->
     <script src="theme-switcher.js"></script>
-    <link rel="icon" type="image/png" href="https://picsum.photos/seed/cfa35/32/32">
+    <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
 </head>
 
 <body style="background-color: var(--color-bg-page); color: var(--color-text-main);">
 
-    <!-- Header & Navigasjon (Ligner på medlem.html) -->
+    <!-- Header & Navigasjon -->
     <header class="bg-white/80 backdrop-blur-md sticky top-0 z-50 shadow-sm">
         <nav class="container mx-auto px-6 py-3">
             <div class="flex items-center justify-between">
-                <a href="index.html#hjem" class="flex items-center space-x-3">
-                    <img src="https://picsum.photos/seed/cfa36/150/150" alt="Cosplay for alle Logo"
-                        class="h-12 w-12 rounded-full object-cover logo-light-only">
-                    <img src="https://picsum.photos/seed/cfa37/150/150" alt="Cosplay for alle Logo"
-                        class="h-12 w-12 rounded-full object-cover logo-dark-only hidden">
+                <a href="index.html" class="flex items-center space-x-3">
+                    <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="h-12 w-12 rounded-full object-cover">
                     <span class="text-xl font-semibold logo-text">CfA</span>
                 </a>
                 <!-- Desktop-meny -->
@@ -37,36 +30,24 @@
                     <a href="hva-skjer.html" class="text-stone-600 hover:text-amber-800 transition-colors">Conventions</a>
                     <a href="galleri.html" class="text-stone-600 hover:text-amber-800 transition-colors">Galleri</a>
                     <a href="kontakt.html" class="text-stone-600 hover:text-amber-800 transition-colors">Kontakt</a>
-                    <!-- Medlemsside-lenke (skjult som standard) -->
-                    <a id="member-link" href="medlem.html"
-                        class="hidden text-stone-600 hover:text-amber-800 transition-colors">Medlemsside</a>
+                    <a id="member-link" href="medlem.html" class="hidden text-stone-600 hover:text-amber-800 transition-colors">Medlemsside</a>
 
-                    <!-- Profil-lenke (Aktiv på denne siden) -->
-                    <a id="profile-link" href="profil.html"
-                        class="hidden h-10 w-10 rounded-full overflow-hidden border-2 border-amber-700 transition-transform hover:scale-110"
-                        title="Min Profil">
-                        <img id="profile-image-header" src="https://picsum.photos/seed/cfa38/800/600"
-                            alt="Din profil" class="h-full w-full object-cover">
+                    <a id="profile-link" href="profil.html" class="hidden h-10 w-10 rounded-full overflow-hidden border-2 border-amber-700 transition-transform hover:scale-110" title="Min Profil">
+                        <img id="profile-image-header" src="Media/Logo/cfa-logo.jpg" alt="Din profil" class="h-full w-full object-cover">
                     </a>
 
-                    <button id="logout-button"
-                        class="hidden bg-stone-500 hover:bg-stone-600 text-white font-bold py-2 px-5 rounded-full text-sm transition-colors">
+                    <button id="logout-button" class="hidden bg-stone-500 hover:bg-stone-600 text-white font-bold py-2 px-5 rounded-full text-sm transition-colors">
                         Logg ut
                     </button>
-                    <!-- Innloggingsknapp (skjult når logget inn) -->
-                    <a id="login-link" href="login.html"
-                        class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-5 rounded-full text-sm transition-colors">
+                    <a id="login-link" href="login.html" class="bg-amber-700 hover:bg-amber-800 text-white font-bold py-2 px-5 rounded-full text-sm transition-colors">
                         Logg inn
                     </a>
-
                 </div>
                 <!-- Mobilmeny-knapp -->
                 <div class="md:hidden">
                     <button id="mobile-menu-button" class="text-stone-700 focus:outline-none">
-                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"
-                            xmlns="http://www.w3.org/2000/svg">
-                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                                d="M4 6h16M4 12h16m-7 6h7"></path>
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                         </svg>
                     </button>
                 </div>
@@ -77,120 +58,68 @@
                 <a href="hva-skjer.html" class="block py-2 text-stone-600 hover:text-amber-800">Conventions</a>
                 <a href="galleri.html" class="block py-2 text-stone-600 hover:text-amber-800">Galleri</a>
                 <a href="kontakt.html" class="block py-2 text-stone-600 hover:text-amber-800">Kontakt</a>
-                <!-- Mobilmeny-lenker for medlem og innlogging -->
-                <a id="mobile-member-link" href="medlem.html"
-                    class="hidden block py-2 text-stone-600 hover:text-amber-800">Medlemsside</a>
-                <a id="mobile-profile-link" href="profil.html"
-                    class="hidden block py-2 text-amber-700 font-semibold hover:text-amber-800">Min Profil</a>
-                <a id="mobile-login-link" href="login.html"
-                    class="w-full text-left block py-2 text-stone-600 hover:text-amber-800">
-                    Logg inn
-                </a>
-                <button id="mobile-logout-button"
-                    class="hidden w-full text-left block py-2 text-stone-600 hover:text-amber-800">
-                    Logg ut
-                </button>
-
+                <a id="mobile-member-link" href="medlem.html" class="hidden block py-2 text-stone-600 hover:text-amber-800">Medlemsside</a>
+                <a id="mobile-profile-link" href="profil.html" class="hidden block py-2 text-amber-700 font-semibold hover:text-amber-800">Min Profil</a>
+                <a id="mobile-login-link" href="login.html" class="w-full text-left block py-2 text-stone-600 hover:text-amber-800">Logg inn</a>
+                <button id="mobile-logout-button" class="hidden w-full text-left block py-2 text-stone-600 hover:text-amber-800">Logg ut</button>
             </div>
         </nav>
     </header>
 
     <main class="container mx-auto px-6 py-12 md:py-20">
-
         <div class="max-w-lg mx-auto p-8 rounded-lg shadow-xl" style="background-color: var(--color-bg-card);">
-            <h1 class="font-display text-4xl font-bold mb-8 text-center" style="color: var(--color-text-main);">Velkommen til vår Cosplay Hub!</h1>
+            <h1 class="font-display text-4xl font-bold mb-8 text-center" style="color: var(--color-text-main);">Min Profil</h1>
 
             <!-- Profilbilde-seksjon -->
             <div class="text-center mb-8">
-                <!-- Fallback-bilde -->
-                <img id="profile-image-preview" src="https://picsum.photos/seed/cfa39/800/600"
-                    alt="Profilbilde" class="w-40 h-40 rounded-full object-cover mx-auto mb-4 bg-stone-200">
+                <img id="profile-image-preview" src="Media/Logo/cfa-logo.jpg" alt="Profilbilde" class="w-40 h-40 rounded-full object-cover mx-auto mb-4 bg-stone-200">
                 <input type="file" id="profile-image-upload" class="hidden" accept="image/png, image/jpeg">
-                <button id="profile-image-upload-button"
-                    class="text-sm text-amber-700 hover:text-amber-800 font-semibold">
+                <button id="profile-image-upload-button" class="text-sm text-amber-700 hover:text-amber-800 font-semibold">
                     Endre profilbilde
                 </button>
-                Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.iHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.dHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.uHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.oHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.aHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.dHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.aHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.uHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.aHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.oHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.nHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.6Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.2Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet./Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.
             </div>
 
             <!-- Visningsnavn-seksjon -->
             <form id="profile-form">
                 <div class="mb-4">
-                    <label for="display-name" class="block font-semibold mb-2"
-                        style="color: var(--color-text-main);">Visningsnavn</label>
-                    <input type="text" id="display-name" required
-                        class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600"
-                        placeholder="F.eks. Eivind R. Skeie">
+                    <label for="display-name" class="block font-semibold mb-2" style="color: var(--color-text-main);">Visningsnavn</label>
+                    <input type="text" id="display-name" required class="w-full px-4 py-2 border border-stone-300 rounded-md focus:outline-none focus:ring-2 focus:ring-amber-600" placeholder="Ditt visningsnavn">
                 </div>
 
                 <div class="mb-6">
-                    <label for="profile-email" class="block font-semibold mb-2"
-                        style="color: var(--color-text-main);">E-post (kan ikke
-                        endres)</label>
-                    <input type="email" id="profile-email" disabled
-                        class="w-full px-4 py-2 border border-stone-300 rounded-md"
-                        style="background-color: var(--color-bg-section); color: var(--color-text-muted);">
+                    <label for="profile-email" class="block font-semibold mb-2" style="color: var(--color-text-main);">E-post (kan ikke endres)</label>
+                    <input type="email" id="profile-email" disabled class="w-full px-4 py-2 border border-stone-300 rounded-md" style="background-color: var(--color-bg-section); color: var(--color-text-muted);">
                 </div>
 
-                <button type="submit" id="profile-save-button" class="button button-primary button-lg"
-                    style="width: 100%;">
+                <button type="submit" id="profile-save-button" class="button button-primary button-lg" style="width: 100%;">
                     Lagre endringer
                 </button>
-                Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.iHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.dHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.oHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.fHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.iHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.uHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.aHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.gHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.nHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.6Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.nHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.4Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet./Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.
-                Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.iHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.dHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.oHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.fHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.iHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.oHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.lHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.aHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.=Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.dHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.6Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.0Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.sHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.xHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.cHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.nHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.eHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.rHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet. Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.mHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.tHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.-Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.4Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet."Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.<Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet./Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.pHer kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.>Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.
             </form>
-
         </div>
-
     </main>
 
     <!-- Footer -->
     <footer class="main-footer">
-        <div class="container">
-            <img src="https://picsum.photos/seed/cfa40/150/150" alt="Cosplay for alle Logo" class="footer-logo">
-            <p class="footer-title">Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.</p>
-            <p class="footer-address">Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.</p>
-            <div class="social-links">
-                <a href="#" target="_blank"
-                    rel="noopener noreferrer" aria-label="Instagram" class="social-link">
-                    <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
-                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
-                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
-                    </svg>
-                </a>
-                <a href="#" target="_blank"
-                    rel="noopener noreferrer" aria-label="Facebook" class="social-link">
-                    <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
-                        <path fill-rule="evenodd"
-                            d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z"
-                            clip-rule="evenodd" />
-                    </svg>
-                </a>
-            </div>
-            <p class="footer-copyright">Her kan du dele fremdriften på prosjektene dine, laste opp bilder, og holde deg oppdatert på hva som skjer i miljøet.</p>
+        <div class="container mx-auto px-6 text-center">
+            <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="footer-logo">
+            <p class="footer-title">Cosplay for alle (CfA)</p>
+            <p class="footer-address">Norge • post@cosplayforalle.no</p>
+            <p class="footer-copyright">&copy; 2026 Cosplay for alle (CfA). Alle rettigheter reservert.</p>
         </div>
     </footer>
 
     <!-- Dark Mode Floating Button -->
     <button class="theme-toggle" aria-label="Bytt tema">
         <svg class="moon-icon" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
-        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24"
-            stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
     </button>
 
-    <!-- Firebase og skript -->
     <script type="module" src="i18n.js"></script>
-    <!-- script.js trengs for header/logikk -->
     <script type="module" src="script.js"></script>
-    <!-- Nytt skript for denne siden -->
     <script type="module" src="profil.js"></script>
 </body>
 
