@@ -1,0 +1,16 @@
+# Deaktiver all skriptkjøring i uploads-mappen
+<FilesMatch "\.(php|phtml|php3|php4|php5|php7|phps|cgi|pl|py|sh|exe)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Skru av PHP-kjøring i denne mappen
+<IfModule mod_php.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php7.c>
+    php_flag engine off
+</IfModule>
+<IfModule mod_php8.c>
+    php_flag engine off
+</IfModule>

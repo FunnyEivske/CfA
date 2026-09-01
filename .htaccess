@@ -1,0 +1,27 @@
+# Beskyttelse mot opplisting av mapper
+Options -Indexes
+
+# Blokker tilgang til sensitive filer
+<FilesMatch "^(package\.json|package-lock\.json|\.gitignore|\.gitattributes|task\.md|README\.md)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+<FilesMatch "\.(sql|log|ini|env|sh|bak)$">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Blokker tilgang til skjulte mapper som .git
+<FilesMatch "^\.">
+    Order allow,deny
+    Deny from all
+</FilesMatch>
+
+# Sikkerhetsheadere
+<IfModule mod_headers.c>
+    Header set X-Content-Type-Options "nosniff"
+    Header set X-Frame-Options "SAMEORIGIN"
+    Header set X-XSS-Protection "1; mode=block"
+    Header set Referrer-Policy "strict-origin-when-cross-origin"
+</IfModule>

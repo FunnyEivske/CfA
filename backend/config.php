@@ -2,10 +2,10 @@
 // backend/config.php
 session_start();
 
-$db_host = 'localhost';
-$db_user = 'root';
-$db_pass = ''; // Webhuset password here
-$db_name = 'cfa_db';
+$db_host = 'sql12.hmg9.webhuset.no';
+$db_user = '237751_cfa';
+$db_pass = 'GIjeri3';
+$db_name = '237751_cfa';
 
 try {
     $pdo = new PDO("mysql:host=$db_host;dbname=$db_name;charset=utf8mb4", $db_user, $db_pass);
