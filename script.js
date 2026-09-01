@@ -21,6 +21,12 @@ async function setupAuthUI() {
             authState.user = res.user;
             authState.role = res.user.role;
             updateHeaderUI(res.user);
+
+            // Sjekk om innlogget bruker må godta vilkår eller endre passord på login-siden
+            const isLoginPage = window.location.pathname.includes('login') || window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('/login');
+            if (isLoginPage && (res.must_accept_tos || res.must_change_password)) {
+                handlePostLoginFlow(res);
+            }
         } else {
             updateHeaderUI(null);
         }
@@ -36,26 +42,78 @@ function updateHeaderUI(user) {
     const memberLink = document.getElementById('member-link');
     const profileLink = document.getElementById('profile-link');
 
+    const mobileLoginLink = document.getElementById('mobile-login-link');
+    const mobileLogoutBtn = document.getElementById('mobile-logout-button');
+    const mobileMemberLink = document.getElementById('mobile-member-link');
+
     if (user) {
-        if (loginLink) loginLink.style.display = 'none';
+        if (loginLink) loginLink.classList.add('hidden');
         if (logoutBtn) {
-            logoutBtn.style.display = 'inline-block';
+            logoutBtn.classList.remove('hidden');
             logoutBtn.onclick = async () => {
                 await AuthAPI.logout();
-                window.location.href = 'index.html';
+                window.location.href = '/';
             };
         }
-        if (memberLink) memberLink.style.display = 'inline-block';
-        if (profileLink) profileLink.style.display = 'inline-block';
+        if (memberLink) {
+            memberLink.classList.remove('hidden');
+            memberLink.style.display = '';
+        }
+        if (profileLink) profileLink.classList.remove('hidden');
+
+        if (mobileLoginLink) mobileLoginLink.classList.add('hidden');
+        if (mobileLogoutBtn) {
+            mobileLogoutBtn.classList.remove('hidden');
+            mobileLogoutBtn.onclick = async () => {
+                await AuthAPI.logout();
+                window.location.href = '/';
+            };
+        }
+        if (mobileMemberLink) {
+            mobileMemberLink.classList.remove('hidden');
+            mobileMemberLink.style.display = '';
+        }
     } else {
-        if (loginLink) loginLink.style.display = 'inline-block';
-        if (logoutBtn) logoutBtn.style.display = 'none';
-        if (memberLink) memberLink.style.display = 'none';
-        if (profileLink) profileLink.style.display = 'none';
+        if (loginLink) loginLink.classList.remove('hidden');
+        if (logoutBtn) logoutBtn.classList.add('hidden');
+        if (memberLink) memberLink.classList.add('hidden');
+        if (profileLink) profileLink.classList.add('hidden');
+
+        if (mobileLoginLink) mobileLoginLink.classList.remove('hidden');
+        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+        if (mobileMemberLink) mobileMemberLink.classList.add('hidden');
     }
 }
 
+
+// Password Visibility Toggle Logic
+export function setupPasswordToggles() {
+    document.querySelectorAll('.password-toggle-btn').forEach(btn => {
+        btn.onclick = (e) => {
+            e.preventDefault();
+            const container = btn.closest('div');
+            if (!container) return;
+            const input = container.querySelector('input');
+            if (!input) return;
+
+            const eyeIcon = btn.querySelector('.eye-icon');
+            const eyeOffIcon = btn.querySelector('.eye-off-icon');
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                if (eyeIcon) eyeIcon.classList.add('hidden');
+                if (eyeOffIcon) eyeOffIcon.classList.remove('hidden');
+            } else {
+                input.type = 'password';
+                if (eyeIcon) eyeIcon.classList.remove('hidden');
+                if (eyeOffIcon) eyeOffIcon.classList.add('hidden');
+            }
+        };
+    });
+}
+
 function setupLoginForm() {
+    setupPasswordToggles();
     const loginForm = document.getElementById('login-form');
     const registerForm = document.getElementById('register-form');
     const errorEl = document.getElementById('login-error');
@@ -72,7 +130,7 @@ function setupLoginForm() {
             try {
                 const res = await AuthAPI.login(email, password);
                 if (res.success) {
-                    window.location.href = 'medlem.html';
+                    handlePostLoginFlow(res);
                 }
             } catch (err) {
                 if (errorEl) errorEl.textContent = 'Feil ved innlogging: ' + err.message;
@@ -91,10 +149,137 @@ function setupLoginForm() {
             try {
                 const res = await AuthAPI.register(email, password, name);
                 if (res.success) {
-                    window.location.href = 'medlem.html';
+                    window.location.href = 'medlem';
                 }
             } catch (err) {
                 if (errorEl) errorEl.textContent = 'Feil ved registrering: ' + err.message;
+            }
+        };
+    }
+}
+
+function handlePostLoginFlow(res) {
+    if (res.must_accept_tos) {
+        showTosModal(res);
+        return;
+    }
+
+    if (res.must_change_password) {
+        showForcePasswordModal();
+        return;
+    }
+
+    window.location.href = 'medlem';
+}
+
+function showTosModal(loginRes) {
+    const tosModal = document.getElementById('tos-modal');
+    const tosCheckbox = document.getElementById('tos-checkbox');
+    const acceptBtn = document.getElementById('accept-tos-btn');
+    const declineBtn = document.getElementById('decline-tos-btn');
+
+    if (!tosModal) {
+        if (loginRes.must_change_password) {
+            showForcePasswordModal();
+        } else {
+            window.location.href = 'medlem';
+        }
+        return;
+    }
+
+    tosModal.classList.remove('hidden');
+    document.body.classList.add('modal-open');
+
+    if (tosCheckbox && acceptBtn) {
+        tosCheckbox.checked = false;
+        acceptBtn.disabled = true;
+
+        tosCheckbox.onchange = () => {
+            acceptBtn.disabled = !tosCheckbox.checked;
+        };
+
+        acceptBtn.onclick = async () => {
+            acceptBtn.disabled = true;
+            acceptBtn.textContent = 'Godkjenner...';
+            try {
+                await AuthAPI.acceptTos();
+                tosModal.classList.add('hidden');
+                
+                if (loginRes.must_change_password) {
+                    showForcePasswordModal();
+                } else {
+                    document.body.classList.remove('modal-open');
+                    window.location.href = 'medlem';
+                }
+            } catch (err) {
+                alert('Kunne ikke lagre godkjenning: ' + err.message);
+                acceptBtn.disabled = false;
+                acceptBtn.textContent = 'Jeg godtar og vil fortsette';
+            }
+        };
+    }
+
+    if (declineBtn) {
+        declineBtn.onclick = async () => {
+            if (confirm('Hvis du ikke godtar brukervilkårene kan du ikke benytte tjenesten, og du vil bli logget ut.')) {
+                await AuthAPI.logout();
+                window.location.reload();
+            }
+        };
+    }
+}
+
+function showForcePasswordModal() {
+    const forceModal = document.getElementById('force-password-modal');
+    if (forceModal) {
+        forceModal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
+        setupForcePasswordForm();
+    } else {
+        window.location.href = 'medlem';
+    }
+}
+
+function setupForcePasswordForm() {
+    const forceForm = document.getElementById('force-password-form');
+    const forceError = document.getElementById('force-password-error');
+    const saveBtn = document.getElementById('save-new-password-btn');
+
+    if (forceForm) {
+        forceForm.onsubmit = async (e) => {
+            e.preventDefault();
+            const p1 = document.getElementById('new-password').value.trim();
+            const p2 = document.getElementById('confirm-new-password').value.trim();
+
+            if (forceError) forceError.textContent = '';
+
+            if (p1.length < 6) {
+                if (forceError) forceError.textContent = 'Passordet må være på minst 6 tegn.';
+                return;
+            }
+
+            if (p1 !== p2) {
+                if (forceError) forceError.textContent = 'Passordene er ikke like. Vennligst skriv dem inn på nytt.';
+                return;
+            }
+
+            if (saveBtn) {
+                saveBtn.disabled = true;
+                saveBtn.textContent = 'Lagrer nytt passord...';
+            }
+
+            try {
+                await AuthAPI.changePassword(p1);
+                alert('Ditt nye passord er lagret! Velkommen til Cosplay for alle.');
+                document.body.classList.remove('modal-open');
+                window.location.href = 'medlem';
+            } catch (err) {
+                if (forceError) forceError.textContent = 'Kunne ikke endre passord: ' + err.message;
+            } finally {
+                if (saveBtn) {
+                    saveBtn.disabled = false;
+                    saveBtn.textContent = 'Lagre passord og fortsett';
+                }
             }
         };
     }
@@ -165,10 +350,31 @@ function setupMobileMenu() {
     const btn = document.getElementById('mobile-menu-button');
     const menu = document.getElementById('mobile-menu');
     if (btn && menu) {
-        btn.onclick = () => {
-            menu.classList.toggle('hidden');
+        btn.onclick = (e) => {
+            e.stopPropagation();
+            menu.classList.toggle('show');
+            document.body.classList.toggle('modal-open', menu.classList.contains('show'));
         };
+
+        menu.querySelectorAll('a, button').forEach(el => {
+            el.addEventListener('click', () => {
+                menu.classList.remove('show');
+                document.body.classList.remove('modal-open');
+            });
+        });
+
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && menu.classList.contains('show')) {
+                menu.classList.remove('show');
+                document.body.classList.remove('modal-open');
+            }
+        });
     }
 }
 
-document.addEventListener('DOMContentLoaded', initApp);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initApp);
+} else {
+    initApp();
+}
+

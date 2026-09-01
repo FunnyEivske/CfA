@@ -5,6 +5,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Min side - Cosplay for alle</title>
+    <link rel="stylesheet" href="style.css">
     <link rel="stylesheet" href="medlem.css">
     <!-- Quill.js for Rich Text Editing -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
@@ -20,17 +21,27 @@
     <!-- Header -->
     <header class="header">
         <div class="container header-inner">
-            <a href="index.html" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
-                <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover;">
-                <h2 style="margin: 0; color: var(--color-primary); font-size: 1.5rem; font-weight: bold;">Cosplay for alle</h2>
-            </a>
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
+                    <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" style="height: 40px; width: 40px; border-radius: 50%; object-fit: cover;">
+                    <h2 style="margin: 0; color: var(--color-primary); font-size: 1.5rem; font-weight: bold;">Cosplay for alle</h2>
+                </a>
+                <button class="lang-toggle-btn" aria-label="Bytt språk" title="Bytt språk">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="globe-icon">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span class="lang-current-label">NO</span>
+                </button>
+            </div>
 
             <nav class="nav-desktop">
-                <a href="om-oss.html" class="nav-link">Om oss</a>
-                <a href="hva-skjer.html" class="nav-link">Hva skjer</a>
-                <a href="galleri.html" class="nav-link">Galleri</a>
-                <a href="kontakt.html" class="nav-link">Kontakt</a>
-                <a href="medlem.html" class="nav-link active">Min side</a>
+                <a href="om-oss" class="nav-link">Om oss</a>
+                <a href="hva-skjer" class="nav-link">Hva skjer</a>
+                <a href="galleri" class="nav-link">Galleri</a>
+                <a href="kontakt" class="nav-link">Kontakt</a>
+                <a href="medlem" class="nav-link active">Min side</a>
                 
                 <!-- Desktop Notifications moved to sidebar -->
 
@@ -39,40 +50,21 @@
 
             </nav>
 
-            <button id="mobile-menu-button" class="mobile-toggle" aria-label="Meny">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                    <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round" stroke-linejoin="round" />
+            <button id="mobile-menu-button" class="mobile-menu-button" aria-label="Åpne meny">
+                <svg class="mobile-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
                 </svg>
             </button>
         </div>
 
         <!-- Mobilmeny -->
-        <div id="mobile-menu" class="mobile-menu">
-            <a href="om-oss.html">Om oss</a>
-            <a href="medlem.html" id="mobile-member-link" class="mobile-nav-link hidden"
-                style="color: var(--color-primary); font-weight: 600;">Min side</a>
-
-            <div id="mobile-notifications-wrapper" class="mobile-nav-link hidden"
-                style="display: flex; justify-content: space-between; align-items: center; cursor: pointer;">
-                <span>Varsler</span>
-                <div style="position: relative;">
-                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
-                        stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
-                        <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
-                    </svg>
-                    <div id="mobile-notifications-badge" class="hidden"
-                        style="position: absolute; top: -5px; right: -5px; background: var(--color-error); color: white; border-radius: 50%; width: 16px; height: 16px; font-size: 10px; display: flex; align-items: center; justify-content: center; font-weight: bold;">
-                        0</div>
-                </div>
-            </div>
-            <a href="hva-skjer.html">Hva skjer</a>
-            <a href="galleri.html">Galleri</a>
-            <a href="kontakt.html">Kontakt</a>
-            <a href="medlem.html" class="active">Min side</a>
-            <button id="mobile-logout-button" class="btn btn-ghost"
-                style="width: 100%; justify-content: flex-start; padding: 0.75rem 0;">Logg ut</button>
-
+        <div id="mobile-menu" class="nav-menu-mobile">
+            <a href="om-oss" class="nav-link">Om oss</a>
+            <a href="hva-skjer" class="nav-link">Conventions</a>
+            <a href="galleri" class="nav-link">Galleri</a>
+            <a href="kontakt" class="nav-link">Kontakt</a>
+            <a href="medlem" class="nav-link-active" style="color: var(--color-primary); font-weight: bold;">Min side</a>
+            <button id="mobile-logout-button" class="button button-secondary" style="width: 100%; margin-top: 1rem;">Logg ut</button>
         </div>
     </header>
 
@@ -191,17 +183,19 @@
 
 
 
-                <!-- Info-kort -->
+                <!-- Info-kort: Verksted-status & Åpningstider -->
                 <div class="card">
-                    <div class="card-header">
-                        <h4 class="text-lg">Workshop-status</h4>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                        <h4 class="text-lg" style="margin: 0;">Verksted & Status</h4>
                     </div>
                     <div class="card-body">
-                        <div class="mb-4">
-                            <p id="workshop-status-text" class="text-sm font-semibold text-primary mb-2"></p>
-                            <p class="text-sm font-medium">Laster åpningstider og status...</p>
-                            <div id="workshop-hours-display" class="text-sm text-muted">
-                            </div>
+                        <div style="margin-bottom: 1rem;">
+                            <div id="workshop-status-text" class="text-sm font-semibold mb-2" style="font-size: 0.95rem;">Laster status...</div>
+                            <p id="workshop-message-text" class="text-xs text-muted mb-3" style="font-style: italic; display: none;"></p>
+                        </div>
+                        <h5 class="text-xs font-semibold text-muted uppercase tracking-wider mb-2" style="border-top: 1px solid var(--color-border); padding-top: 0.75rem;">Åpningstider</h5>
+                        <div id="workshop-hours-display" style="display: flex; flex-direction: column; gap: 0.35rem; font-size: 0.8rem;">
+                            <span class="text-muted text-xs">Laster åpningstider...</span>
                         </div>
                     </div>
                 </div>
@@ -298,43 +292,50 @@
     <div id="profile-modal" class="hidden modal-container">
         <div id="profile-modal-overlay" class="modal-overlay"></div>
         <div class="card modal-content maxWidth-600">
-            <div class="card-header">
-                <h3>Rediger profil</h3>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin-bottom: 0;">Rediger profil</h3>
+                <button type="button" id="close-profile-modal-x" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
             <form id="profile-form">
                 <div class="card-body">
                     <div class="form-group">
                         <label for="display-name-input" class="form-label">Visningsnavn</label>
-                        <input type="text" id="display-name-input" class="form-input" placeholder="Ditt navn">
+                        <input type="text" id="display-name-input" class="form-input" placeholder="Ditt navn" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Profilbilde</label>
-                        <div style="display: flex; flex-direction: column; gap: 0.5rem;">
-                            <!-- Premium Drop Zone for Profile -->
+                        <div style="display: flex; flex-direction: column; gap: 0.75rem;">
+                            <!-- Drop Zone for Profile -->
                             <div id="profile-upload-drop-zone" class="upload-drop-zone"
-                                style="min-height: 100px; padding: 1rem;">
+                                style="min-height: 100px; padding: 1.25rem; border: 2px dashed var(--color-border); border-radius: 8px; text-align: center; cursor: pointer; position: relative;">
                                 <div class="drop-zone-content">
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
                                         fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                        stroke-linejoin="round" class="mb-2" style="opacity: 0.5;">
+                                        stroke-linejoin="round" class="mb-2" style="opacity: 0.5; margin: 0 auto;">
                                         <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                         <polyline points="17 8 12 3 7 8"></polyline>
                                         <line x1="12" y1="3" x2="12" y2="15"></line>
                                     </svg>
                                     <p class="text-xs font-semibold mb-1">Dra bilde hit</p>
-                                    <p class="text-xs text-muted">eller klikk for å velge</p>
+                                    <p class="text-xs text-muted" style="margin: 0;">eller klikk for å velge</p>
                                 </div>
-                                <input type="file" id="profile-image-file-input" accept="image/png, image/jpeg">
+                                <input type="file" id="profile-image-file-input" accept="image/png, image/jpeg, image/webp" style="position: absolute; inset: 0; opacity: 0; cursor: pointer;">
                             </div>
-                             <!-- Profile Image Preview -->
-                             <div id="profile-preview-container" class="hidden crop-preview-wrapper profile-mini-preview">
-                                 <div class="crop-area">
-                                     <img id="profile-image-preview" src="" class="crop-image">
-                                     <div class="crop-overlay"></div>
-                                     <div class="crop-viewport square"></div>
-                                 </div>
-                             </div>
-                            <p class="text-xs text-muted">Støtter kun JPG og PNG.</p>
+                            
+                            <!-- Profile Image Live Preview -->
+                            <div id="profile-preview-container" class="hidden" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: 8px;">
+                                <img id="profile-image-preview" src="" style="width: 50px; height: 50px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
+                                <div style="flex: 1;">
+                                    <p id="profile-image-name" class="text-xs font-medium" style="margin: 0; color: var(--color-text-main);"></p>
+                                    <button type="button" id="remove-profile-image-btn" class="btn btn-ghost btn-xs text-error" style="padding: 0; font-size: 0.75rem;">Fjern valgt bilde</button>
+                                </div>
+                            </div>
+                            
+                            <p class="text-xs text-muted" style="margin: 0;">Støtter JPG, PNG og WebP.</p>
                         </div>
                     </div>
                 </div>
@@ -351,13 +352,18 @@
     <div id="upload-modal" class="hidden modal-container">
         <div id="upload-modal-overlay" class="modal-overlay"></div>
         <div class="card modal-content maxWidth-800" style="max-height: 90vh; display: flex; flex-direction: column;">
-            <div class="card-header">
-                <h3>Administrer bilder</h3>
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 style="margin-bottom: 0;">Administrer bilder</h3>
+                <button type="button" id="close-upload-modal-x" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
             </div>
 
             <div class="card-body">
                 <!-- Upload Section -->
-                <form id="upload-form" class="mb-6">
+                <form id="upload-form" class="mb-6" novalidate>
                     <div class="form-group">
                         <label class="form-label" style="display: block; margin-bottom: 1rem;">Last opp nye
                             bilder</label>
@@ -375,9 +381,9 @@
                                 <p class="text-sm font-semibold mb-1">Dra og slipp bilder her</p>
                                 <p class="text-xs text-muted">eller klikk for å velge filer</p>
                             </div>
-                            <input type="file" id="upload-files-input" accept="image/png, image/jpeg" multiple required>
+                            <input type="file" id="upload-files-input" accept="image/png, image/jpeg, image/webp" multiple>
                         </div>
-                        <p class="text-xs text-muted mt-2">Kun JPG og PNG er tillatt. Video og RAW støttes ikke.</p>
+                        <p class="text-xs text-muted mt-2">Kun JPG, PNG og WebP er tillatt.</p>
                     </div>
 
                     <!-- Pending Uploads Grid -->
@@ -409,230 +415,7 @@
         </div>
     </div>
 
-    <!-- Admin Image Selection Modal (Gallery Management) -->
-    <div id="admin-image-modal" class="hidden modal-container">
-        <div id="admin-image-modal-overlay" class="modal-overlay"></div>
-        <div class="card modal-content maxWidth-800">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 id="admin-modal-title" class="text-lg">Velg bilder til galleri</h3>
-                <button id="close-admin-modal" class="btn btn-ghost" style="padding: 0.5rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="card-body" style="min-height: 400px; display: flex; flex-direction: column;">
-                <!-- Nåværende utvalg (Sticky Top) -->
-                <div id="active-gallery-preview" class="gallery-admin-active-section">
-                    <h4 class="text-sm font-semibold mb-2" style="display: flex; justify-content: space-between;">
-                        Aktive bilder på nettstedet
-                        <span id="active-image-count" class="text-xs font-normal text-muted">0 bilder</span>
-                    </h4>
-                    <div id="active-images-grid" class="active-images-grid">
-                        <p class="text-xs text-muted w-full text-center py-2">Ingen bilder valgt</p>
-                    </div>
-                </div>
 
-                <!-- Globale kontroller -->
-                <div class="gallery-admin-controls">
-                    <button type="button" id="expand-all-users" class="btn btn-ghost btn-sm text-xs">
-                        Åpne alle
-                    </button>
-                    <button type="button" id="collapse-all-users" class="btn btn-ghost btn-sm text-xs">
-                        Lukk alle
-                    </button>
-                </div>
-
-                <!-- User List Container -->
-                <div id="admin-user-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                    <p class="text-muted text-center">Laster brukere og bilder...</p>
-                </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button type="button" id="cancel-admin-modal" class="btn btn-secondary">Avbryt</button>
-                <button type="button" id="save-admin-selection" class="btn btn-primary">Lagre valg</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Status/Hours Modal -->
-    <div id="admin-status-modal" class="hidden modal-container">
-        <div id="admin-status-modal-overlay" class="modal-overlay"></div>
-        <div class="card modal-content maxWidth-600">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                <h3 class="text-lg">Status & åpningstider</h3>
-                <button id="close-status-modal" class="btn btn-ghost" style="padding: 0.5rem;">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
-            </div>
-            <div class="card-body">
-                <form id="status-hours-form">
-                    <div class="form-group">
-                        <label class="form-label">Egendefinert status (f.eks. "Stengt pga oppussing")</label>
-                        <input type="text" id="custom-status-input" class="form-input"
-                            placeholder="La stå tom for standard">
-                    </div>
-
-                    <h4 class="text-sm font-semibold mb-3 mt-6">Ukentlige åpningstider</h4>
-                    <div id="opening-hours-inputs" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Mandag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Mandag"
-                                placeholder="f.eks. 10-20 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Tirsdag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Tirsdag"
-                                placeholder="f.eks. 10-20 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Onsdag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Onsdag"
-                                placeholder="f.eks. 10-20 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Torsdag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Torsdag"
-                                placeholder="f.eks. 10-20 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Fredag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Fredag"
-                                placeholder="f.eks. 10-20 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Lørdag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Lørdag"
-                                placeholder="f.eks. 12-18 eller Stengt">
-                        </div>
-                        <div style="display: grid; grid-template-columns: 100px 1fr; align-items: center; gap: 1rem;">
-                            <label class="text-xs font-semibold">Søndag</label>
-                            <input type="text" class="form-input text-sm opening-day-input" data-day="Søndag"
-                                placeholder="f.eks. 12-18 eller Stengt">
-                        </div>
-                    </div>
-                </form>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end; gap: 1rem;">
-                <button type="button" id="cancel-status-modal" class="btn btn-secondary">Avbryt</button>
-                <button type="button" id="save-status-btn" class="btn btn-primary">Lagre endringer</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Admin Add/Edit User form is now part of the unified members modal -->
-
-
-    <!-- Admin Manage Members Modal -->
-    <div id="admin-members-modal" class="hidden modal-container">
-        <div id="admin-members-modal-overlay" class="modal-overlay"></div>
-        <div class="card modal-content maxWidth-800">
-            <div class="card-header" style="flex-direction: column; align-items: flex-start; padding-bottom: 0;">
-                <div
-                    style="display: flex; justify-content: space-between; width: 100%; align-items: center; margin-bottom: 1rem;">
-                    <h3 class="text-lg">Medlemsadministrasjon</h3>
-                    <button id="close-members-modal" class="btn btn-ghost" style="padding: 0.5rem;">
-                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                            stroke-width="2">
-                            <path d="M18 6L6 18M6 6l12 12" />
-                        </svg>
-                    </button>
-                </div>
-                <!-- Tabs -->
-                <div class="modal-tabs-container">
-                    <button id="tab-active-members" class="btn btn-primary text-sm tab-btn active">Aktive
-                        medlemmer</button>
-                    <button id="tab-pending-deletions" class="btn btn-secondary text-sm tab-btn">Sletting
-                        forespurt</button>
-                    <button id="tab-archive" class="btn btn-secondary text-sm tab-btn">Arkiv</button>
-                    <button id="tab-add-member" class="btn btn-secondary text-sm tab-btn">+ Legg til / Rediger</button>
-                </div>
-            </div>
-            <div class="card-body">
-                <!-- Active Members Tab -->
-                <div id="active-members-section">
-                    <div id="admin-members-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <p class="text-muted text-center">Laster medlemmer...</p>
-                    </div>
-                </div>
-
-                <!-- Pending Deletions Tab -->
-                <div id="pending-deletions-section" class="hidden">
-                    <div id="admin-pending-list" style="display: flex; flex-direction: column; gap: 1rem;">
-                        <p class="text-muted text-center">Ingen forespørsler om sletting.</p>
-                    </div>
-                </div>
-
-                <!-- Archive Tab -->
-                <div id="archive-section" class="hidden">
-                    <div id="admin-archive-list"
-                        style="display: flex; flex-direction: column; gap: 1rem; padding: 1.5rem;">
-                        <p class="text-muted text-center">Laster arkiv...</p>
-                    </div>
-                </div>
-
-                <!-- Add/Edit Member Tab -->
-                <div id="add-member-section" class="hidden">
-                    <form id="admin-create-user-form">
-                        <div class="form-group">
-                            <label for="new-user-email" class="form-label">E-postadresse</label>
-                            <input type="email" id="new-user-email" class="form-input" placeholder="bruker@epost.no"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-user-password" class="form-label">Passord</label>
-                            <input type="text" id="new-user-password" class="form-input"
-                                placeholder="La stå tomt for å beholde eksisterende">
-                            <p class="text-xs text-muted mt-1" id="password-hint">Minst 6 tegn for nye brukere.</p>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-user-name" class="form-label">Fullt navn</label>
-                            <input type="text" id="new-user-name" class="form-input" placeholder="Navn Navnesen"
-                                required>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-user-role" class="form-label">Rolle</label>
-                            <select id="new-user-role" class="form-input">
-                                <option value="member">Medlem</option>
-                                <option value="styremedlem">Styremedlem</option>
-                                <option value="sekretær">Sekretær</option>
-                                <option value="admin">Administrator</option>
-                            </select>
-                        </div>
-                        <div class="form-group">
-                            <label for="new-user-member-since" class="form-label">Medlem siden (Startdato)</label>
-                            <input type="date" id="new-user-member-since" class="form-input">
-                        </div>
-                        <div class="form-group">
-                            <label for="new-user-organization-role" class="form-label">Medlemstype (Vises i
-                                medlemsliste)</label>
-                            <select id="new-user-organization-role" class="form-input">
-                                <option value="medlem">Medlem</option>
-                                <option value="styremedlem">Styremedlem</option>
-                                <option value="styremedlem - sekretær">Styremedlem - Sekretær</option>
-                                <option value="styremedlem - økonomiansvarlig">Styremedlem - Økonomiansvarlig</option>
-                                <option value="styremedlem - leder">Styremedlem - Leder</option>
-                                <option value="it administrator">IT Administrator</option>
-                            </select>
-                        </div>
-                        <input type="hidden" id="edit-user-id">
-
-                        <div
-                            style="display: flex; justify-content: space-between; align-items: center; margin-top: 2rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
-                            <button type="button" id="admin-soft-delete-btn" class="btn btn-ghost hidden"
-                                style="color: var(--color-error); padding-left: 0;">Slett konto...</button>
-                            <button type="submit" id="create-user-btn" class="btn btn-primary">Lagre endringer</button>
-                        </div>
-                    </form>
-                </div>
-            </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end;">
-                <button type="button" id="close-members-footer-btn" class="btn btn-secondary">Lukk</button>
-            </div>
-        </div>
-    </div>
     <!-- Custom Alert/Message Modal -->
     <div id="message-modal" class="hidden modal-container" style="z-index: 3000;">
         <div id="message-modal-overlay" class="modal-overlay"></div>
@@ -653,7 +436,7 @@
         <div class="card modal-content maxWidth-600">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 class="text-lg" style="margin-bottom: 0;">Nytt innlegg</h3>
-                <button id="close-post-modal" class="btn btn-ghost" style="padding: 0.5rem;">
+                <button type="button" id="close-post-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
@@ -663,47 +446,34 @@
                 <form id="new-post-form">
                     <div class="form-group">
                         <label class="form-label">Tittel</label>
-                        <input type="text" id="post-title" class="form-input" required>
+                        <input type="text" id="post-title" name="title" class="form-input" placeholder="Tittel på innlegget" required>
                     </div>
                     <div class="form-group">
                         <label class="form-label">Innhold</label>
-                        <div id="post-quill-container" class="mb-4">
-                            <div id="post-quill-editor" style="min-height: 150px; background: var(--color-bg-body); border-bottom-left-radius: var(--radius-md); border-bottom-right-radius: var(--radius-md);"></div>
-                            <textarea id="post-content" class="hidden"></textarea>
+                        <div id="post-quill-container" class="mb-2">
+                            <div id="post-quill-editor" style="min-height: 140px; background: var(--color-bg-body); border: 1px solid var(--color-border); border-radius: var(--radius-md);"></div>
+                            <textarea id="post-content" name="content" class="form-input hidden" style="min-height: 140px;" placeholder="Skriv innholdet ditt her..."></textarea>
                         </div>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Legg til bilde (Valgfritt)</label>
-                        <div id="post-upload-drop-zone" class="upload-drop-zone"
-                            style="min-height: 120px; padding: 1rem;">
+                        <label class="form-label">Bilde (Valgfritt)</label>
+                        <div id="post-upload-drop-zone" class="upload-drop-zone" style="min-height: 90px; padding: 1rem; cursor: pointer;">
                             <div class="drop-zone-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="mb-2" style="opacity: 0.5;">
-                                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
-                                    <circle cx="8.5" cy="8.5" r="1.5" />
-                                    <polyline points="21 15 16 10 5 21" />
-                                </svg>
-                                <p class="text-sm font-semibold mb-1">Last opp bilde</p>
-                                <p class="text-xs text-muted">Dra hit eller klikk</p>
+                                <p class="text-sm font-semibold mb-1">📸 Klikk eller dra inn et bilde</p>
+                                <p class="text-xs text-muted" id="post-image-filename">PNG, JPG, WEBP</p>
                             </div>
-                            <input type="file" id="post-image-input" accept="image/png, image/jpeg">
+                            <input type="file" id="post-image-input" name="image" accept="image/png, image/jpeg, image/webp" style="display: none;">
                         </div>
-                        <div id="post-image-preview-container" class="hidden crop-preview-wrapper post">
-                            <div class="crop-area">
-                                <img id="post-image-preview" src="" class="crop-image">
-                                <div class="crop-overlay"></div>
-                                <div class="crop-viewport post"></div>
-                                <button type="button" id="remove-post-image"
-                                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 40;">&times;</button>
-                            </div>
+                        <div id="post-image-preview-container" class="hidden" style="margin-top: 0.75rem; position: relative;">
+                            <img id="post-image-preview" src="" style="max-height: 220px; width: 100%; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--color-border);">
+                            <button type="button" id="remove-post-image" style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;">&times;</button>
                         </div>
                     </div>
-                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
                         <button type="button" id="cancel-post-modal" class="btn btn-secondary">Avbryt</button>
                         <button type="submit" id="post-submit-button" class="btn btn-primary">Publiser innlegg</button>
                     </div>
-                    <p id="post-error" class="form-error"></p>
+                    <p id="post-error" class="form-error" style="margin-top: 0.5rem;"></p>
                 </form>
             </div>
         </div>
@@ -819,36 +589,42 @@
                         <p class="text-xs text-muted mt-1">Hvis denne er av, vil ikke medlemmer kunne melde seg på, og kontaktknappen skjules på forsiden.</p>
                     </div>
                     <div class="form-group">
-                        <label class="form-label">Bilde</label>
+                        <label class="form-label" style="display: flex; justify-content: space-between;">
+                            <span>Bilde / Banner til arrangement</span>
+                            <span class="text-xs text-muted">Dra inn fra PC eller andre nettsider</span>
+                        </label>
                         <div id="event-upload-drop-zone" class="upload-drop-zone"
-                            style="min-height: 120px; padding: 1rem;">
+                            style="min-height: 120px; padding: 1.25rem; border: 2px dashed var(--color-primary); border-radius: var(--radius-md); text-align: center; cursor: pointer; background: var(--color-bg-subtle); transition: all 0.2s ease;">
                             <div class="drop-zone-content">
-                                <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24"
-                                    fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                                    stroke-linejoin="round" class="mb-2" style="opacity: 0.5;">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 24 24"
+                                    fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round"
+                                    stroke-linejoin="round" class="mb-2" style="margin: 0 auto; display: block;">
                                     <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
                                     <polyline points="17 8 12 3 7 8"></polyline>
                                     <line x1="12" y1="3" x2="12" y2="15"></line>
                                 </svg>
-                                <p class="text-sm font-semibold mb-1">Velg bilde til arrangementet</p>
-                                <p class="text-xs text-muted">Dra og slipp eller klikk</p>
+                                <p class="text-sm font-semibold mb-1" style="color: var(--color-text-main);">Dra og slipp bilde her, eller klikk for å velge</p>
+                                <p class="text-xs text-muted">Støtter også å dra bilder direkte fra andre nettsider eller lime inn!</p>
                             </div>
-                            <input type="file" id="event-image" accept="image/*">
+                            <input type="file" id="event-image" accept="image/*" style="display: none;">
                         </div>
-                        <div id="event-image-preview-wrapper" class="hidden crop-preview-wrapper banner">
-                            <div class="crop-area">
-                                <img id="event-image-preview" src="" class="crop-image">
-                                <div class="crop-overlay"></div>
-                                <div class="crop-viewport banner"></div>
-                                <button type="button" id="remove-event-image"
-                                    style="position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.5); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: pointer; display: flex; align-items: center; justify-content: center; z-index: 40;">&times;</button>
-                            </div>
+                        
+                        <!-- URL Input option -->
+                        <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem;">
+                            <input type="url" id="event-image-url-input" class="form-input" style="font-size: 0.85rem;" placeholder="Eller lim inn bilde-URL fra en annen nettside...">
+                            <button type="button" id="apply-event-image-url-btn" class="btn btn-secondary btn-sm" style="flex-shrink: 0;">Bruk URL</button>
+                        </div>
+
+                        <!-- Live Preview (No Cropping!) -->
+                        <div id="event-image-preview-wrapper" class="hidden" style="position: relative; margin-top: 1rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-bg-surface);">
+                            <img id="event-image-preview" src="" style="width: 100%; max-height: 280px; object-fit: cover; display: block;">
+                            <button type="button" id="remove-event-image"
+                                style="position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; box-shadow: var(--shadow-md);" title="Fjern bilde">&times;</button>
                         </div>
                     </div>
                     <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 2rem;">
                         <button type="button" id="cancel-event-modal" class="btn btn-secondary">Avbryt</button>
-                        <button type="submit" id="event-submit-button" class="btn btn-primary">Publiser
-                            arrangement</button>
+                        <button type="submit" id="event-submit-button" class="btn btn-primary">Publiser arrangement</button>
                     </div>
                     <p id="event-error" class="form-error"></p>
                 </form>
@@ -930,6 +706,25 @@
                         <input type="date" id="doc-entry-date" class="form-input" required>
                     </div>
                     
+                    <div class="form-group" style="margin-bottom: 1.25rem;">
+                        <label class="form-label" style="display: flex; justify-content: space-between;">
+                            <span>Last opp PDF / Word / Tekst</span>
+                            <span class="text-xs" style="color: var(--color-primary); font-weight: normal;">(Automatisk utfylling)</span>
+                        </label>
+                        <div id="doc-pdf-dropzone" class="upload-drop-zone" style="border: 2px dashed var(--color-primary); border-radius: var(--radius-md); padding: 1.25rem; text-align: center; cursor: pointer; background: var(--color-bg-subtle); transition: all 0.2s ease;">
+                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" style="margin: 0 auto 0.5rem auto; display: block;">
+                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                <polyline points="14 2 14 8 20 8"></polyline>
+                                <line x1="12" y1="18" x2="12" y2="12"></line>
+                                <line x1="9" y1="15" x2="15" y2="15"></line>
+                            </svg>
+                            <div style="font-weight: 600; font-size: 0.95rem; color: var(--color-text-main);">📄 Klikk eller dra inn PDF / dokument</div>
+                            <div class="text-xs text-muted mt-1">Teksten leses automatisk ut og formateres inn i feltene under!</div>
+                            <input type="file" id="doc-pdf-input" accept=".pdf,.doc,.docx,.txt" style="display: none;">
+                        </div>
+                        <div id="doc-pdf-status" class="text-xs mt-2 hidden" style="font-weight: 600; color: var(--color-primary);"></div>
+                    </div>
+
                     <div class="form-group" id="doc-content-group">
                         <label class="form-label" id="doc-content-label">Innhold</label>
                         <p class="text-xs text-muted mb-2" id="doc-content-hint">Tips: Hver linje blir et eget punkt i
@@ -1042,7 +837,7 @@
         <div class="card modal-content maxWidth-800">
             <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                 <h3 class="text-lg" style="margin-bottom: 0;">Medlemsadministrasjon</h3>
-                <button id="close-admin-members-modal" class="btn btn-ghost" style="padding: 0.5rem;">
+                <button type="button" id="close-admin-members-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
                     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                         <path d="M18 6L6 18M6 6l12 12" />
                     </svg>
@@ -1051,7 +846,7 @@
             <div class="card-body">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
                     <p class="text-sm text-muted" style="margin: 0;">Administrer brukere, slett kontoer eller endre medlemsroller.</p>
-                    <button id="admin-add-user-btn" class="btn btn-primary btn-sm">+ Opprett nytt medlem</button>
+                    <button type="button" id="admin-add-user-btn" class="btn btn-primary btn-sm">+ Opprett nytt medlem</button>
                 </div>
                 <div id="admin-members-list-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
                     <!-- Dynamically populated member management list -->
@@ -1059,6 +854,165 @@
             </div>
             <div class="card-footer" style="display: flex; justify-content: flex-end;">
                 <button type="button" id="close-admin-members-footer" class="btn btn-secondary">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Edit Member Detailed Modal -->
+    <div id="admin-edit-member-modal" class="hidden modal-container" style="z-index: 3200;">
+        <div class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-600" style="max-height: 90vh; overflow-y: auto;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="text-lg" style="margin-bottom: 0;">✏️ Rediger medlem</h3>
+                <button type="button" id="close-admin-edit-member-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="card-body">
+                <form id="admin-edit-member-form">
+                    <input type="hidden" id="edit-member-id">
+                    
+                    <div style="display: flex; align-items: center; gap: 1.25rem; margin-bottom: 1.5rem;">
+                        <img id="edit-member-avatar-preview" src="" alt="Avatar" style="width: 70px; height: 70px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
+                        <div>
+                            <label class="form-label font-semibold text-xs mb-1" style="display: block;">Endre profilbilde</label>
+                            <input type="file" id="edit-member-avatar-input" accept="image/*" class="text-xs">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-member-name" class="form-label font-semibold">Visningsnavn</label>
+                        <input type="text" id="edit-member-name" class="form-input" required>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="edit-member-email" class="form-label font-semibold">E-postadresse</label>
+                        <input type="email" id="edit-member-email" class="form-input" required>
+                    </div>
+
+                    <div class="grid grid-cols-2 gap-4">
+                        <div class="form-group">
+                            <label for="edit-member-role" class="form-label font-semibold">Rolle</label>
+                            <select id="edit-member-role" class="form-input">
+                                <option value="medlem">Medlem</option>
+                                <option value="admin">Administrator</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-member-since" class="form-label font-semibold">Starttid som medlem</label>
+                            <input type="date" id="edit-member-since" class="form-input">
+                        </div>
+                    </div>
+
+                    <div class="form-group" style="border-top: 1px solid var(--color-border); padding-top: 1rem; margin-top: 1rem;">
+                        <label for="edit-member-password" class="form-label font-semibold">Sett nytt passord <span class="text-muted font-normal text-xs">(valgfritt)</span></label>
+                        <input type="text" id="edit-member-password" class="form-input" placeholder="La stå tomt for å beholde nåværende">
+                        <p class="text-xs text-muted mt-1">Hvis du setter et passord her, må medlemmet opprette sitt eget nye passord neste gang de logger inn.</p>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" id="cancel-admin-edit-member" class="btn btn-secondary">Avbryt</button>
+                        <button type="submit" id="save-admin-edit-member-btn" class="btn btn-primary">Lagre endringer</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Public Gallery Management Modal -->
+    <div id="admin-image-modal" class="hidden modal-container">
+        <div id="admin-image-modal-overlay" class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-800">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="text-lg" style="margin-bottom: 0;">Administrer Offentlig Galleri</h3>
+                <button type="button" id="close-admin-image-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="card-body">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 1.5rem; flex-wrap: wrap; gap: 1rem;">
+                    <p class="text-sm text-muted" style="margin: 0;">Her kan du se og slette bilder fra galleriet.</p>
+                    <button type="button" id="admin-upload-gallery-btn" class="btn btn-primary btn-sm">+ Last opp bilde</button>
+                </div>
+                <div id="admin-gallery-list-container" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 1rem;">
+                    <!-- Dynamically populated gallery list -->
+                </div>
+            </div>
+            <div class="card-footer" style="display: flex; justify-content: flex-end;">
+                <button type="button" id="close-admin-image-footer" class="btn btn-secondary">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Admin Status & Opening Hours Modal -->
+    <div id="admin-status-modal" class="hidden modal-container">
+        <div id="admin-status-modal-overlay" class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-600">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                <h3 class="text-lg" style="margin-bottom: 0;">Status & Åpningstider</h3>
+                <button type="button" id="close-admin-status-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div class="card-body">
+                <form id="admin-status-form">
+                    <div class="form-group">
+                        <label class="form-label font-semibold">Verksted-status i dag</label>
+                        <select id="admin-workshop-status" class="form-input">
+                            <option value="open">🟢 Åpent</option>
+                            <option value="closed">🔴 Stengt</option>
+                            <option value="event">🟡 Pågår arrangement</option>
+                        </select>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label class="form-label font-semibold">Viktig beskjed / Kunngjøring</label>
+                        <textarea id="admin-status-message" class="form-input" style="min-height: 70px;" placeholder="f.eks. Husk verneutstyr i dag eller Velkommen på sy-kveld!"></textarea>
+                    </div>
+
+                    <h4 class="text-sm font-semibold mb-3 mt-4" style="color: var(--color-primary);">Åpningstider per ukedag</h4>
+                    <div id="opening-hours-inputs" style="display: flex; flex-direction: column; gap: 0.5rem;">
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Mandag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Mandag" placeholder="f.eks. Stengt eller 18:00 - 21:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Tirsdag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Tirsdag" placeholder="f.eks. 18:00 - 21:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Onsdag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Onsdag" placeholder="f.eks. 18:00 - 21:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Torsdag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Torsdag" placeholder="f.eks. 18:00 - 21:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Fredag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Fredag" placeholder="f.eks. 18:00 - 22:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Lørdag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Lørdag" placeholder="f.eks. 12:00 - 18:00">
+                        </div>
+                        <div style="display: grid; grid-template-columns: 90px 1fr; align-items: center; gap: 0.75rem;">
+                            <label class="text-xs font-semibold">Søndag</label>
+                            <input type="text" class="form-input text-xs opening-day-input" data-day="Søndag" placeholder="f.eks. Stengt eller 12:00 - 18:00">
+                        </div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; gap: 1rem; margin-top: 1.5rem;">
+                        <button type="button" id="close-admin-status-footer" class="btn btn-secondary">Avbryt</button>
+                        <button type="submit" id="save-workshop-status-btn" class="btn btn-primary">Lagre åpningstider</button>
+                    </div>
+                </form>
             </div>
         </div>
     </div>
@@ -1138,6 +1092,7 @@
     </div>
 
     <!-- Firebase og hoved-script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="module" src="i18n.js"></script>
     <script type="module" src="tagging.js"></script>

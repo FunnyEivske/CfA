@@ -29,3 +29,22 @@ Thumbs.db
 *.log
 deploy_log.txt
 deploy_result.txt
+
+# Sensitive credentials & Local configs (NEVER commit to GitHub)
+.env
+.env.*
+*.local
+*.local.json
+*credentials*
+webhuset-credentials.json
+deploy-config.json
+secret*
+*.secret
+
+# Deploy artifacts
+dist_webhuset/
+cfa_webhuset_klar_til_opplasting/
+cfa_webhuset_klar_til_opplasting*
+deploy.ps1
+*.zip
+

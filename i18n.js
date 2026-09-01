@@ -12,6 +12,19 @@ async function loadTranslations(lang) {
         }
     }
     applyTranslations(lang);
+    updateLangBadges(lang);
+}
+
+function updateLangBadges(lang) {
+    const labels = document.querySelectorAll('.lang-current-label');
+    labels.forEach(el => {
+        el.textContent = lang.toUpperCase();
+    });
+    const buttons = document.querySelectorAll('.lang-toggle-btn, #lang-toggle-btn');
+    buttons.forEach(btn => {
+        btn.setAttribute('aria-label', lang === 'no' ? 'Bytt til engelsk' : 'Switch to Norwegian');
+        btn.setAttribute('title', lang === 'no' ? 'Bytt til engelsk' : 'Switch to Norwegian');
+    });
 }
 
 function applyTranslations(lang) {
@@ -46,10 +59,15 @@ export function toggleLanguage() {
 export function initI18n() {
     loadTranslations(currentLang);
     
-    const langBtn = document.getElementById('lang-toggle-btn');
-    if (langBtn) {
-        langBtn.addEventListener('click', toggleLanguage);
-    }
+    const langBtns = document.querySelectorAll('.lang-toggle-btn, #lang-toggle-btn');
+    langBtns.forEach(btn => {
+        btn.addEventListener('click', toggleLanguage);
+    });
 }
 
-document.addEventListener('DOMContentLoaded', initI18n);
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initI18n);
+} else {
+    initI18n();
+}
+

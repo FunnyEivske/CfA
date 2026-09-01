@@ -1,4 +1,4 @@
-import { AuthAPI } from './api-client.js';
+﻿import { AuthAPI } from './api-client.js';
 
 export async function initProfilePage() {
     const profileNameEl = document.getElementById('profile-name');
@@ -9,7 +9,7 @@ export async function initProfilePage() {
     try {
         const authRes = await AuthAPI.getAuthState();
         if (!authRes.authenticated) {
-            window.location.href = 'login.html';
+            window.location.href = 'login';
             return;
         }
 

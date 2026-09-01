@@ -56,25 +56,26 @@
 
 /* --- Dark Mode Overrides --- */
 [data-theme="dark"] {
+  --color-primary: #B72B50;
+  --color-primary-hover: #FFCDD2;
+
   --color-bg-body: var(--palette-charcoal-grey);
   --color-bg-surface: #2B2B2E;
   --color-bg-subtle: #323236;
-  /* Darker than body */
 
   --color-text-main: var(--palette-cream-ivory);
-  --color-text-muted: #FFCDD2;
+  --color-text-muted: #D1D1D6;
+  --color-text-inverse: #FFFFFF;
 
   --color-border: #4D4D52;
-  /* zinc-600 */
   --color-border-dark: #64646A;
-  /* zinc-500 */
 
   --color-bg-white: var(--palette-charcoal-grey);
   --color-bg-header: #18181B;
 
   --color-bg-input: #1F1F22;
-  /* Darker background for inputs */
 }
+
 
 /* Custom Scrollbar Styles */
 ::-webkit-scrollbar {
@@ -612,6 +613,46 @@ p {
   border-radius: var(--radius-full);
 }
 
+/* Globe Language Toggle Button beside Logo */
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+  text-decoration: none;
+}
+
+.lang-toggle-btn:hover {
+  transform: translateY(-1px) scale(1.04);
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.lang-toggle-btn .globe-icon {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
+[data-theme="dark"] .lang-toggle-btn {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-text-main);
+}
+
+
 .nav-desktop {
   display: none;
   align-items: center;
@@ -652,73 +693,80 @@ p {
   display: block;
 }
 
-.mobile-menu {
+.mobile-menu,
+.nav-menu-mobile {
   position: fixed;
   top: 0;
+  left: 0;
   right: 0;
-  width: 100%;
+  bottom: 0;
+  width: 100vw;
   height: 100vh;
-  background-color: rgba(255, 255, 255, 0.8);
+  background-color: var(--color-bg-surface, #FFFFFF);
   backdrop-filter: blur(15px);
   -webkit-backdrop-filter: blur(15px);
-  z-index: 100;
-  display: flex;
+  z-index: 2000;
+  display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: 2rem;
+  gap: 1.5rem;
   padding: 2rem;
-  transform: translateX(100%);
-  transition: transform 0.4s cubic-bezier(0.16, 1, 0.3, 1);
-  opacity: 0;
-  pointer-events: none;
 }
 
-[data-theme="dark"] .mobile-menu {
-  background-color: rgba(41, 37, 36, 0.8);
+[data-theme="dark"] .mobile-menu,
+[data-theme="dark"] .nav-menu-mobile {
+  background-color: var(--color-bg-surface, #1C1917);
 }
 
-.mobile-menu.show {
-  transform: translateX(0);
-  opacity: 1;
-  pointer-events: auto;
-  display: flex;
+.mobile-menu.show,
+.nav-menu-mobile.show {
+  display: flex !important;
 }
 
-.mobile-menu a {
+.mobile-menu a,
+.nav-menu-mobile a {
   display: block;
   font-size: 1.5rem;
   font-weight: 700;
-  font-family: var(--font-display);
+  font-family: var(--font-display, inherit);
   color: var(--color-text-main);
+  text-decoration: none;
   text-align: center;
-  padding: 0;
+  padding: 0.5rem 1rem;
   border: none !important;
-  transition: border-color 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+  transition: all 0.15s ease;
 }
 
 .mobile-menu a:hover,
-.mobile-menu a.active {
+.mobile-menu a.active,
+.nav-menu-mobile a:hover,
+.nav-menu-mobile a.nav-link-active {
   color: var(--color-primary);
-  transform: translateY(-5px);
+  transform: translateY(-2px);
 }
 
-.mobile-menu .btn {
+.mobile-menu .btn,
+.nav-menu-mobile .button,
+.nav-menu-mobile .btn {
   margin-top: 1rem;
   width: auto;
   min-width: 200px;
 }
 
 @media (min-width: 768px) {
-  .nav-desktop {
+  .nav-desktop,
+  .nav-menu-desktop {
     display: flex;
   }
 
-  .mobile-toggle {
-    display: none;
+  .mobile-toggle,
+  .mobile-menu-button {
+    display: none !important;
   }
 
-  .mobile-menu {
+  .mobile-menu,
+  .nav-menu-mobile {
     display: none !important;
   }
 }

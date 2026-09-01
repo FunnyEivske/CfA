@@ -1,8 +1,23 @@
 # Beskyttelse mot opplisting av mapper
 Options -Indexes
 
-# Blokker tilgang til sensitive filer
-<FilesMatch "^(package\.json|package-lock\.json|\.gitignore|\.gitattributes|task\.md|README\.md)$">
+# Rewrite Engine for pene URL-er (uten .html)
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+    RewriteBase /
+
+    # Omadresser forespørsler med .html til ren URL i adressefeltet (f.eks. /galleri.html -> /galleri)
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.html [NC]
+    RewriteRule ^ %1 [R=301,L]
+
+    # Server .html-filen internt hvis forespørselen matcher en eksisterende HTML-fil
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/$1.html -f
+    RewriteRule ^(.*?)/?$ $1.html [L]
+</IfModule>
+
+# Blokker direkte tilgang til sensitive filer, inkludert config.php og schema.sql
+<FilesMatch "^(config\.php|schema\.sql|package\.json|package-lock\.json|\.gitignore|\.gitattributes|task\.md|README\.md)$">
     Order allow,deny
     Deny from all
 </FilesMatch>
@@ -12,7 +27,7 @@ Options -Indexes
     Deny from all
 </FilesMatch>
 
-# Blokker tilgang til skjulte mapper som .git
+# Blokker tilgang til skjulte filer og mapper som .git
 <FilesMatch "^\.">
     Order allow,deny
     Deny from all

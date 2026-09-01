@@ -15,21 +15,30 @@
     <!-- Header & Navigasjon -->
     <header class="main-header">
         <nav class="container main-nav">
-            <a href="index.html" class="logo-link">
-                <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="logo-img">
-                <span class="logo-text">CfA</span>
-            </a>
+            <div class="nav-brand-group">
+                <a href="/" class="logo-link">
+                    <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="logo-img">
+                    <span class="logo-text">CfA</span>
+                </a>
+                <button class="lang-toggle-btn" aria-label="Bytt språk" title="Bytt språk">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="globe-icon">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span class="lang-current-label">NO</span>
+                </button>
+            </div>
 
             <!-- Desktop-meny -->
             <div class="nav-menu-desktop">
-                <a href="om-oss.html" class="nav-link" data-i18n="nav_about">Om oss</a>
-                <a href="hva-skjer.html" class="nav-link" data-i18n="nav_events">Conventions</a>
-                <a href="galleri.html" class="nav-link" data-i18n="nav_gallery">Galleri</a>
-                <a href="kontakt.html" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
-                <a id="member-link" href="medlem.html" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
-                <a id="login-link" href="login.html" class="button button-primary" data-i18n="nav_login">Logg inn</a>
+                <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
+                <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
+                <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
+                <a href="kontakt" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
+                <a id="member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
+                <a id="login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
-                <button id="lang-toggle-btn" class="button button-ghost" style="padding: 0.4rem 0.8rem; cursor: pointer;">🌐 NO / EN</button>
             </div>
 
             <!-- Mobilmeny-knapp -->
@@ -43,12 +52,12 @@
 
             <!-- Mobilmeny -->
             <div id="mobile-menu" class="nav-menu-mobile">
-                <a href="om-oss.html" class="nav-link" data-i18n="nav_about">Om oss</a>
-                <a href="hva-skjer.html" class="nav-link" data-i18n="nav_events">Conventions</a>
-                <a href="galleri.html" class="nav-link" data-i18n="nav_gallery">Galleri</a>
-                <a href="kontakt.html" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
-                <a id="mobile-member-link" href="medlem.html" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
-                <a id="mobile-login-link" href="login.html" class="button button-primary" data-i18n="nav_login">Logg inn</a>
+                <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
+                <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
+                <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
+                <a href="kontakt" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
+                <a id="mobile-member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
+                <a id="mobile-login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="mobile-logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
             </div>
         </nav>
@@ -59,25 +68,25 @@
         <section id="kontakt" class="section section-bg-white">
             <div class="container">
                 <div class="text-center" style="max-width: 600px; margin: 0 auto 3rem auto;">
-                    <h1>Kontakt oss</h1>
-                    <p class="text-lg">Har du spørsmål om organisasjonen, våre samlinger eller vil bli medlem? Send oss en melding!</p>
+                    <h1 data-i18n="contact_page_title">Kontakt oss</h1>
+                    <p class="text-lg" data-i18n="contact_page_subtitle">Har du spørsmål om organisasjonen, våre samlinger eller vil bli medlem? Send oss en melding!</p>
                 </div>
                 <div class="form-container">
                     <form>
                         <div class="form-group">
-                            <label for="name" class="form-label">Navn</label>
-                            <input type="text" id="name" name="name" class="form-input" placeholder="Ditt navn">
+                            <label for="name" class="form-label" data-i18n="form_name">Navn</label>
+                            <input type="text" id="name" name="name" class="form-input" data-i18n="form_name_placeholder" placeholder="Ditt navn">
                         </div>
                         <div class="form-group">
-                            <label for="email" class="form-label">E-post</label>
-                            <input type="email" id="email" name="email" class="form-input" placeholder="din@epost.no">
+                            <label for="email" class="form-label" data-i18n="form_email">E-post</label>
+                            <input type="email" id="email" name="email" class="form-input" data-i18n="form_email_placeholder" placeholder="din@epost.no">
                         </div>
                         <div class="form-group">
-                            <label for="message" class="form-label">Melding</label>
-                            <textarea id="message" name="message" class="form-textarea" placeholder="Skriv din melding her..."></textarea>
+                            <label for="message" class="form-label" data-i18n="form_message">Melding</label>
+                            <textarea id="message" name="message" class="form-textarea" data-i18n="form_message_placeholder_contact" placeholder="Skriv din melding her..."></textarea>
                         </div>
                         <div class="text-center">
-                            <button type="submit" class="button button-primary button-lg">Send Melding</button>
+                            <button type="submit" class="button button-primary button-lg" data-i18n="form_send_btn">Send Melding</button>
                         </div>
                     </form>
                 </div>
@@ -90,7 +99,7 @@
         <div class="container">
             <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="footer-logo">
             <p class="footer-title">Cosplay for alle (CfA)</p>
-            <p class="footer-address">Norge • post@cosplayforalle.no</p>
+            <p class="footer-address">Norge • Org.nr: 938 323 143 • post@cosplayforalle.no</p>
             <div class="social-links">
                 <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link">
                     <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -99,7 +108,7 @@
                         <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
                     </svg>
                 </a>
-                <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-link">
+                <a href="https://www.facebook.com/people/Cosplay-for-alle/61558775345038/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-link">
                     <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
                     </svg>

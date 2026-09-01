@@ -11,9 +11,7 @@ function getMockDB() {
         db = {
             currentUser: null,
             members: [
-                { id: 'usr_admin', email: 'admin@cfa.no', display_name: 'Admin Cosplayer', role: 'admin', photo_url: 'https://picsum.photos/seed/cfa_admin/150/150' },
-                { id: 'usr_2', email: 'nora@cfa.no', display_name: 'Nora (Foam Smith)', role: 'medlem', photo_url: 'https://picsum.photos/seed/cfa_nora/150/150' },
-                { id: 'usr_3', email: 'erik@cfa.no', display_name: 'Erik 3D Props', role: 'medlem', photo_url: 'https://picsum.photos/seed/cfa_erik/150/150' }
+                { id: 'usr_eivind', email: 'eivindrosstadskeie@gmail.com', display_name: 'Eivind', role: 'admin', photo_url: 'Media/Logo/cfa-logo.jpg' }
             ],
             posts: [
                 {
@@ -189,16 +187,21 @@ export async function request(action, method = 'GET', data = null, isFormData = 
             json = JSON.parse(text);
         } catch (e) {
             // PHP is not running locally (e.g. raw PHP code or 404 returned by Vite dev server)
-            return handleMockRequest(action, data);
+            if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+                return handleMockRequest(action, data);
+            }
+            throw new Error('Uventet serversvar: ' + text.substring(0, 150));
         }
 
         if (!response.ok) {
-            throw new Error(json.error || 'Network response error');
+            throw new Error(json.error || `Serverfeil (${response.status})`);
         }
         return json;
     } catch (err) {
-        // Fallback to local mock when PHP server is offline during dev testing
-        return handleMockRequest(action, data);
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+            return handleMockRequest(action, data);
+        }
+        throw err;
     }
 }
 
@@ -208,7 +211,9 @@ export const AuthAPI = {
     logout: () => request('logout', 'POST'),
     getAuthState: () => request('auth_state'),
     updateProfile: (displayName) => request('update_profile', 'POST', { display_name: displayName }),
-    uploadAvatar: (formData) => request('upload_avatar', 'POST', formData, true)
+    uploadAvatar: (formData) => request('upload_avatar', 'POST', formData, true),
+    changePassword: (newPassword) => request('change_password', 'POST', { new_password: newPassword }),
+    acceptTos: () => request('accept_tos', 'POST')
 };
 
 export const PostAPI = {
@@ -219,14 +224,41 @@ export const PostAPI = {
 };
 
 export const MemberAPI = {
-    getMembers: () => request('get_members')
+    getMembers: () => request('get_members'),
+    createMember: (email, password, name, role = 'medlem') => request('admin_create_member', 'POST', { email, password, name, role }),
+    updateMember: (dataOrId, displayName, role) => {
+        if (typeof dataOrId === 'object') {
+            if (dataOrId instanceof FormData) {
+                return request('admin_update_member', 'POST', dataOrId, true);
+            }
+            return request('admin_update_member', 'POST', dataOrId);
+        }
+        return request('admin_update_member', 'POST', { id: dataOrId, display_name: displayName, role });
+    },
+    deleteMember: (id) => request('delete_member', 'POST', { id })
 };
 
 export const GalleryAPI = {
-    getGallery: () => request('get_gallery'),
-    uploadImage: (formData) => request('upload_gallery', 'POST', formData, true)
+    getGallery: (type = 'public') => request('get_gallery', 'GET', { type }),
+    uploadImage: (formData) => request('upload_gallery', 'POST', formData, true),
+    deleteImage: (id) => request('delete_gallery', 'POST', { id }),
+    togglePublic: (id, isPublic = null) => request('toggle_gallery_public', 'POST', { id, is_public: isPublic })
 };
 
 export const EventAPI = {
-    getEvents: () => request('get_events')
+    getEvents: () => request('get_events'),
+    createEvent: (formData) => request('create_event', 'POST', formData, true),
+    deleteEvent: (id) => request('delete_event', 'POST', { id })
 };
+
+export const SettingsAPI = {
+    getWorkshopStatus: () => request('get_workshop_status'),
+    updateWorkshopStatus: (status, message, hours) => request('update_workshop_status', 'POST', { status, message, hours })
+};
+
+export const DocumentAPI = {
+    getDocuments: (category = '') => request('get_documents', 'GET', category ? { category } : {}),
+    saveDocument: (data) => request('save_document', 'POST', data),
+    deleteDocument: (id) => request('delete_document', 'POST', { id })
+};
+
