@@ -219,6 +219,7 @@ export const AuthAPI = {
 export const PostAPI = {
     getPosts: (category = 'general') => request('get_posts', 'GET', { category }),
     createPost: (formData) => request('create_post', 'POST', formData, true),
+    updatePost: (formData) => request('update_post', 'POST', formData, true),
     deletePost: (id) => request('delete_post', 'POST', { id }),
     toggleLike: (id) => request('like_post', 'POST', { id })
 };
@@ -248,6 +249,7 @@ export const GalleryAPI = {
 export const EventAPI = {
     getEvents: () => request('get_events'),
     createEvent: (formData) => request('create_event', 'POST', formData, true),
+    updateEvent: (formData) => request('update_event', 'POST', formData, true),
     deleteEvent: (id) => request('delete_event', 'POST', { id })
 };
 

@@ -2,6 +2,7 @@ import { PostAPI, AuthAPI } from './api-client.js';
 
 let currentUser = null;
 let postQuill = null;
+let currentPostImageFile = null;
 
 export async function initFeed() {
     const feedContainer = document.getElementById('feed-container');
@@ -61,7 +62,9 @@ function setupPostImageUpload() {
     const filenameLabel = document.getElementById('post-image-filename');
 
     if (dropZone && fileInput) {
-        dropZone.onclick = () => fileInput.click();
+        dropZone.onclick = (e) => {
+            if (e.target !== removeBtn) fileInput.click();
+        };
 
         dropZone.ondragover = (e) => {
             e.preventDefault();
@@ -87,6 +90,7 @@ function setupPostImageUpload() {
     }
 
     function handleFileSelected(file) {
+        currentPostImageFile = file;
         if (filenameLabel) filenameLabel.textContent = file.name;
         const reader = new FileReader();
         reader.onload = (e) => {
@@ -96,12 +100,14 @@ function setupPostImageUpload() {
         reader.readAsDataURL(file);
     }
 
-    if (removeBtn && fileInput) {
+    if (removeBtn) {
         removeBtn.onclick = (e) => {
             e.stopPropagation();
-            fileInput.value = '';
+            currentPostImageFile = null;
+            if (fileInput) fileInput.value = '';
             if (filenameLabel) filenameLabel.textContent = 'PNG, JPG, WEBP';
             if (previewContainer) previewContainer.classList.add('hidden');
+            if (previewImg) previewImg.src = '';
         };
     }
 }
@@ -118,9 +124,11 @@ export async function loadPosts() {
         
         feedContainer.innerHTML = '';
         if (!data.posts || data.posts.length === 0) {
-            feedContainer.innerHTML = '<p class="text-center" style="color: var(--color-text-muted);" data-i18n="no_posts">Ingen oppdateringer ennå.</p>';
+            feedContainer.innerHTML = '<p class="text-center text-muted py-6" data-i18n="no_posts">Ingen oppdateringer ennå.</p>';
             return;
         }
+
+        const isAdmin = currentUser && currentUser.role === 'admin';
 
         data.posts.forEach(post => {
             const article = document.createElement('article');
@@ -128,7 +136,6 @@ export async function loadPosts() {
             article.dataset.id = post.id;
 
             const isLikedClass = post.is_liked ? 'liked' : '';
-            const isAdmin = currentUser && currentUser.role === 'admin';
 
             article.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 1rem; margin-bottom: 1rem;">
@@ -140,13 +147,18 @@ export async function loadPosts() {
                         <p style="font-weight: 600; margin: 0; color: var(--color-text-main);">${post.author_name || 'Admin'}</p>
                         <p style="font-size: 0.85rem; margin: 0; color: var(--color-text-muted);">${new Date(post.created_at).toLocaleDateString('nb-NO')}</p>
                     </div>
-                    ${isAdmin ? `<button type="button" class="btn btn-ghost btn-sm delete-post-btn" data-id="${post.id}" style="margin-left: auto; color: var(--color-error); font-size: 1.1rem; padding: 0.2rem 0.5rem;" title="Slett innlegg">🗑️</button>` : ''}
+                    ${isAdmin ? `
+                        <div style="margin-left: auto; display: flex; gap: 0.5rem; align-items: center;">
+                            <button type="button" class="btn btn-secondary btn-xs edit-post-btn" style="padding: 0.3rem 0.6rem; font-size: 0.8rem; cursor: pointer;">✏️ Rediger</button>
+                            <button type="button" class="btn btn-ghost btn-xs delete-post-btn" data-id="${post.id}" style="color: var(--color-error); font-size: 0.9rem; padding: 0.3rem 0.5rem; cursor: pointer;" title="Slett innlegg">🗑️</button>
+                        </div>
+                    ` : ''}
                 </div>
-                <h3 style="margin-top: 0; color: var(--color-text-main);">${post.title}</h3>
-                <div class="feed-item-content" style="color: var(--color-text-main); margin: 0.75rem 0;">${post.content}</div>
+                <h3 style="margin-top: 0; color: var(--color-text-main); font-size: 1.25rem;">${post.title}</h3>
+                <div class="feed-item-content" style="color: var(--color-text-main); margin: 0.75rem 0; line-height: 1.6;">${post.content}</div>
                 ${post.image_url ? `
                     <div class="feed-item-image" style="margin-top: 1rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border);">
-                        <img src="${post.image_url}" alt="${post.title}" style="width: 100%; max-height: 500px; object-fit: cover;">
+                        <img src="${post.image_url}" alt="${post.title}" style="width: 100%; max-height: 500px; object-fit: cover; display: block;">
                     </div>
                 ` : ''}
                 <div class="post-actions" style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
@@ -156,6 +168,15 @@ export async function loadPosts() {
                 </div>
             `;
 
+            if (isAdmin) {
+                const editBtn = article.querySelector('.edit-post-btn');
+                if (editBtn) {
+                    editBtn.onclick = () => {
+                        openEditPostModal(post);
+                    };
+                }
+            }
+
             feedContainer.appendChild(article);
         });
 
@@ -164,6 +185,41 @@ export async function loadPosts() {
     } catch (err) {
         if (loadingEl) loadingEl.classList.add('hidden');
         feedContainer.innerHTML = '<p class="text-center text-error">Kunne ikke laste innlegg.</p>';
+    }
+}
+
+function openEditPostModal(post) {
+    let editIdInput = document.getElementById('post-edit-id');
+    if (!editIdInput) {
+        const form = document.getElementById('new-post-form');
+        if (form) {
+            editIdInput = document.createElement('input');
+            editIdInput.type = 'hidden';
+            editIdInput.id = 'post-edit-id';
+            form.prepend(editIdInput);
+        }
+    }
+
+    if (editIdInput) editIdInput.value = post.id;
+    const titleInput = document.getElementById('post-title');
+    if (titleInput) titleInput.value = post.title;
+
+    if (postQuill) {
+        postQuill.root.innerHTML = post.content || '';
+    } else {
+        const textarea = document.getElementById('post-content');
+        if (textarea) textarea.value = post.content || '';
+    }
+
+    const modalTitle = document.querySelector('#post-modal .card-header h3');
+    if (modalTitle) modalTitle.textContent = 'Rediger innlegg';
+    const submitBtn = document.getElementById('publish-post-btn') || document.querySelector('#new-post-form button[type="submit"]');
+    if (submitBtn) submitBtn.textContent = 'Lagre endringer';
+
+    const modal = document.getElementById('post-modal');
+    if (modal) {
+        modal.classList.remove('hidden');
+        document.body.classList.add('modal-open');
     }
 }
 
@@ -205,6 +261,21 @@ function setupPostForm() {
     const form = document.getElementById('new-post-form');
     if (!form) return;
 
+    // Reset edit state when new post button is clicked
+    const newPostBtn = document.getElementById('new-post-btn');
+    if (newPostBtn) {
+        newPostBtn.addEventListener('click', () => {
+            const editIdInput = document.getElementById('post-edit-id');
+            if (editIdInput) editIdInput.value = '';
+            form.reset();
+            if (postQuill) postQuill.setContents([]);
+            const modalTitle = document.querySelector('#post-modal .card-header h3');
+            if (modalTitle) modalTitle.textContent = 'Opprett nytt innlegg';
+            const submitBtn = document.getElementById('publish-post-btn') || form.querySelector('button[type="submit"]');
+            if (submitBtn) submitBtn.textContent = 'Publiser innlegg';
+        });
+    }
+
     form.onsubmit = async (e) => {
         e.preventDefault();
         const titleInput = document.getElementById('post-title');
@@ -219,16 +290,22 @@ function setupPostForm() {
             content = textarea ? textarea.value.trim() : '';
         }
 
-        if (!title) {
-            alert('Vennligst oppgi en tittel.');
-            return;
-        }
-        if (!content) {
-            alert('Vennligst skriv inn tekst i innlegget.');
+        if (!title || !content) {
+            alert('Vennligst fyll ut både tittel og innhold.');
             return;
         }
 
+        const editIdInput = document.getElementById('post-edit-id');
+        const editId = editIdInput ? editIdInput.value : '';
+
+        const submitBtn = document.getElementById('publish-post-btn') || form.querySelector('button[type="submit"]');
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = 'Lagrer innlegg...';
+        }
+
         const formData = new FormData();
+        if (editId) formData.append('id', editId);
         formData.append('title', title);
         formData.append('content', content);
         formData.append('category', 'general');
@@ -238,24 +315,28 @@ function setupPostForm() {
             formData.append('image', fileInput.files[0]);
         }
 
-        const submitBtn = document.getElementById('post-submit-button');
-        if (submitBtn) {
-            submitBtn.disabled = true;
-            submitBtn.textContent = 'Publiserer...';
-        }
-
         try {
-            await PostAPI.createPost(formData);
+            if (editId) {
+                await PostAPI.updatePost(formData);
+                alert('Innlegget ble oppdatert!');
+            } else {
+                await PostAPI.createPost(formData);
+                alert('Innlegget ble publisert!');
+            }
+
             form.reset();
+            if (editIdInput) editIdInput.value = '';
             if (postQuill) postQuill.setContents([]);
-            const previewCont = document.getElementById('post-image-preview-container');
-            if (previewCont) previewCont.classList.add('hidden');
+            const previewContainer = document.getElementById('post-image-preview-container');
+            if (previewContainer) previewContainer.classList.add('hidden');
+
             const modal = document.getElementById('post-modal');
             if (modal) modal.classList.add('hidden');
+            document.body.classList.remove('modal-open');
+
             await loadPosts();
-            alert('Innlegget ble publisert!');
         } catch (err) {
-            alert('Feil ved publisering: ' + err.message);
+            alert('Kunne ikke lagre innlegg: ' + err.message);
         } finally {
             if (submitBtn) {
                 submitBtn.disabled = false;
@@ -270,3 +351,4 @@ if (document.readyState === 'loading') {
 } else {
     initFeed();
 }
+

@@ -70,9 +70,14 @@ export async function loadHomepageGalleryTeaser() {
             return;
         }
 
-        // Shuffle array to get a random selection of 4 to 6 pictures
+        // Shuffle array and select 4 pictures so it is always 1 single clean line that scales smoothly
         const shuffled = [...items].sort(() => 0.5 - Math.random());
-        const selected = shuffled.slice(0, 6);
+        const count = Math.min(shuffled.length, 4);
+        const selected = shuffled.slice(0, count);
+
+        teaserContainer.style.display = 'grid';
+        teaserContainer.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+        teaserContainer.style.gap = 'clamp(0.5rem, 1.75vw, 1.25rem)';
 
         selected.forEach(img => {
             const itemDiv = document.createElement('div');

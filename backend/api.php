@@ -227,6 +227,40 @@ switch ($action) {
         jsonResponse(['success' => true, 'post_id' => $pdo->lastInsertId()]);
         break;
 
+    case 'update_post':
+        requireAuth();
+        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        
+        $postId = (int)($_POST['id'] ?? 0);
+        $title = trim($_POST['title'] ?? '');
+        $content = trim($_POST['content'] ?? '');
+        $category = trim($_POST['category'] ?? 'general');
+        
+        if (!$postId || !$title || !$content) jsonResponse(['error' => 'Tittel, innhold og ID er påkrevd'], 400);
+        
+        $imageUrl = null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['image'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+                $ext = 'jpg';
+            }
+            $filename = 'post_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+            if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
+                $imageUrl = '/uploads/' . $filename;
+            }
+        }
+        
+        if ($imageUrl) {
+            $stmt = $pdo->prepare('UPDATE posts SET title = ?, content = ?, category = ?, image_url = ? WHERE id = ?');
+            $stmt->execute([$title, $content, $category, $imageUrl, $postId]);
+        } else {
+            $stmt = $pdo->prepare('UPDATE posts SET title = ?, content = ?, category = ? WHERE id = ?');
+            $stmt->execute([$title, $content, $category, $postId]);
+        }
+        jsonResponse(['success' => true, 'id' => $postId]);
+        break;
+
     case 'delete_post':
         requireAuth();
         if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
@@ -411,6 +445,17 @@ switch ($action) {
             if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
                 $imageUrl = '/uploads/' . $filename;
             }
+        } elseif (isset($_POST['image_base64']) && strpos($_POST['image_base64'], 'data:image') === 0) {
+            $dataParts = explode(',', $_POST['image_base64']);
+            if (isset($dataParts[1])) {
+                $decoded = base64_decode($dataParts[1]);
+                if ($decoded) {
+                    $filename = 'event_' . time() . '_' . bin2hex(random_bytes(6)) . '.jpg';
+                    if (file_put_contents($upload_dir . $filename, $decoded)) {
+                        $imageUrl = '/uploads/' . $filename;
+                    }
+                }
+            }
         } elseif ($imageUrl && (strpos($imageUrl, 'http://') === 0 || strpos($imageUrl, 'https://') === 0)) {
             // Try downloading web image locally
             $context = stream_context_create([
@@ -432,6 +477,73 @@ switch ($action) {
             $stmt = $pdo->prepare('INSERT INTO events (title, description, date, location, image_url, visibility) VALUES (?, ?, ?, ?, ?, ?)');
             $stmt->execute([$title, $description, $date, $location, $imageUrl, $visibility]);
             jsonResponse(['success' => true, 'event_id' => $pdo->lastInsertId(), 'image_url' => $imageUrl]);
+        } catch (PDOException $e) {
+            jsonResponse(['error' => 'Databasefeil: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'update_event':
+        requireAuth();
+        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Bare administratorer kan redigere arrangementer.'], 403);
+        
+        $eventId = (int)($_POST['id'] ?? 0);
+        $title = trim($_POST['title'] ?? '');
+        $description = trim($_POST['description'] ?? '');
+        $rawDate = trim($_POST['date'] ?? '');
+        $location = trim($_POST['location'] ?? '');
+        $visibility = trim($_POST['visibility'] ?? 'public');
+        
+        if (!$eventId || !$title || !$rawDate) jsonResponse(['error' => 'ID, tittel og dato er påkrevd.'], 400);
+        
+        $date = date('Y-m-d H:i:s', strtotime($rawDate));
+        
+        $imageUrl = trim($_POST['image_url'] ?? '') ?: null;
+        if (isset($_FILES['image']) && $_FILES['image']['error'] === UPLOAD_ERR_OK) {
+            $file = $_FILES['image'];
+            $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
+            if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif', 'jfif', 'avif'])) {
+                $ext = 'jpg';
+            }
+            $filename = 'event_' . time() . '_' . bin2hex(random_bytes(6)) . '.' . $ext;
+            if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
+                $imageUrl = '/uploads/' . $filename;
+            }
+        } elseif (isset($_POST['image_base64']) && strpos($_POST['image_base64'], 'data:image') === 0) {
+            $dataParts = explode(',', $_POST['image_base64']);
+            if (isset($dataParts[1])) {
+                $decoded = base64_decode($dataParts[1]);
+                if ($decoded) {
+                    $filename = 'event_' . time() . '_' . bin2hex(random_bytes(6)) . '.jpg';
+                    if (file_put_contents($upload_dir . $filename, $decoded)) {
+                        $imageUrl = '/uploads/' . $filename;
+                    }
+                }
+            }
+        } elseif ($imageUrl && (strpos($imageUrl, 'http://') === 0 || strpos($imageUrl, 'https://') === 0)) {
+            $context = stream_context_create([
+                'http' => [
+                    'timeout' => 5,
+                    'user_agent' => 'Mozilla/5.0 (Windows NT 10.0; Win64; x64)'
+                ]
+            ]);
+            $imgData = @file_get_contents($imageUrl, false, $context);
+            if ($imgData && strlen($imgData) > 100) {
+                $filename = 'event_' . time() . '_' . bin2hex(random_bytes(6)) . '.jpg';
+                if (@file_put_contents($upload_dir . $filename, $imgData)) {
+                    $imageUrl = '/uploads/' . $filename;
+                }
+            }
+        }
+        
+        try {
+            if ($imageUrl) {
+                $stmt = $pdo->prepare('UPDATE events SET title = ?, description = ?, date = ?, location = ?, visibility = ?, image_url = ? WHERE id = ?');
+                $stmt->execute([$title, $description, $date, $location, $visibility, $imageUrl, $eventId]);
+            } else {
+                $stmt = $pdo->prepare('UPDATE events SET title = ?, description = ?, date = ?, location = ?, visibility = ? WHERE id = ?');
+                $stmt->execute([$title, $description, $date, $location, $visibility, $eventId]);
+            }
+            jsonResponse(['success' => true, 'id' => $eventId, 'image_url' => $imageUrl]);
         } catch (PDOException $e) {
             jsonResponse(['error' => 'Databasefeil: ' . $e->getMessage()], 500);
         }
