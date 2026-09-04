@@ -82,10 +82,14 @@ function setupModals() {
         const email = prompt('Skriv inn e-post for det nye medlemmet:');
         if (!email || !email.trim()) return;
         const name = prompt('Skriv inn visningsnavn:', email.split('@')[0]);
-        const password = prompt('Midlertidig passord:', '123456');
+        const password = prompt('Midlertidig passord (minst 6 tegn):', '123456');
+        if (!password || !password.trim()) {
+            alert('Passord kan ikke være tomt.');
+            return;
+        }
         try {
-            await MemberAPI.createMember(email.trim(), password || '123456', name ? name.trim() : 'Medlem', 'medlem');
-            alert('Brukeren ble opprettet!');
+            await MemberAPI.createMember(email.trim(), password.trim(), name ? name.trim() : 'Medlem', 'medlem');
+            alert(`✅ Brukeren ble opprettet!\n\nE-post: ${email.trim()}\nMidlertidig passord: ${password.trim()}\n\nHusk å gi dette midlertidige passordet til medlemmet. De må godkjenne brukervilkårene og sette sitt eget nye passord ved første innlogging.`);
             renderAdminMembersList();
             loadSidebarMembers();
         } catch (err) {
@@ -594,6 +598,7 @@ async function renderAdminMembersList() {
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem;">
                     <button type="button" class="btn btn-secondary btn-xs edit-user-btn" style="padding: 0.4rem 0.75rem; font-size: 0.8rem; cursor: pointer;">✏️ Rediger</button>
+                    <button type="button" class="btn btn-ghost btn-xs reset-user-pwd-btn" style="padding: 0.4rem 0.6rem; font-size: 0.8rem; cursor: pointer;" title="Sett nytt midlertidig passord">🔑 Passord</button>
                     <button type="button" class="btn btn-ghost btn-xs delete-user-btn" data-id="${m.id}" style="color: var(--color-error); cursor: pointer; padding: 0.4rem 0.6rem;" title="Slett medlem">🗑️</button>
                 </div>
             `;
@@ -602,6 +607,29 @@ async function renderAdminMembersList() {
             if (editBtn) {
                 editBtn.onclick = () => {
                     openAdminEditMemberModal(m);
+                };
+            }
+
+            const resetPwdBtn = item.querySelector('.reset-user-pwd-btn');
+            if (resetPwdBtn) {
+                resetPwdBtn.onclick = async () => {
+                    const newPw = prompt(`Sett nytt midlertidig passord for ${m.display_name} (${m.email}):`, '123456');
+                    if (!newPw || !newPw.trim()) return;
+                    if (newPw.trim().length < 6) {
+                        alert('Passordet må være minst 6 tegn.');
+                        return;
+                    }
+                    try {
+                        await MemberAPI.updateMember({
+                            id: m.id,
+                            display_name: m.display_name,
+                            role: m.role,
+                            new_password: newPw.trim()
+                        });
+                        alert(`✅ Passordet for ${m.display_name} ble oppdatert til: ${newPw.trim()}\n\nBrukeren må skifte passord ved neste innlogging.`);
+                    } catch (err) {
+                        alert('Kunne ikke oppdatere passord: ' + err.message);
+                    }
                 };
             }
 

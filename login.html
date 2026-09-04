@@ -14,8 +14,10 @@
 
     <div class="login-layout">
         <!-- Venstre side: Bilde/Stemning -->
-        <div class="login-visual" style="background-image: url('Media/Bilder/cosplay-gruppe.jpg'); background-size: cover; background-position: center;">
-            <div class="login-visual-content" style="background: rgba(0, 0, 0, 0.6); padding: 2rem; border-radius: 12px; backdrop-filter: blur(4px);">
+        <div class="login-visual"
+            style="background-image: url('Media/Bilder/cosplay-gruppe.jpg'); background-size: cover; background-position: center;">
+            <div class="login-visual-content"
+                style="background: rgba(0, 0, 0, 0.6); padding: 2rem; border-radius: 12px; backdrop-filter: blur(4px);">
                 <h1>Logg inn</h1>
                 <p class="text-lg">Velkommen til Cosplay for alle sin medlemsportal.</p>
             </div>
@@ -25,10 +27,13 @@
         <div class="login-form-section" style="position: relative;">
             <div style="position: absolute; top: 1.5rem; right: 1.5rem; z-index: 10;">
                 <button class="lang-toggle-btn" aria-label="Bytt språk" title="Bytt språk">
-                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="globe-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round" class="globe-icon">
                         <circle cx="12" cy="12" r="10"></circle>
                         <line x1="2" y1="12" x2="22" y2="12"></line>
-                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                        <path
+                            d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z">
+                        </path>
                     </svg>
                     <span class="lang-current-label">NO</span>
                 </button>
@@ -37,7 +42,8 @@
             <div class="login-wrapper">
                 <div class="mb-6 text-center">
                     <a href="/" class="login-logo">
-                        <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" style="height: 64px; width: 64px; border-radius: 50%; object-fit: cover;">
+                        <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo"
+                            style="height: 64px; width: 64px; border-radius: 50%; object-fit: cover;">
                     </a>
                     <h2>Velkommen til medlemsportalen</h2>
                     <p>Logg inn for å få tilgang til Min Side, medlemsliste og arrangementer.</p>
@@ -46,34 +52,49 @@
                 <form id="login-form">
                     <div class="form-group">
                         <label for="login-email" class="form-label">E-postadresse</label>
-                        <input type="email" id="login-email" name="email" class="form-input" placeholder="din@epost.no" required>
+                        <input type="email" id="login-email" name="email" class="form-input" placeholder="din@epost.no"
+                            required>
                     </div>
 
                     <div class="form-group">
-                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
+                        <div
+                            style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.5rem;">
                             <label for="login-password" class="form-label" style="margin-bottom: 0;">Passord</label>
-                            <button type="button" id="forgot-password-btn" class="btn-ghost text-sm text-primary" style="padding: 0;">Glemt passord?</button>
+                            <button type="button" id="forgot-password-btn" class="btn-ghost text-sm text-primary"
+                                style="padding: 0;">Glemt passord?</button>
                         </div>
                         <div style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="login-password" name="password" class="form-input" placeholder="••••••••" style="padding-right: 2.75rem;" required>
-                            <button type="button" class="password-toggle-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;" aria-label="Vis/skjul passord">
-                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <input type="password" id="login-password" name="password" class="form-input"
+                                placeholder="••••••••" style="padding-right: 2.75rem;" required>
+                            <button type="button" class="password-toggle-btn"
+                                style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;"
+                                aria-label="Vis/skjul passord">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                    </path>
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </button>
                         </div>
                     </div>
 
-                    <button type="submit" class="btn btn-primary btn-full">Logg inn</button>
+                    <div id="login-error" class="form-error text-center"
+                        style="display: none; color: #e53e3e; background: rgba(229, 62, 62, 0.1); border: 1px solid rgba(229, 62, 62, 0.3); border-radius: var(--radius-md, 8px); padding: 0.75rem 1rem; margin-bottom: 1.25rem; font-size: 0.875rem; font-weight: 500;">
+                    </div>
+
+                    <button type="submit" id="login-submit-btn" class="btn btn-primary btn-full">Logg inn</button>
                 </form>
 
                 <div class="mt-4 text-center">
-                    <p class="text-sm">Har du ikke konto ennå? <a href="bli-medlem" style="color: var(--color-primary); font-weight: 600;">Søk medlemskap</a></p>
+                    <p class="text-sm">Har du ikke konto ennå? <a href="bli-medlem"
+                            style="color: var(--color-primary); font-weight: 600;">Søk medlemskap</a></p>
                 </div>
             </div>
         </div>
@@ -83,23 +104,32 @@
     <div id="force-password-modal" class="hidden modal-container" style="z-index: 3500;">
         <div class="modal-overlay"></div>
         <div class="card modal-content maxWidth-600" style="position: relative; z-index: 10; padding: 2rem;">
-            <div class="card-header text-center" style="border-bottom: 2px solid var(--color-bg-section); padding-bottom: 1.25rem;">
+            <div class="card-header text-center"
+                style="border-bottom: 2px solid var(--color-bg-section); padding-bottom: 1.25rem;">
                 <h2 style="margin: 0; font-size: 1.4rem;">🔑 Opprett ditt personlige passord</h2>
-                <p class="text-xs text-muted mt-1">Dette er din første innlogging. Vennligst lag et nytt, sikkert passord for kontoen din.</p>
+                <p class="text-xs text-muted mt-1">Dette er din første innlogging. Vennligst lag et nytt, sikkert
+                    passord for kontoen din.</p>
             </div>
             <div class="card-body" style="padding-top: 1.5rem;">
                 <form id="force-password-form">
                     <div class="form-group">
                         <label for="new-password" class="form-label">Nytt passord (minst 6 tegn)</label>
                         <div style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="new-password" class="form-input" placeholder="Skriv nytt passord" style="padding-right: 2.75rem;" required minlength="6">
-                            <button type="button" class="password-toggle-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;" aria-label="Vis/skjul passord">
-                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <input type="password" id="new-password" class="form-input" placeholder="Skriv nytt passord"
+                                style="padding-right: 2.75rem;" required minlength="6">
+                            <button type="button" class="password-toggle-btn"
+                                style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;"
+                                aria-label="Vis/skjul passord">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                    </path>
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </button>
@@ -109,14 +139,22 @@
                     <div class="form-group">
                         <label for="confirm-new-password" class="form-label">Bekreft nytt passord</label>
                         <div style="position: relative; display: flex; align-items: center;">
-                            <input type="password" id="confirm-new-password" class="form-input" placeholder="Gjenta nytt passord" style="padding-right: 2.75rem;" required minlength="6">
-                            <button type="button" class="password-toggle-btn" style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;" aria-label="Vis/skjul passord">
-                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <input type="password" id="confirm-new-password" class="form-input"
+                                placeholder="Gjenta nytt passord" style="padding-right: 2.75rem;" required
+                                minlength="6">
+                            <button type="button" class="password-toggle-btn"
+                                style="position: absolute; right: 0.75rem; background: none; border: none; cursor: pointer; color: var(--color-text-muted); display: flex; align-items: center; justify-content: center; padding: 0.25rem;"
+                                aria-label="Vis/skjul passord">
+                                <svg class="eye-icon" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
                                     <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
                                     <circle cx="12" cy="12" r="3"></circle>
                                 </svg>
-                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                <svg class="eye-off-icon hidden" width="20" height="20" viewBox="0 0 24 24" fill="none"
+                                    stroke="currentColor" stroke-width="2">
+                                    <path
+                                        d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24">
+                                    </path>
                                     <line x1="1" y1="1" x2="23" y2="23"></line>
                                 </svg>
                             </button>
@@ -125,7 +163,8 @@
 
                     <div id="force-password-error" class="text-error text-xs mb-3 font-semibold"></div>
 
-                    <button type="submit" id="save-new-password-btn" class="btn btn-primary btn-full" style="padding: 0.85rem;">Lagre passord og fortsett</button>
+                    <button type="submit" id="save-new-password-btn" class="btn btn-primary btn-full"
+                        style="padding: 0.85rem;">Lagre passord og fortsett</button>
                 </form>
             </div>
         </div>
@@ -135,77 +174,123 @@
     <div id="tos-modal" class="hidden modal-container" style="z-index: 3400;">
         <div id="tos-modal-overlay" class="modal-overlay"></div>
         <div class="card modal-content maxWidth-800" style="max-height: 85vh; display: flex; flex-direction: column;">
-            <div class="card-header" style="text-align: center; border-bottom: 2px solid var(--color-bg-section); flex-shrink: 0;">
+            <div class="card-header"
+                style="text-align: center; border-bottom: 2px solid var(--color-bg-section); flex-shrink: 0;">
                 <h2 style="margin: 0; font-size: 1.5rem;">📜 Brukervilkår & Personvernerklæring</h2>
-                <p class="text-xs text-muted mt-1">Sist oppdatert: 1. september 2026 – Vennligst les og godta vilkårene for å aktivere kontoen din.</p>
+                <p class="text-xs text-muted mt-1">Sist oppdatert: 1. september 2026 – Vennligst les og godta vilkårene
+                    for å aktivere kontoen din.</p>
             </div>
-            <div class="card-body" style="padding: 1.5rem; line-height: 1.6; font-size: 0.9rem; overflow-y: auto; flex: 1;">
+            <div class="card-body"
+                style="padding: 1.5rem; line-height: 1.6; font-size: 0.9rem; overflow-y: auto; flex: 1;">
                 <div id="tos-content" class="text-left" style="display: flex; flex-direction: column; gap: 1rem;">
-                    <p style="background: var(--color-bg-subtle); padding: 0.75rem 1rem; border-radius: 6px; border-left: 4px solid var(--color-primary); font-weight: 500;">
-                        Dette er en juridisk bindende avtale mellom deg som medlem og CfA Cosplay for Alle. Brukerkontoer i våre systemer opprettes kun av administrator eller styret. For å få tilgang til din tildelte konto og bruke våre tjenester, må du lese og erklære deg enig i samtlige punkter nedenfor ved første pålogging.
+                    <p
+                        style="background: var(--color-bg-subtle); padding: 0.75rem 1rem; border-radius: 6px; border-left: 4px solid var(--color-primary); font-weight: 500;">
+                        Dette er en juridisk bindende avtale mellom deg som medlem og CfA Cosplay for Alle.
+                        Brukerkontoer i våre systemer opprettes kun av administrator eller styret. For å få tilgang til
+                        din tildelte konto og bruke våre tjenester, må du lese og erklære deg enig i samtlige punkter
+                        nedenfor ved første pålogging.
                     </p>
 
                     <div>
-                        <h4 class="font-semibold text-base" style="color: var(--color-primary); margin-bottom: 0.25rem;">1. Opprettelse av konto og Aldersgrense</h4>
+                        <h4 class="font-semibold text-base"
+                            style="color: var(--color-primary); margin-bottom: 0.25rem;">1. Opprettelse av konto og
+                            Aldersgrense</h4>
                         <p class="font-medium text-xs text-muted mb-1">1.1 Administrasjonsstyrt opprettelse</p>
-                        <p class="mb-2">Brukerkontoer på denne plattformen opprettes ikke av brukeren selv, men tildeles av CfA Cosplay for Alles administratorer eller styret etter godkjent medlemskap eller avtale.</p>
-                        
+                        <p class="mb-2">Brukerkontoer på denne plattformen opprettes ikke av brukeren selv, men tildeles
+                            av CfA Cosplay for Alles administratorer eller styret etter godkjent medlemskap eller
+                            avtale.</p>
+
                         <p class="font-medium text-xs text-muted mb-1">1.2 Alderskrav og Samtykke</p>
-                        <p class="mb-1"><strong>Over 18 år:</strong> Administrator oppretter konto for myndige personer etter avtale.</p>
-                        <p><strong>Under 18 år:</strong> Dersom styret oppretter en konto for en person under 18 år, skal det foreligge et signert samtykkeskjema fra foresatte i CfAs arkiv før kontoen aktiveres.</p>
+                        <p class="mb-1"><strong>Over 18 år:</strong> Administrator oppretter konto for myndige personer
+                            etter avtale.</p>
+                        <p><strong>Under 18 år:</strong> Dersom styret oppretter en konto for en person under 18 år,
+                            skal det foreligge et signert samtykkeskjema fra foresatte i CfAs arkiv før kontoen
+                            aktiveres.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-semibold text-base" style="color: var(--color-primary); margin-bottom: 0.25rem;">2. Personvernerklæring (GDPR)</h4>
-                        <p class="mb-2">Vi behandler dine data i tråd med personvernforordningen (GDPR). Siden kontoen din er opprettet av en tredjepart (admin), er det avgjørende at du godkjenner denne behandlingen ved første pålogging.</p>
-                        
+                        <h4 class="font-semibold text-base"
+                            style="color: var(--color-primary); margin-bottom: 0.25rem;">2. Personvernerklæring (GDPR)
+                        </h4>
+                        <p class="mb-2">Vi behandler dine data i tråd med personvernforordningen (GDPR). Siden kontoen
+                            din er opprettet av en tredjepart (admin), er det avgjørende at du godkjenner denne
+                            behandlingen ved første pålogging.</p>
+
                         <p class="font-medium text-xs text-muted mb-1">2.1 Data som behandles</p>
                         <ul style="padding-left: 1.25rem; margin-bottom: 0.75rem;">
                             <li><strong>Identitetsdata:</strong> Fullt navn og e-postadresse (tildelt av admin).</li>
-                            <li><strong>Tidslinje:</strong> Registreringsdato (startdato) og utmeldingsdato (sluttdato).</li>
-                            <li><strong>Brukerinnhold:</strong> Bilder du laster opp (for eksempel av cosplay/props), kommentarer og prosjektbeskrivelser.</li>
+                            <li><strong>Tidslinje:</strong> Registreringsdato (startdato) og utmeldingsdato (sluttdato).
+                            </li>
+                            <li><strong>Brukerinnhold:</strong> Bilder du laster opp (for eksempel av cosplay/props),
+                                kommentarer og prosjektbeskrivelser.</li>
                         </ul>
 
-                        <p class="font-medium text-xs text-muted mb-1">2.2 Sletteprosedyre og "Soft Delete" (30-dagers regelen)</p>
-                        <p class="mb-1">Når et medlemskap avsluttes, eller styret bestemmer at en konto skal slettes, trer følgende prosess i kraft:</p>
+                        <p class="font-medium text-xs text-muted mb-1">2.2 Sletteprosedyre og "Soft Delete" (30-dagers
+                            regelen)</p>
+                        <p class="mb-1">Når et medlemskap avsluttes, eller styret bestemmer at en konto skal slettes,
+                            trer følgende prosess i kraft:</p>
                         <ul style="padding-left: 1.25rem;">
-                            <li><strong>Låst tilstand (30 dager):</strong> Alle data lagres i sin helhet i 30 dager etter deaktivering. Brukeren mister tilgangen umiddelbart.</li>
-                            <li><strong>Permanent sletting:</strong> Etter 30 dager slettes alle personlige filer, bilder og innstillinger permanent fra aktive systemer.</li>
-                            <li><strong>Sikkerhetsarkiv:</strong> Navn, e-post, startdato og sluttdato flyttes til et lukket arkiv for å forhindre misbruk (svartelisting).</li>
+                            <li><strong>Låst tilstand (30 dager):</strong> Alle data lagres i sin helhet i 30 dager
+                                etter deaktivering. Brukeren mister tilgangen umiddelbart.</li>
+                            <li><strong>Permanent sletting:</strong> Etter 30 dager slettes alle personlige filer,
+                                bilder og innstillinger permanent fra aktive systemer.</li>
+                            <li><strong>Sikkerhetsarkiv:</strong> Navn, e-post, startdato og sluttdato flyttes til et
+                                lukket arkiv for å forhindre misbruk (svartelisting).</li>
                         </ul>
                     </div>
 
                     <div>
-                        <h4 class="font-semibold text-base" style="color: var(--color-primary); margin-bottom: 0.25rem;">3. Brukergenerert innhold og Promotering</h4>
-                        <p class="mb-2">CfA Cosplay for Alle er en plattform for å fremme kreativitet, inkludering og skaperglede. For at fellesskapet skal vokse, trenger vi rettigheter til å vise frem arbeidet som lastes opp på siden.</p>
-                        
+                        <h4 class="font-semibold text-base"
+                            style="color: var(--color-primary); margin-bottom: 0.25rem;">3. Brukergenerert innhold og
+                            Promotering</h4>
+                        <p class="mb-2">CfA Cosplay for Alle er en plattform for å fremme kreativitet, inkludering og
+                            skaperglede. For at fellesskapet skal vokse, trenger vi rettigheter til å vise frem arbeidet
+                            som lastes opp på siden.</p>
+
                         <p class="font-medium text-xs text-muted mb-1">3.1 Opphavsrett</p>
                         <p class="mb-2">Du beholder eierskapet til bildene og innholdet du laster opp til din konto.</p>
-                        
+
                         <p class="font-medium text-xs text-muted mb-1">3.2 Global Lisens for Promotering</p>
-                        <p>Ved å laste opp bilder til systemet, gir du CfA Cosplay for Alle en vederlagsfri rett til å bruke dette innholdet for å promotere foreningens egne aktiviteter og formål. Dette inkluderer bruk på nettsider, sosiale medier (Instagram, Facebook, TikTok) og i markedsføringsmateriell for CfA.</p>
+                        <p>Ved å laste opp bilder til systemet, gir du CfA Cosplay for Alle en vederlagsfri rett til å
+                            bruke dette innholdet for å promotere foreningens egne aktiviteter og formål. Dette
+                            inkluderer bruk på nettsider, sosiale medier (Instagram, Facebook, TikTok) og i
+                            markedsføringsmateriell for CfA.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-semibold text-base" style="color: var(--color-primary); margin-bottom: 0.25rem;">4. Sikkerhet og Styrets fullmakter</h4>
-                        <p class="mb-1"><strong>Eierskap til konto:</strong> Kontoen er CfA Cosplay for Alles eiendom og tildeles brukeren for personlig bruk knyttet til medlemskapet.</p>
-                        <p><strong>Utestengelse:</strong> Styret eller administrator har fullmakt til å låse eller slette kontoer umiddelbart ved brudd på våre retningslinjer, trivselsregler, eller ved uønsket adferd som strider mot CfAs verdier.</p>
+                        <h4 class="font-semibold text-base"
+                            style="color: var(--color-primary); margin-bottom: 0.25rem;">4. Sikkerhet og Styrets
+                            fullmakter</h4>
+                        <p class="mb-1"><strong>Eierskap til konto:</strong> Kontoen er CfA Cosplay for Alles eiendom og
+                            tildeles brukeren for personlig bruk knyttet til medlemskapet.</p>
+                        <p><strong>Utestengelse:</strong> Styret eller administrator har fullmakt til å låse eller
+                            slette kontoer umiddelbart ved brudd på våre retningslinjer, trivselsregler, eller ved
+                            uønsket adferd som strider mot CfAs verdier.</p>
                     </div>
 
                     <div>
-                        <h4 class="font-semibold text-base" style="color: var(--color-primary); margin-bottom: 0.25rem;">5. Aksept av vilkår ved første pålogging</h4>
-                        <p>Ved å huke av for "Jeg godtar" og logge inn på din tildelte konto, bekrefter du at informasjonen er korrekt, at du er over 18 år (eller har innhentet nødvendig samtykke), at du forstår sletterutinen og at du gir tillatelse til promotering av dine bilder som beskrevet over.</p>
+                        <h4 class="font-semibold text-base"
+                            style="color: var(--color-primary); margin-bottom: 0.25rem;">5. Aksept av vilkår ved første
+                            pålogging</h4>
+                        <p>Ved å huke av for "Jeg godtar" og logge inn på din tildelte konto, bekrefter du at
+                            informasjonen er korrekt, at du er over 18 år (eller har innhentet nødvendig samtykke), at
+                            du forstår sletterutinen og at du gir tillatelse til promotering av dine bilder som
+                            beskrevet over.</p>
                     </div>
                 </div>
             </div>
-            <div class="card-footer" style="padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; border-top: 2px solid var(--color-bg-section); flex-shrink: 0;">
+            <div class="card-footer"
+                style="padding: 1.25rem; display: flex; flex-direction: column; gap: 0.75rem; align-items: center; border-top: 2px solid var(--color-bg-section); flex-shrink: 0;">
                 <div style="display: flex; align-items: center; gap: 0.75rem;">
                     <input type="checkbox" id="tos-checkbox" style="width: 20px; height: 20px; cursor: pointer;">
-                    <label for="tos-checkbox" style="font-weight: 600; cursor: pointer; font-size: 0.9rem;">Jeg har lest og godtar Brukervilkår og Personvernerklæring</label>
+                    <label for="tos-checkbox" style="font-weight: 600; cursor: pointer; font-size: 0.9rem;">Jeg har lest
+                        og godtar Brukervilkår og Personvernerklæring</label>
                 </div>
                 <div style="display: flex; gap: 1rem; width: 100%; max-width: 500px;">
-                    <button type="button" id="decline-tos-btn" class="btn btn-secondary" style="flex: 1; padding: 0.75rem;">Nekt og logg ut</button>
-                    <button type="button" id="accept-tos-btn" class="btn btn-primary" style="flex: 2; padding: 0.75rem;" disabled>Jeg godtar og vil fortsette</button>
+                    <button type="button" id="decline-tos-btn" class="btn btn-secondary"
+                        style="flex: 1; padding: 0.75rem;">Nekt og logg ut</button>
+                    <button type="button" id="accept-tos-btn" class="btn btn-primary" style="flex: 2; padding: 0.75rem;"
+                        disabled>Jeg godtar og vil fortsette</button>
                 </div>
             </div>
         </div>
@@ -214,11 +299,13 @@
     <!-- Custom Alert/Message Modal -->
     <div id="message-modal" class="hidden modal-container" style="z-index: 3000;">
         <div id="message-modal-overlay" class="modal-overlay"></div>
-        <div class="card" style="position: relative; width: 100%; max-width: 400px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
+        <div class="card"
+            style="position: relative; width: 100%; max-width: 400px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
             <div class="card-body text-center" style="padding: 2.5rem 2rem;">
                 <p id="message-modal-text" class="mb-8 text-lg" style="line-height: 1.5;"></p>
                 <div style="display: flex; justify-content: center;">
-                    <button id="message-modal-close" class="btn btn-primary" style="min-width: 120px; padding: 0.8rem 2rem;">Lukk</button>
+                    <button id="message-modal-close" class="btn btn-primary"
+                        style="min-width: 120px; padding: 0.8rem 2rem;">Lukk</button>
                 </div>
             </div>
         </div>
@@ -227,12 +314,15 @@
     <!-- Custom Confirm Modal -->
     <div id="confirm-modal" class="hidden modal-container" style="z-index: 3100;">
         <div id="confirm-modal-overlay" class="modal-overlay"></div>
-        <div class="card" style="position: relative; width: 100%; max-width: 450px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
+        <div class="card"
+            style="position: relative; width: 100%; max-width: 450px; z-index: 10; box-shadow: var(--shadow-xl); border: 2px solid var(--color-primary); overflow: hidden;">
             <div class="card-body text-center" style="padding: 2.5rem 2rem;">
                 <p id="confirm-modal-text" class="mb-8 text-lg" style="line-height: 1.5;"></p>
                 <div style="display: flex; justify-content: center; gap: 1rem;">
-                    <button id="confirm-modal-cancel" class="btn btn-secondary" style="flex: 1; padding: 0.8rem 1rem;">Avbryt</button>
-                    <button id="confirm-modal-ok" class="btn btn-primary" style="flex: 1; padding: 0.8rem 1rem;">Gå videre</button>
+                    <button id="confirm-modal-cancel" class="btn btn-secondary"
+                        style="flex: 1; padding: 0.8rem 1rem;">Avbryt</button>
+                    <button id="confirm-modal-ok" class="btn btn-primary" style="flex: 1; padding: 0.8rem 1rem;">Gå
+                        videre</button>
                 </div>
             </div>
         </div>
@@ -241,10 +331,13 @@
     <!-- Dark Mode Floating Button -->
     <button class="theme-toggle" aria-label="Bytt tema">
         <svg class="moon-icon" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
         </svg>
-        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24"
+            stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
         </svg>
     </button>
 

@@ -118,14 +118,45 @@ function setupLoginForm() {
     const registerForm = document.getElementById('register-form');
     const errorEl = document.getElementById('login-error');
 
+    const forgotBtn = document.getElementById('forgot-password-btn');
+    if (forgotBtn) {
+        forgotBtn.onclick = () => {
+            const msg = 'Brukerkontoer i Cosplay for Alle administreres av styret.\n\nHvis du har glemt passordet ditt, eller ikke har mottatt et midlertidig passord, vennligst send en e-post til:\nCosplayforalle@gmail.com\n\nså hjelper styret deg med å tilbakestille kontoen.';
+            if (typeof showCustomAlert === 'function') {
+                showCustomAlert(msg);
+            } else {
+                alert(msg);
+            }
+        };
+    }
+
     if (loginForm) {
+        const submitBtn = document.getElementById('login-submit-btn') || loginForm.querySelector('button[type="submit"]');
+
         loginForm.onsubmit = async (e) => {
             e.preventDefault();
             const emailInput = document.getElementById('login-email') || loginForm.email;
             const passwordInput = document.getElementById('login-password') || loginForm.password;
             const email = emailInput ? emailInput.value.trim() : '';
             const password = passwordInput ? passwordInput.value.trim() : '';
-            if (errorEl) errorEl.textContent = '';
+            
+            if (errorEl) {
+                errorEl.textContent = '';
+                errorEl.style.display = 'none';
+            }
+
+            if (!email || !password) {
+                if (errorEl) {
+                    errorEl.textContent = 'Vennligst fyll ut både e-postadresse og passord.';
+                    errorEl.style.display = 'block';
+                }
+                return;
+            }
+
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Logger inn...';
+            }
 
             try {
                 const res = await AuthAPI.login(email, password);
@@ -133,7 +164,18 @@ function setupLoginForm() {
                     handlePostLoginFlow(res);
                 }
             } catch (err) {
-                if (errorEl) errorEl.textContent = 'Feil ved innlogging: ' + err.message;
+                if (errorEl) {
+                    const is401 = err.message && (err.message.includes('401') || err.message.toLowerCase().includes('feil'));
+                    errorEl.textContent = is401 
+                        ? 'Feil e-postadresse eller passord. Hvis du nylig ble opprettet som medlem, sjekk at du bruker det midlertidige passordet du fikk av styret.' 
+                        : 'Kunne ikke logge inn: ' + err.message;
+                    errorEl.style.display = 'block';
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = 'Logg inn';
+                }
             }
         };
     }
