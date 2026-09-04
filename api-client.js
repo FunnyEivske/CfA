@@ -33,11 +33,24 @@ function getMockDB() {
             ],
             events: [
                 { id: 1, title: 'Bekkebotn Con 2026', date: '2026-10-15T12:00:00', location: 'Oslo Spectrum', description: 'Bli med på årets største treff!' }
+            ],
+            documents: [
+                { id: 1, category: 'vedtekter', title: '§ 1 Formål', content: '<p>Cosplay for alle har som formål å fremme interesse og fellesskap rundt cosplay.</p>', document_date: '2026-01-01' },
+                { id: 2, category: 'retningslinjer', title: 'Husregler for verkstedet', content: '<p>1. Rydd opp etter deg.<br>2. Sikkerhetsutstyr er påbudt ved maskiner.</p>', document_date: '2026-01-01' },
+                { id: 3, category: 'referater', title: 'Styremøte Januar 2026', content: '<p>Referat fra styremøtet. Gjennomgang av planer for året.</p>', document_date: '2026-01-15' }
             ]
         };
         localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(db));
     } else {
         db = JSON.parse(db);
+        if (!db.documents) {
+            db.documents = [
+                { id: 1, category: 'vedtekter', title: '§ 1 Formål', content: '<p>Cosplay for alle har som formål å fremme interesse og fellesskap rundt cosplay.</p>', document_date: '2026-01-01' },
+                { id: 2, category: 'retningslinjer', title: 'Husregler for verkstedet', content: '<p>1. Rydd opp etter deg.<br>2. Sikkerhetsutstyr er påbudt ved maskiner.</p>', document_date: '2026-01-01' },
+                { id: 3, category: 'referater', title: 'Styremøte Januar 2026', content: '<p>Referat fra styremøtet. Gjennomgang av planer for året.</p>', document_date: '2026-01-15' }
+            ];
+            localStorage.setItem(MOCK_STORAGE_KEY, JSON.stringify(db));
+        }
     }
     return db;
 }
@@ -152,12 +165,56 @@ function handleMockRequest(action, data) {
         case 'get_events':
             return { events: db.events };
 
+        case 'get_documents':
+            const docCat = data && data.category ? data.category : null;
+            const docs = (db.documents || []).filter(d => !docCat || d.category === docCat);
+            return { documents: docs };
+
+        case 'save_document':
+            if (!db.documents) db.documents = [];
+            const docId = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('id') : (data ? data.id : null);
+            const title = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('title') : (data ? data.title : '');
+            const content = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('content') : (data ? data.content : '');
+            const category = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('category') : (data ? data.category : 'vedtekter');
+            const docDate = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('document_date') : (data ? data.document_date : new Date().toISOString().split('T')[0]);
+
+            if (docId) {
+                const existing = db.documents.find(d => d.id == docId);
+                if (existing) {
+                    existing.title = title;
+                    existing.content = content;
+                    existing.category = category;
+                    existing.document_date = docDate;
+                    saveMockDB(db);
+                    return { success: true, id: existing.id };
+                }
+            }
+            const newDoc = {
+                id: Date.now(),
+                title,
+                content,
+                category,
+                document_date: docDate,
+                created_at: new Date().toISOString()
+            };
+            db.documents.unshift(newDoc);
+            saveMockDB(db);
+            return { success: true, id: newDoc.id };
+
+        case 'delete_document':
+            if (!db.documents) db.documents = [];
+            const delId = data ? data.id : null;
+            db.documents = db.documents.filter(d => d.id != delId);
+            saveMockDB(db);
+            return { success: true };
+
         default:
             return { success: true };
     }
 }
 
 export async function request(action, method = 'GET', data = null, isFormData = false) {
+    const isForm = isFormData || (typeof FormData !== 'undefined' && data instanceof FormData);
     const options = {
         method,
         headers: {}
@@ -165,7 +222,7 @@ export async function request(action, method = 'GET', data = null, isFormData = 
 
     let url = `${API_BASE}?action=${action}`;
 
-    if (data && !isFormData) {
+    if (data && !isForm) {
         if (method === 'POST' || method === 'PUT') {
             options.headers['Content-Type'] = 'application/json';
             options.body = JSON.stringify(data);
@@ -173,7 +230,7 @@ export async function request(action, method = 'GET', data = null, isFormData = 
             const queryParams = new URLSearchParams(data).toString();
             url += `&${queryParams}`;
         }
-    } else if (data && isFormData) {
+    } else if (data && isForm) {
         options.body = data;
     }
 
@@ -260,7 +317,7 @@ export const SettingsAPI = {
 
 export const DocumentAPI = {
     getDocuments: (category = '') => request('get_documents', 'GET', category ? { category } : {}),
-    saveDocument: (data) => request('save_document', 'POST', data),
+    saveDocument: (data) => request('save_document', 'POST', data, true),
     deleteDocument: (id) => request('delete_document', 'POST', { id })
 };
 

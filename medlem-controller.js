@@ -784,12 +784,12 @@ function setupDocuments() {
             const id = document.getElementById('doc-entry-id').value;
             const category = document.getElementById('doc-entry-category').value || currentDocCategory;
             const title = document.getElementById('doc-entry-name').value.trim();
-            const date = document.getElementById('doc-entry-date').value;
+            const date = document.getElementById('doc-entry-date').value || new Date().toISOString().split('T')[0];
             
             let content = '';
             if (docQuill && !document.getElementById('doc-quill-editor').classList.contains('hidden')) {
-                content = docQuill.root.innerHTML.trim();
-                if (content === '<p><br></p>') content = '';
+                const textOnly = docQuill.getText().trim();
+                content = (textOnly.length > 0 || docQuill.root.innerHTML.includes('<img')) ? docQuill.root.innerHTML.trim() : '';
             } else {
                 content = document.getElementById('doc-entry-content').value.trim();
             }
