@@ -65,7 +65,7 @@ function handleMockRequest(action, data) {
     console.log(`[Local Mock API] Action: ${action}`, data);
 
     switch (action) {
-        case 'login':
+        case 'login': {
             const loginUser = db.members.find(m => m.email === data.email) || {
                 id: 'usr_' + Date.now(),
                 email: data.email || 'user@cfa.no',
@@ -76,8 +76,9 @@ function handleMockRequest(action, data) {
             db.currentUser = loginUser;
             saveMockDB(db);
             return { success: true, user: loginUser };
+        }
 
-        case 'register':
+        case 'register': {
             const newUser = {
                 id: 'usr_' + Date.now(),
                 email: data.email,
@@ -89,6 +90,7 @@ function handleMockRequest(action, data) {
             db.currentUser = newUser;
             saveMockDB(db);
             return { success: true, user: newUser };
+        }
 
         case 'auth_state':
             return { authenticated: !!db.currentUser, user: db.currentUser };
@@ -113,7 +115,7 @@ function handleMockRequest(action, data) {
         case 'get_posts':
             return { posts: db.posts };
 
-        case 'create_post':
+        case 'create_post': {
             const title = data instanceof FormData ? data.get('title') : data.title;
             const content = data instanceof FormData ? data.get('content') : data.content;
             const newPost = {
@@ -132,13 +134,14 @@ function handleMockRequest(action, data) {
             db.posts.unshift(newPost);
             saveMockDB(db);
             return { success: true, post_id: newPost.id };
+        }
 
         case 'delete_post':
             db.posts = db.posts.filter(p => p.id != data.id);
             saveMockDB(db);
             return { success: true };
 
-        case 'like_post':
+        case 'like_post': {
             const post = db.posts.find(p => p.id == data.id);
             if (post) {
                 post.is_liked = !post.is_liked;
@@ -147,11 +150,12 @@ function handleMockRequest(action, data) {
                 return { success: true, liked: post.is_liked, likes_count: post.likes_count };
             }
             return { success: false };
+        }
 
         case 'get_gallery':
             return { gallery: db.gallery };
 
-        case 'upload_gallery':
+        case 'upload_gallery': {
             const galItem = {
                 id: Date.now(),
                 title: 'Nytt Bilde',
@@ -161,16 +165,18 @@ function handleMockRequest(action, data) {
             db.gallery.unshift(galItem);
             saveMockDB(db);
             return { success: true, image_url: galItem.image_url };
+        }
 
         case 'get_events':
             return { events: db.events };
 
-        case 'get_documents':
+        case 'get_documents': {
             const docCat = data && data.category ? data.category : null;
             const docs = (db.documents || []).filter(d => !docCat || d.category === docCat);
             return { documents: docs };
+        }
 
-        case 'save_document':
+        case 'save_document': {
             if (!db.documents) db.documents = [];
             const docId = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('id') : (data ? data.id : null);
             const title = (data && typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('title') : (data ? data.title : '');
@@ -200,13 +206,15 @@ function handleMockRequest(action, data) {
             db.documents.unshift(newDoc);
             saveMockDB(db);
             return { success: true, id: newDoc.id };
+        }
 
-        case 'delete_document':
+        case 'delete_document': {
             if (!db.documents) db.documents = [];
             const delId = data ? data.id : null;
             db.documents = db.documents.filter(d => d.id != delId);
             saveMockDB(db);
             return { success: true };
+        }
 
         default:
             return { success: true };
