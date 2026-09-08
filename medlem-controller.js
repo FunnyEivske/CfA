@@ -154,6 +154,19 @@ function setupModals() {
             document.body.classList.remove('modal-open');
         }
     });
+
+    // 9. Logg ut-knapper
+    const handleLogout = async () => {
+        try {
+            await AuthAPI.logout();
+        } catch (e) {
+            console.error('Logout error:', e);
+        }
+        window.location.href = '/';
+    };
+    bindClick('logout-button', handleLogout);
+    bindClick('dropdown-logout-button', handleLogout);
+    bindClick('mobile-logout-button', handleLogout);
 }
 
 function bindClick(id, handler) {

@@ -38,23 +38,23 @@ async function setupAuthUI() {
 
 function updateHeaderUI(user) {
     const loginLink = document.getElementById('login-link');
-    const logoutBtn = document.getElementById('logout-button');
+    const logoutBtns = document.querySelectorAll('#logout-button, #dropdown-logout-button');
     const memberLink = document.getElementById('member-link');
     const profileLink = document.getElementById('profile-link');
 
     const mobileLoginLink = document.getElementById('mobile-login-link');
-    const mobileLogoutBtn = document.getElementById('mobile-logout-button');
+    const mobileLogoutBtns = document.querySelectorAll('#mobile-logout-button');
     const mobileMemberLink = document.getElementById('mobile-member-link');
 
     if (user) {
         if (loginLink) loginLink.classList.add('hidden');
-        if (logoutBtn) {
-            logoutBtn.classList.remove('hidden');
-            logoutBtn.onclick = async () => {
+        logoutBtns.forEach(btn => {
+            btn.classList.remove('hidden');
+            btn.onclick = async () => {
                 await AuthAPI.logout();
                 window.location.href = '/';
             };
-        }
+        });
         if (memberLink) {
             memberLink.classList.remove('hidden');
             memberLink.style.display = '';
@@ -62,25 +62,25 @@ function updateHeaderUI(user) {
         if (profileLink) profileLink.classList.remove('hidden');
 
         if (mobileLoginLink) mobileLoginLink.classList.add('hidden');
-        if (mobileLogoutBtn) {
-            mobileLogoutBtn.classList.remove('hidden');
-            mobileLogoutBtn.onclick = async () => {
+        mobileLogoutBtns.forEach(btn => {
+            btn.classList.remove('hidden');
+            btn.onclick = async () => {
                 await AuthAPI.logout();
                 window.location.href = '/';
             };
-        }
+        });
         if (mobileMemberLink) {
             mobileMemberLink.classList.remove('hidden');
             mobileMemberLink.style.display = '';
         }
     } else {
         if (loginLink) loginLink.classList.remove('hidden');
-        if (logoutBtn) logoutBtn.classList.add('hidden');
+        logoutBtns.forEach(btn => btn.classList.add('hidden'));
         if (memberLink) memberLink.classList.add('hidden');
         if (profileLink) profileLink.classList.add('hidden');
 
         if (mobileLoginLink) mobileLoginLink.classList.remove('hidden');
-        if (mobileLogoutBtn) mobileLogoutBtn.classList.add('hidden');
+        mobileLogoutBtns.forEach(btn => btn.classList.add('hidden'));
         if (mobileMemberLink) mobileMemberLink.classList.add('hidden');
     }
 }
