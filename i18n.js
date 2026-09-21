@@ -41,6 +41,9 @@ function applyTranslations(lang) {
                 el.placeholder = t[key];
             } else {
                 el.textContent = t[key];
+                if (el.tagName === 'A' && t[key].includes('@')) {
+                    el.href = `mailto:${t[key]}`;
+                }
             }
         }
     });

@@ -121,7 +121,7 @@ function setupLoginForm() {
     const forgotBtn = document.getElementById('forgot-password-btn');
     if (forgotBtn) {
         forgotBtn.onclick = () => {
-            const msg = 'Brukerkontoer i Cosplay for Alle administreres av styret.\n\nHvis du har glemt passordet ditt, eller ikke har mottatt et midlertidig passord, vennligst send en e-post til:\nCosplayforalle@gmail.com\n\nså hjelper styret deg med å tilbakestille kontoen.';
+            const msg = 'Brukerkontoer i Cosplay for Alle administreres av styret.\n\nHvis du har glemt passordet ditt, eller ikke har mottatt et midlertidig passord, vennligst send en e-post til:\nkontakt@cosplayforalle.no\n\nså hjelper styret deg med å tilbakestille kontoen.';
             if (typeof showCustomAlert === 'function') {
                 showCustomAlert(msg);
             } else {

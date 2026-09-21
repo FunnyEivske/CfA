@@ -11,7 +11,7 @@ function getMockDB() {
         db = {
             currentUser: null,
             members: [
-                { id: 'usr_eivind', email: 'eivindrosstadskeie@gmail.com', display_name: 'Eivind', role: 'admin', photo_url: 'Media/Logo/cfa-logo.jpg' }
+                { id: 'usr_eivind', email: 'eivind@cosplayforalle.no', display_name: 'Eivind', role: 'admin', photo_url: 'Media/Logo/cfa-logo.jpg' }
             ],
             posts: [
                 {

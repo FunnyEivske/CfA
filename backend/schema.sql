@@ -60,6 +60,6 @@ CREATE TABLE IF NOT EXISTS gallery (
 
 -- Hovedbruker / Admin
 INSERT IGNORE INTO users (id, email, password_hash, display_name, role, member_since)
-VALUES ('usr_eivind', 'eivindrosstadskeie@gmail.com', '$2y$10$S8cgwn7J/dJxSpY8clISl.Z/PznKW.MbZCDSi5gtkXkmdVz0sKU0', 'Eivind', 'admin', CURDATE());
+VALUES ('usr_eivind', 'eivind@cosplayforalle.no', '$2y$10$S8cgwn7J/dJxSpY8clISl.Z/PznKW.MbZCDSi5gtkXkmdVz0sKU0', 'Eivind', 'admin', CURDATE());
 
 
