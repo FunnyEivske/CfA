@@ -308,10 +308,10 @@ export async function request(action, method = 'GET', data = null, isFormData = 
 /**
  * Rask klientside-bildeoptimalisering via HTML5 Canvas.
  * Skalerer ned store kamera- og mobilbilder (f.eks. 5-30 MB) og komprimerer til JPEG.
- * Forhindrer at opplastinger feiler med 400 Bad Request eller 500 pga. serverens
- * upload_max_filesize eller post_max_size begrensninger.
+ * Hvis bildet fremdeles er for stort i kilobyte, reduseres kvaliteten og oppløsningen
+ * automatisk trinn for trinn til filen er optimal (under 500 KB).
  */
-export async function optimizeImageForUpload(file, maxWidth = 1920, quality = 0.85) {
+export async function optimizeImageForUpload(file, maxWidth = 1024, initialQuality = 0.85, maxSizeBytes = 500 * 1024) {
     if (!file || !(file instanceof Blob) || !file.type || !file.type.startsWith('image/')) {
         return file;
     }
@@ -324,53 +324,62 @@ export async function optimizeImageForUpload(file, maxWidth = 1920, quality = 0.
         const img = new Image();
         const url = URL.createObjectURL(file);
 
-        img.onload = () => {
+        img.onload = async () => {
             URL.revokeObjectURL(url);
-            let width = img.width;
-            let height = img.height;
+            let curWidth = img.width;
+            let curHeight = img.height;
+            let curQuality = initialQuality;
 
-            if (width <= maxWidth && height <= maxWidth && file.size < 500 * 1024 && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
-                resolve(file);
-                return;
-            }
-
-            if (width > height) {
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
+            if (curWidth > curHeight) {
+                if (curWidth > maxWidth) {
+                    curHeight = Math.round((curHeight * maxWidth) / curWidth);
+                    curWidth = maxWidth;
                 }
             } else {
-                if (height > maxWidth) {
-                    width = Math.round((width * maxWidth) / height);
-                    height = maxWidth;
+                if (curHeight > maxWidth) {
+                    curWidth = Math.round((curWidth * maxWidth) / curHeight);
+                    curHeight = maxWidth;
                 }
             }
 
             const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
             const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
 
-            canvas.toBlob(
-                (blob) => {
-                    if (blob) {
-                        const originalName = file.name || 'image.jpg';
-                        const cleanName = originalName.replace(/\.[^/.]+$/, '') + '.jpg';
-                        try {
-                            const optimizedFile = new File([blob], cleanName, { type: 'image/jpeg' });
-                            resolve(optimizedFile);
-                        } catch (e) {
-                            blob.name = cleanName;
-                            resolve(blob);
-                        }
-                    } else {
-                        resolve(file);
-                    }
-                },
-                'image/jpeg',
-                quality
-            );
+            function getBlob(w, h, q) {
+                canvas.width = w;
+                canvas.height = h;
+                ctx.clearRect(0, 0, w, h);
+                ctx.drawImage(img, 0, 0, w, h);
+                return new Promise((resBlob) => {
+                    canvas.toBlob(resBlob, 'image/jpeg', q);
+                });
+            }
+
+            let blob = await getBlob(curWidth, curHeight, curQuality);
+
+            // Reduser kvalitet og oppløsning trinnvis dersom bildet fremdeles er for stort
+            while (blob && blob.size > maxSizeBytes && (curQuality > 0.4 || curWidth > 350)) {
+                if (curQuality > 0.5) {
+                    curQuality -= 0.15;
+                } else {
+                    curWidth = Math.round(curWidth * 0.8);
+                    curHeight = Math.round(curHeight * 0.8);
+                }
+                blob = await getBlob(curWidth, curHeight, curQuality);
+            }
+
+            if (blob) {
+                const originalName = file.name || 'image.jpg';
+                const cleanName = originalName.replace(/\.[^/.]+$/, '') + '.jpg';
+                try {
+                    resolve(new File([blob], cleanName, { type: 'image/jpeg' }));
+                } catch (e) {
+                    blob.name = cleanName;
+                    resolve(blob);
+                }
+            } else {
+                resolve(file);
+            }
         };
 
         img.onerror = () => {

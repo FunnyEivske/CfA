@@ -19,6 +19,90 @@ if (!file_exists($upload_dir)) {
     mkdir($upload_dir, 0755, true);
 }
 
+/**
+ * Komprimerer og skalerer et bilde på serversiden vha. PHP GD.
+ * Hvis bildet er for stort, reduseres oppløsning og kvalitet automatisk til det er optimalt.
+ * Fikser også mobilkameraers EXIF-rotasjon automatisk.
+ */
+function compressImageServerSide($srcPath, $destPath, $maxDim = 1024, $quality = 82) {
+    if (!extension_loaded('gd') || !file_exists($srcPath)) {
+        return move_uploaded_file($srcPath, $destPath);
+    }
+
+    $imageInfo = @getimagesize($srcPath);
+    if (!$imageInfo) {
+        return move_uploaded_file($srcPath, $destPath);
+    }
+
+    $width = $imageInfo[0];
+    $height = $imageInfo[1];
+    $mime = $imageInfo['mime'] ?? '';
+
+    $srcImg = null;
+    switch ($mime) {
+        case 'image/jpeg':
+            $srcImg = @imagecreatefromjpeg($srcPath);
+            break;
+        case 'image/png':
+            $srcImg = @imagecreatefrompng($srcPath);
+            break;
+        case 'image/webp':
+            $srcImg = function_exists('imagecreatefromwebp') ? @imagecreatefromwebp($srcPath) : null;
+            break;
+    }
+
+    if (!$srcImg) {
+        return move_uploaded_file($srcPath, $destPath);
+    }
+
+    // Rett opp eventuell EXIF-rotasjon fra mobilkamera
+    if (function_exists('exif_read_data') && $mime === 'image/jpeg') {
+        $exif = @exif_read_data($srcPath);
+        if (!empty($exif['Orientation'])) {
+            switch ((int)$exif['Orientation']) {
+                case 3:
+                    $srcImg = imagerotate($srcImg, 180, 0);
+                    break;
+                case 6:
+                    $srcImg = imagerotate($srcImg, -90, 0);
+                    $tmp = $width; $width = $height; $height = $tmp;
+                    break;
+                case 8:
+                    $srcImg = imagerotate($srcImg, 90, 0);
+                    $tmp = $width; $width = $height; $height = $tmp;
+                    break;
+            }
+        }
+    }
+
+    $newWidth = $width;
+    $newHeight = $height;
+
+    if ($width > $height) {
+        if ($width > $maxDim) {
+            $newHeight = (int)round(($height * $maxDim) / $width);
+            $newWidth = $maxDim;
+        }
+    } else {
+        if ($height > $maxDim) {
+            $newWidth = (int)round(($width * $maxDim) / $height);
+            $newHeight = $maxDim;
+        }
+    }
+
+    $dstImg = imagecreatetruecolor($newWidth, $newHeight);
+    $white = imagecolorallocate($dstImg, 255, 255, 255);
+    imagefill($dstImg, 0, 0, $white);
+
+    imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
+
+    $saved = imagejpeg($dstImg, $destPath, $quality);
+    imagedestroy($srcImg);
+    imagedestroy($dstImg);
+
+    return $saved;
+}
+
 switch ($action) {
     case 'login':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonResponse(['error' => 'Method not allowed'], 405);
@@ -195,10 +279,10 @@ switch ($action) {
             @mkdir($upload_dir, 0755, true);
         }
         
-        $filename = 'avatar_' . $_SESSION['user_id'] . '_' . time() . '.' . $ext;
+        $filename = 'avatar_' . $_SESSION['user_id'] . '_' . time() . '.jpg';
         $target = $upload_dir . $filename;
         
-        if (move_uploaded_file($file['tmp_name'], $target)) {
+        if (compressImageServerSide($file['tmp_name'], $target, 1024, 82)) {
             $url = '/uploads/' . $filename;
             $stmt = $pdo->prepare('UPDATE users SET photo_url = ? WHERE id = ?');
             $stmt->execute([$url, $_SESSION['user_id']]);
@@ -681,8 +765,8 @@ switch ($action) {
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
             if ($ext === 'jpeg' || $ext === 'jfif') $ext = 'jpg';
             if (in_array($ext, ['jpg', 'png', 'webp', 'gif', 'avif', 'bmp'])) {
-                $filename = 'avatar_' . $id . '_' . time() . '.' . $ext;
-                if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
+                $filename = 'avatar_' . $id . '_' . time() . '.jpg';
+                if (compressImageServerSide($file['tmp_name'], $upload_dir . $filename, 1024, 82)) {
                     $photoUrl = '/uploads/' . $filename;
                 }
             }
