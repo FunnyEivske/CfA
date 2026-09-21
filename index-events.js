@@ -6,13 +6,37 @@ export async function loadPublicEvents() {
 
     try {
         const data = await EventAPI.getEvents();
-        const events = (data.events || []).filter(e => e.visibility !== 'internal');
+        const rawEvents = (data.events || []).filter(e => e.visibility !== 'internal');
         eventsContainer.innerHTML = '';
 
-        if (events.length === 0) {
+        if (rawEvents.length === 0) {
             eventsContainer.innerHTML = '<p class="text-center text-muted py-6" style="grid-column: 1/-1;" data-i18n="no_events">Ingen kommende arrangementer for øyeblikket.</p>';
             return;
         }
+
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        // Finn fremtidige arrangementer først
+        const upcomingEvents = rawEvents.filter(e => {
+            if (!e.date) return true;
+            const d = new Date(e.date);
+            const endD = e.end_date ? new Date(e.end_date) : d;
+            return endD >= now;
+        });
+
+        // Bruk fremtidige hvis de finnes, ellers listen som den er
+        const listToSort = upcomingEvents.length > 0 ? upcomingEvents : rawEvents;
+
+        // Sorter kronologisk etter dato (nærmest i tid først)
+        listToSort.sort((a, b) => {
+            const da = a.date ? new Date(a.date).getTime() : Infinity;
+            const db = b.date ? new Date(b.date).getTime() : Infinity;
+            return da - db;
+        });
+
+        // Vis kun de 4 første / nærmeste arrangementene på forsiden
+        const events = listToSort.slice(0, 4);
 
         events.forEach(event => {
             const card = document.createElement('a');
