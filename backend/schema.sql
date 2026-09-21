@@ -62,4 +62,15 @@ CREATE TABLE IF NOT EXISTS gallery (
 INSERT IGNORE INTO users (id, email, password_hash, display_name, role, member_since)
 VALUES ('usr_eivind', 'eivind@cosplayforalle.no', '$2y$10$S8cgwn7J/dJxSpY8clISl.Z/PznKW.MbZCDSi5gtkXkmdVz0sKU0', 'Eivind', 'admin', CURDATE());
 
+-- Kontaktskjema-meldinger
+CREATE TABLE IF NOT EXISTS contact_messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    ip_address VARCHAR(45) DEFAULT NULL,
+    status VARCHAR(50) DEFAULT 'new',
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
 

@@ -415,8 +415,23 @@ p {
 }
 
 .form-error {
-  color: var(--color-error);
-  font-size: 0.875rem;
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.form-success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
   text-align: center;
   margin-top: 1rem;
 }

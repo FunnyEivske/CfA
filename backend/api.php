@@ -780,6 +780,81 @@ switch ($action) {
         jsonResponse(['success' => true]);
         break;
 
+    case 'send_contact':
+        if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
+            jsonResponse(['error' => 'Method not allowed'], 405);
+        }
+        $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
+        $name = trim($data['name'] ?? '');
+        $email = trim($data['email'] ?? '');
+        $message = trim($data['message'] ?? '');
+        $honeypot = trim($data['website'] ?? '');
+
+        // Spam protection: silent drop if honeypot was filled
+        if (!empty($honeypot)) {
+            jsonResponse(['success' => true, 'message' => 'Takk for din henvendelse!']);
+        }
+
+        if (empty($name) || mb_strlen($name) < 2) {
+            jsonResponse(['error' => 'Vennligst fyll inn navnet ditt.'], 400);
+        }
+        if (empty($email) || !filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            jsonResponse(['error' => 'Vennligst oppgi en gyldig e-postadresse.'], 400);
+        }
+        if (empty($message) || mb_strlen($message) < 5) {
+            jsonResponse(['error' => 'Meldingen må inneholde minst 5 tegn.'], 400);
+        }
+
+        // 1. Lagre alltid henvendelsen i databasen for å sikre at ingen meldinger går tapt
+        try {
+            $pdo->exec("CREATE TABLE IF NOT EXISTS contact_messages (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                name VARCHAR(255) NOT NULL,
+                email VARCHAR(255) NOT NULL,
+                message TEXT NOT NULL,
+                ip_address VARCHAR(45) DEFAULT NULL,
+                status VARCHAR(50) DEFAULT 'new',
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            )");
+            $stmt = $pdo->prepare("INSERT INTO contact_messages (name, email, message, ip_address) VALUES (?, ?, ?, ?)");
+            $stmt->execute([$name, $email, $message, $_SERVER['REMOTE_ADDR'] ?? '']);
+        } catch (Exception $e) {
+            error_log('Database insert error in send_contact: ' . $e->getMessage());
+        }
+
+        // 2. Send e-post til Google Workspace (kontakt@cosplayforalle.no)
+        $cleanName = preg_replace('/[\r\n]/', '', $name);
+        $cleanEmail = filter_var($email, FILTER_SANITIZE_EMAIL);
+        $encodedName = '=?UTF-8?B?' . base64_encode($cleanName) . '?=';
+
+        $to = 'kontakt@cosplayforalle.no';
+        $subject = '=?UTF-8?B?' . base64_encode('Ny henvendelse fra nettsiden: ' . $cleanName) . '?=';
+
+        $headers = [];
+        $headers[] = 'MIME-Version: 1.0';
+        $headers[] = 'Content-Type: text/plain; charset=UTF-8; format=flowed';
+        $headers[] = 'Content-Transfer-Encoding: 8bit';
+        $headers[] = 'From: "Cosplay for Alle Kontaktskjema" <kontakt@cosplayforalle.no>';
+        $headers[] = "Reply-To: $encodedName <$cleanEmail>";
+        $headers[] = 'X-Mailer: PHP/' . phpversion();
+
+        $body = "Du har mottatt en ny henvendelse fra kontaktskjemaet på cosplayforalle.no:\n\n";
+        $body .= "Navn: " . $cleanName . "\n";
+        $body .= "E-post: " . $cleanEmail . "\n";
+        $body .= "Dato: " . date('d.m.Y H:i') . "\n";
+        $body .= "--------------------------------------------------\n\n";
+        $body .= $message . "\n\n";
+        $body .= "--------------------------------------------------\n";
+        $body .= "Trykk 'Svar' (Reply) i e-posten for å svare direkte til " . $cleanName . " (" . $cleanEmail . ").\n";
+
+        $mailSent = @mail($to, $subject, $body, implode("\r\n", $headers), '-fkontakt@cosplayforalle.no');
+
+        jsonResponse([
+            'success' => true,
+            'message' => 'Meldingen din er sendt! Vi svarer deg så snart vi kan.'
+        ]);
+        break;
+
     default:
         jsonResponse(['error' => 'Invalid endpoint action'], 404);
 }

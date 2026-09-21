@@ -218,6 +218,9 @@ function handleMockRequest(action, data) {
 
         default:
             return { success: true };
+
+        case 'send_contact':
+            return { success: true, message: 'Meldingen din har blitt sendt!' };
     }
 }
 
@@ -327,5 +330,9 @@ export const DocumentAPI = {
     getDocuments: (category = '') => request('get_documents', 'GET', category ? { category } : {}),
     saveDocument: (data) => request('save_document', 'POST', data, true),
     deleteDocument: (id) => request('delete_document', 'POST', { id })
+};
+
+export const ContactAPI = {
+    sendMessage: (name, email, message, website = '') => request('send_contact', 'POST', { name, email, message, website })
 };
 

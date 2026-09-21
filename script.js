@@ -1,4 +1,4 @@
-import { AuthAPI, MemberAPI, GalleryAPI } from './api-client.js';
+import { AuthAPI, MemberAPI, GalleryAPI, ContactAPI } from './api-client.js';
 
 export let authState = {
     user: null,
@@ -9,6 +9,7 @@ export let authState = {
 export async function initApp() {
     setupAuthUI();
     setupLoginForm();
+    setupContactForms();
     setupMembersList();
     setupGalleryUpload();
     setupMobileMenu();
@@ -198,6 +199,74 @@ function setupLoginForm() {
             }
         };
     }
+}
+
+function setupContactForms() {
+    const contactForms = [
+        { formId: 'contact-form', statusId: 'contact-status', btnId: 'contact-submit-btn' },
+        { formId: 'event-suggest-form', statusId: 'event-suggest-status', btnId: 'event-suggest-submit-btn' }
+    ];
+
+    contactForms.forEach(({ formId, statusId, btnId }) => {
+        const form = document.getElementById(formId);
+        if (!form) return;
+
+        const statusEl = document.getElementById(statusId);
+        const submitBtn = document.getElementById(btnId) || form.querySelector('button[type="submit"]');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+
+            const name = (form.name?.value || '').trim();
+            const email = (form.email?.value || '').trim();
+            const message = (form.message?.value || '').trim();
+            const website = (form.website?.value || '').trim();
+
+            if (!name || !email || !message) {
+                if (statusEl) {
+                    statusEl.innerHTML = '<div class="form-error">Vennligst fyll ut alle feltene.</div>';
+                }
+                return;
+            }
+
+            const origBtnText = submitBtn ? submitBtn.textContent : '';
+            if (submitBtn) {
+                submitBtn.disabled = true;
+                submitBtn.textContent = document.documentElement.lang === 'en' ? 'Sending message...' : 'Sender melding...';
+            }
+            if (statusEl) {
+                statusEl.innerHTML = '';
+            }
+
+            try {
+                const res = await ContactAPI.sendMessage(name, email, message, website);
+                if (res && res.success) {
+                    form.reset();
+                    if (statusEl) {
+                        const successText = document.documentElement.lang === 'en'
+                            ? 'Thank you for your message! We have received your inquiry and will reply as soon as possible via email.'
+                            : 'Takk for meldingen din! Vi har mottatt henvendelsen og svarer deg så snart vi kan på e-post.';
+                        statusEl.innerHTML = `<div class="form-success">${successText}</div>`;
+                    }
+                } else {
+                    throw new Error((res && res.error) || 'Kunne ikke sende meldingen');
+                }
+            } catch (err) {
+                console.error('Contact form submission error:', err);
+                if (statusEl) {
+                    const errorText = document.documentElement.lang === 'en'
+                        ? (err.message || 'An error occurred while sending. Please try again or email us directly at contact@cosplayforalle.no.')
+                        : (err.message || 'Det oppsto en feil under sending. Vennligst prøv igjen, eller send en e-post direkte til kontakt@cosplayforalle.no.');
+                    statusEl.innerHTML = `<div class="form-error">${errorText}</div>`;
+                }
+            } finally {
+                if (submitBtn) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = origBtnText;
+                }
+            }
+        });
+    });
 }
 
 function handlePostLoginFlow(res) {
