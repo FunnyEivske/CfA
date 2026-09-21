@@ -216,11 +216,32 @@ function handleMockRequest(action, data) {
             return { success: true };
         }
 
-        default:
-            return { success: true };
-
         case 'send_contact':
             return { success: true, message: 'Meldingen din har blitt sendt!' };
+
+        case 'get_workshop_status': {
+            return {
+                status: db.workshop_status || 'auto',
+                message: db.workshop_message || '',
+                hours: db.workshop_hours || {
+                    'Mandag': 'Stengt',
+                    'Tirsdag': 'Stengt',
+                    'Onsdag': 'Stengt',
+                    'Torsdag': 'Stengt',
+                    'Fredag': '18:00-21:00',
+                    'Lørdag': 'Stengt',
+                    'Søndag': 'Stengt'
+                }
+            };
+        }
+
+        case 'update_workshop_status': {
+            db.workshop_status = data.status || 'auto';
+            db.workshop_message = data.message || '';
+            if (data.hours) db.workshop_hours = data.hours;
+            saveMockDB(db);
+            return { success: true };
+        }
     }
 }
 

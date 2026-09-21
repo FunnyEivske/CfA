@@ -187,6 +187,7 @@
                 <div class="card">
                     <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
                         <h4 class="text-lg" style="margin: 0;">Verksted & Status</h4>
+                        <button id="quick-edit-status-btn" class="btn btn-ghost text-xs hidden" style="padding: 2px 8px; font-size: 0.75rem;" title="Endre status og åpningstider">Rediger</button>
                     </div>
                     <div class="card-body">
                         <div style="margin-bottom: 1rem;">
@@ -965,10 +966,14 @@
                     <div class="form-group">
                         <label class="form-label font-semibold">Verksted-status i dag</label>
                         <select id="admin-workshop-status" class="form-input">
-                            <option value="open">🟢 Åpent</option>
-                            <option value="closed">🔴 Stengt</option>
+                            <option value="auto">⚡ Automatisk (følger åpningstidene)</option>
+                            <option value="open">🟢 Overstyr: Alltid åpent</option>
+                            <option value="closed">🔴 Overstyr: Midlertidig stengt</option>
                             <option value="event">🟡 Pågår arrangement</option>
                         </select>
+                        <small class="text-xs text-muted" style="display: block; margin-top: 4px;">
+                            «Automatisk» sjekker åpningstidene for dagens ukedag og klokkeslett, og oppdaterer statusen av seg selv.
+                        </small>
                     </div>
                     
                     <div class="form-group">

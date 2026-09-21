@@ -737,7 +737,7 @@ switch ($action) {
         $stmt = $pdo->query("SELECT setting_key, setting_value FROM site_settings WHERE setting_key IN ('workshop_status', 'workshop_message', 'workshop_hours')");
         $rows = $stmt->fetchAll(PDO::FETCH_KEY_PAIR);
         
-        $status = $rows['workshop_status'] ?? 'open';
+        $status = $rows['workshop_status'] ?? 'auto';
         $message = $rows['workshop_message'] ?? 'Velkommen til vårt verksted!';
         $hours = isset($rows['workshop_hours']) ? json_decode($rows['workshop_hours'], true) : [
             'Mandag' => 'Stengt',
@@ -761,7 +761,7 @@ switch ($action) {
         if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
         $data = json_decode(file_get_contents('php://input'), true);
         
-        $status = $data['status'] ?? 'open';
+        $status = $data['status'] ?? 'auto';
         $message = trim($data['message'] ?? '');
         $hours = json_encode($data['hours'] ?? []);
         

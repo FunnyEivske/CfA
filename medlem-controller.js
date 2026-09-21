@@ -1220,6 +1220,45 @@ function setupGalleryManagement() {
     }
 }
 
+// Beregn om verkstedet er åpent akkurat nå basert på åpningstidene
+function isCurrentlyOpenAccordingToHours(hours) {
+    if (!hours) return false;
+    const days = ['Mandag', 'Tirsdag', 'Onsdag', 'Torsdag', 'Fredag', 'Lørdag', 'Søndag'];
+    const now = new Date();
+    const weekdayIndex = (now.getDay() + 6) % 7; // 0=Mandag, 6=Søndag
+    const todayName = days[weekdayIndex];
+    const todayStr = (hours[todayName] || '').trim().toLowerCase();
+
+    if (!todayStr || todayStr.includes('stengt') || todayStr.includes('closed')) {
+        return false;
+    }
+
+    const currentMinutes = now.getHours() * 60 + now.getMinutes();
+    const regex = /(\d{1,2})(?:[:.](\d{2}))?\s*[-–—]\s*(\d{1,2})(?:[:.](\d{2}))?/g;
+    let match;
+
+    while ((match = regex.exec(todayStr)) !== null) {
+        const startH = parseInt(match[1], 10);
+        const startM = match[2] ? parseInt(match[2], 10) : 0;
+        const endH = parseInt(match[3], 10);
+        const endM = match[4] ? parseInt(match[4], 10) : 0;
+
+        const startMin = startH * 60 + startM;
+        const endMin = endH * 60 + endM;
+
+        if (endMin >= startMin) {
+            if (currentMinutes >= startMin && currentMinutes < endMin) return true;
+        } else {
+            // Over midnatt
+            if (currentMinutes >= startMin || currentMinutes < endMin) return true;
+        }
+    }
+
+    return false;
+}
+
+let workshopTimerStarted = false;
+
 // Hent og vis verksted-status og åpningstider
 async function loadWorkshopStatus() {
     const statusTextEl = document.getElementById('workshop-status-text');
@@ -1231,12 +1270,21 @@ async function loadWorkshopStatus() {
         currentWorkshopData = data;
 
         if (statusTextEl) {
-            if (data.status === 'open') {
+            const rawStatus = data.status || 'auto';
+            if (rawStatus === 'open') {
                 statusTextEl.innerHTML = '<span style="color: #10B981;">🟢 Åpent verksted</span>';
-            } else if (data.status === 'event') {
+            } else if (rawStatus === 'closed') {
+                statusTextEl.innerHTML = '<span style="color: #EF4444;">🔴 Stengt for øyeblikket</span>';
+            } else if (rawStatus === 'event') {
                 statusTextEl.innerHTML = '<span style="color: #F59E0B;">🟡 Pågår arrangement</span>';
             } else {
-                statusTextEl.innerHTML = '<span style="color: #EF4444;">🔴 Stengt for øyeblikket</span>';
+                // 'auto': sjekk automatisk åpningstidene mot dagens ukedag og klokkeslett
+                const isOpenNow = isCurrentlyOpenAccordingToHours(data.hours);
+                if (isOpenNow) {
+                    statusTextEl.innerHTML = '<span style="color: #10B981;">🟢 Åpent nå</span>';
+                } else {
+                    statusTextEl.innerHTML = '<span style="color: #EF4444;">🔴 Stengt for øyeblikket</span>';
+                }
             }
         }
 
@@ -1269,6 +1317,12 @@ async function loadWorkshopStatus() {
             });
             hoursDisplayEl.innerHTML = html;
         }
+
+        // Start periodisk oppdatering hvert minutt for at statusen automatisk endrer seg
+        if (!workshopTimerStarted) {
+            workshopTimerStarted = true;
+            setInterval(loadWorkshopStatus, 60000);
+        }
     } catch (e) {
         if (statusTextEl) statusTextEl.textContent = '🟢 Åpent verksted';
     }
@@ -1279,7 +1333,7 @@ function populateStatusModal() {
     const statusSelect = document.getElementById('admin-workshop-status');
     const msgInput = document.getElementById('admin-status-message');
 
-    if (statusSelect) statusSelect.value = currentWorkshopData.status || 'open';
+    if (statusSelect) statusSelect.value = currentWorkshopData.status || 'auto';
     if (msgInput) msgInput.value = currentWorkshopData.message || '';
 
     if (currentWorkshopData.hours) {
@@ -1374,6 +1428,14 @@ async function setupProfileData() {
             if (authRes.user.role === 'admin') {
                 if (adminPublishCard) adminPublishCard.classList.remove('hidden');
                 if (adminTriggerContainer) adminTriggerContainer.classList.remove('hidden');
+                const quickEditBtn = document.getElementById('quick-edit-status-btn');
+                if (quickEditBtn) {
+                    quickEditBtn.classList.remove('hidden');
+                    quickEditBtn.onclick = () => {
+                        populateStatusModal();
+                        openModal('admin-status-modal');
+                    };
+                }
             }
         }
     } catch (e) {
