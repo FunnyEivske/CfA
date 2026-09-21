@@ -109,6 +109,17 @@ function handleMockRequest(action, data) {
             }
             return { success: true };
 
+        case 'upload_avatar': {
+            const url = 'https://picsum.photos/seed/' + Date.now() + '/150/150';
+            if (db.currentUser) {
+                db.currentUser.photo_url = url;
+                const m = db.members.find(u => u.id === db.currentUser.id);
+                if (m) m.photo_url = url;
+                saveMockDB(db);
+            }
+            return { success: true, photo_url: url };
+        }
+
         case 'get_members':
             return { members: db.members };
 
@@ -294,21 +305,130 @@ export async function request(action, method = 'GET', data = null, isFormData = 
     }
 }
 
+/**
+ * Rask klientside-bildeoptimalisering via HTML5 Canvas.
+ * Skalerer ned store kamera- og mobilbilder (f.eks. 5-30 MB) og komprimerer til JPEG.
+ * Forhindrer at opplastinger feiler med 400 Bad Request eller 500 pga. serverens
+ * upload_max_filesize eller post_max_size begrensninger.
+ */
+export async function optimizeImageForUpload(file, maxWidth = 1920, quality = 0.85) {
+    if (!file || !(file instanceof Blob) || !file.type || !file.type.startsWith('image/')) {
+        return file;
+    }
+    // Bevar animerte GIF-er
+    if (file.type === 'image/gif') {
+        return file;
+    }
+
+    return new Promise((resolve) => {
+        const img = new Image();
+        const url = URL.createObjectURL(file);
+
+        img.onload = () => {
+            URL.revokeObjectURL(url);
+            let width = img.width;
+            let height = img.height;
+
+            if (width <= maxWidth && height <= maxWidth && file.size < 500 * 1024 && ['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                resolve(file);
+                return;
+            }
+
+            if (width > height) {
+                if (width > maxWidth) {
+                    height = Math.round((height * maxWidth) / width);
+                    width = maxWidth;
+                }
+            } else {
+                if (height > maxWidth) {
+                    width = Math.round((width * maxWidth) / height);
+                    height = maxWidth;
+                }
+            }
+
+            const canvas = document.createElement('canvas');
+            canvas.width = width;
+            canvas.height = height;
+            const ctx = canvas.getContext('2d');
+            ctx.drawImage(img, 0, 0, width, height);
+
+            canvas.toBlob(
+                (blob) => {
+                    if (blob) {
+                        const originalName = file.name || 'image.jpg';
+                        const cleanName = originalName.replace(/\.[^/.]+$/, '') + '.jpg';
+                        try {
+                            const optimizedFile = new File([blob], cleanName, { type: 'image/jpeg' });
+                            resolve(optimizedFile);
+                        } catch (e) {
+                            blob.name = cleanName;
+                            resolve(blob);
+                        }
+                    } else {
+                        resolve(file);
+                    }
+                },
+                'image/jpeg',
+                quality
+            );
+        };
+
+        img.onerror = () => {
+            URL.revokeObjectURL(url);
+            resolve(file);
+        };
+
+        img.src = url;
+    });
+}
+
 export const AuthAPI = {
     login: (email, password) => request('login', 'POST', { email, password }),
     register: (email, password, name) => request('register', 'POST', { email, password, name }),
     logout: () => request('logout', 'POST'),
     getAuthState: () => request('auth_state'),
     updateProfile: (displayName) => request('update_profile', 'POST', { display_name: displayName }),
-    uploadAvatar: (formData) => request('upload_avatar', 'POST', formData, true),
+    uploadAvatar: async (formDataOrFile) => {
+        let fd = formDataOrFile;
+        if (formDataOrFile instanceof File || formDataOrFile instanceof Blob) {
+            const optimized = await optimizeImageForUpload(formDataOrFile, 1024, 0.85);
+            fd = new FormData();
+            fd.append('file', optimized);
+        } else if (formDataOrFile instanceof FormData) {
+            const file = formDataOrFile.get('file');
+            if (file && (file instanceof File || file instanceof Blob)) {
+                const optimized = await optimizeImageForUpload(file, 1024, 0.85);
+                formDataOrFile.set('file', optimized);
+            }
+        }
+        return request('upload_avatar', 'POST', fd, true);
+    },
     changePassword: (newPassword) => request('change_password', 'POST', { new_password: newPassword }),
     acceptTos: () => request('accept_tos', 'POST')
 };
 
 export const PostAPI = {
     getPosts: (category = 'general') => request('get_posts', 'GET', { category }),
-    createPost: (formData) => request('create_post', 'POST', formData, true),
-    updatePost: (formData) => request('update_post', 'POST', formData, true),
+    createPost: async (formData) => {
+        if (formData instanceof FormData) {
+            const img = formData.get('image');
+            if (img && (img instanceof File || img instanceof Blob)) {
+                const optimized = await optimizeImageForUpload(img, 1920, 0.85);
+                formData.set('image', optimized);
+            }
+        }
+        return request('create_post', 'POST', formData, true);
+    },
+    updatePost: async (formData) => {
+        if (formData instanceof FormData) {
+            const img = formData.get('image');
+            if (img && (img instanceof File || img instanceof Blob)) {
+                const optimized = await optimizeImageForUpload(img, 1920, 0.85);
+                formData.set('image', optimized);
+            }
+        }
+        return request('update_post', 'POST', formData, true);
+    },
     deletePost: (id) => request('delete_post', 'POST', { id }),
     toggleLike: (id) => request('like_post', 'POST', { id })
 };
@@ -316,9 +436,14 @@ export const PostAPI = {
 export const MemberAPI = {
     getMembers: () => request('get_members'),
     createMember: (email, password, name, role = 'medlem') => request('admin_create_member', 'POST', { email, password, name, role }),
-    updateMember: (dataOrId, displayName, role) => {
+    updateMember: async (dataOrId, displayName, role) => {
         if (typeof dataOrId === 'object') {
             if (dataOrId instanceof FormData) {
+                const photo = dataOrId.get('photo');
+                if (photo && (photo instanceof File || photo instanceof Blob)) {
+                    const optimized = await optimizeImageForUpload(photo, 1024, 0.85);
+                    dataOrId.set('photo', optimized);
+                }
                 return request('admin_update_member', 'POST', dataOrId, true);
             }
             return request('admin_update_member', 'POST', dataOrId);
@@ -330,7 +455,16 @@ export const MemberAPI = {
 
 export const GalleryAPI = {
     getGallery: (type = 'public') => request('get_gallery', 'GET', { type }),
-    uploadImage: (formData) => request('upload_gallery', 'POST', formData, true),
+    uploadImage: async (formData) => {
+        if (formData instanceof FormData) {
+            const file = formData.get('file');
+            if (file && (file instanceof File || file instanceof Blob)) {
+                const optimized = await optimizeImageForUpload(file, 2048, 0.85);
+                formData.set('file', optimized);
+            }
+        }
+        return request('upload_gallery', 'POST', formData, true);
+    },
     deleteImage: (id) => request('delete_gallery', 'POST', { id }),
     togglePublic: (id, isPublic = null) => request('toggle_gallery_public', 'POST', { id, is_public: isPublic })
 };

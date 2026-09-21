@@ -137,12 +137,62 @@ switch ($action) {
 
     case 'upload_avatar':
         requireAuth();
-        if (!isset($_FILES['file'])) jsonResponse(['error' => 'No file uploaded'], 400);
+        
+        // Sjekk om filen overskrider post_max_size i PHP (da tømmes $_FILES og $_POST automatisk av PHP)
+        if (empty($_FILES) && isset($_SERVER['CONTENT_LENGTH']) && (int)$_SERVER['CONTENT_LENGTH'] > 0) {
+            jsonResponse(['error' => 'Bildet er for stort for webserveren (maks post_max_size). Vennligst velg et mindre bilde.'], 400);
+        }
+
+        if (!isset($_FILES['file'])) {
+            jsonResponse(['error' => 'Ingen fil ble valgt eller mottatt.'], 400);
+        }
         
         $file = $_FILES['file'];
+        
+        // Sjekk PHP opplastingsfeilkoder
+        if ($file['error'] !== UPLOAD_ERR_OK) {
+            $uploadErrors = [
+                UPLOAD_ERR_INI_SIZE   => 'Bildet er for stort for serveren (' . ini_get('upload_max_filesize') . ').',
+                UPLOAD_ERR_FORM_SIZE  => 'Bildet overskrider tillatt størrelse.',
+                UPLOAD_ERR_PARTIAL    => 'Bildet ble bare delvis lastet opp. Vennligst prøv igjen.',
+                UPLOAD_ERR_NO_FILE    => 'Ingen fil ble valgt.',
+                UPLOAD_ERR_NO_TMP_DIR => 'Mangler midlertidig lagringsmappe på serveren.',
+                UPLOAD_ERR_CANT_WRITE => 'Kunne ikke lagre filen til disk.',
+                UPLOAD_ERR_EXTENSION  => 'En PHP-utvidelse stoppet opplastingen.'
+            ];
+            $msg = $uploadErrors[$file['error']] ?? ('Feil ved filopplasting (kode ' . $file['error'] . ')');
+            jsonResponse(['error' => $msg], 400);
+        }
+        
         $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-        if (!in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
-            jsonResponse(['error' => 'Invalid file format'], 400);
+        if ($ext === 'jpeg' || $ext === 'jfif') {
+            $ext = 'jpg';
+        }
+        
+        $allowedExtensions = ['jpg', 'png', 'webp', 'gif', 'avif', 'bmp'];
+        if (!in_array($ext, $allowedExtensions)) {
+            // MIME fallback for filer uten eller med uvanlig filendelse
+            $finfo = finfo_open(FILEINFO_MIME_TYPE);
+            $mime = $finfo ? finfo_file($finfo, $file['tmp_name']) : '';
+            if ($finfo) finfo_close($finfo);
+
+            $mimeMap = [
+                'image/jpeg' => 'jpg',
+                'image/png'  => 'png',
+                'image/webp' => 'webp',
+                'image/gif'  => 'gif',
+                'image/avif' => 'avif',
+                'image/bmp'  => 'bmp'
+            ];
+            if (isset($mimeMap[$mime])) {
+                $ext = $mimeMap[$mime];
+            } else {
+                jsonResponse(['error' => 'Ugyldig filformat. Vennligst bruk JPG, PNG eller WebP.'], 400);
+            }
+        }
+        
+        if (!is_dir($upload_dir)) {
+            @mkdir($upload_dir, 0755, true);
         }
         
         $filename = 'avatar_' . $_SESSION['user_id'] . '_' . time() . '.' . $ext;
@@ -154,7 +204,7 @@ switch ($action) {
             $stmt->execute([$url, $_SESSION['user_id']]);
             jsonResponse(['success' => true, 'photo_url' => $url]);
         } else {
-            jsonResponse(['error' => 'Failed to save image'], 500);
+            jsonResponse(['error' => 'Kunne ikke lagre bildet på serveren.'], 500);
         }
         break;
 
@@ -629,7 +679,8 @@ switch ($action) {
         if (isset($_FILES['photo']) && $_FILES['photo']['error'] === UPLOAD_ERR_OK) {
             $file = $_FILES['photo'];
             $ext = strtolower(pathinfo($file['name'], PATHINFO_EXTENSION));
-            if (in_array($ext, ['jpg', 'jpeg', 'png', 'webp', 'gif'])) {
+            if ($ext === 'jpeg' || $ext === 'jfif') $ext = 'jpg';
+            if (in_array($ext, ['jpg', 'png', 'webp', 'gif', 'avif', 'bmp'])) {
                 $filename = 'avatar_' . $id . '_' . time() . '.' . $ext;
                 if (move_uploaded_file($file['tmp_name'], $upload_dir . $filename)) {
                     $photoUrl = '/uploads/' . $filename;

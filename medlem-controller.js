@@ -1,4 +1,4 @@
-import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI } from './api-client.js';
+import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI, optimizeImageForUpload } from './api-client.js';
 
 let currentUser = null;
 let currentWorkshopData = null;
@@ -229,13 +229,17 @@ function setupProfileForm() {
                 if (profileNameEl) profileNameEl.textContent = newName;
 
                 if (fileInput && fileInput.files && fileInput.files[0]) {
+                    if (submitBtn) submitBtn.textContent = 'Laster opp bilde...';
+                    const optimizedFile = await optimizeImageForUpload(fileInput.files[0], 1024, 0.85);
                     const formData = new FormData();
-                    formData.append('file', fileInput.files[0]);
+                    formData.append('file', optimizedFile);
                     const avatarRes = await AuthAPI.uploadAvatar(formData);
                     if (avatarRes && avatarRes.photo_url) {
                         if (currentUser) currentUser.photo_url = avatarRes.photo_url;
                         const profileImgEl = document.getElementById('profile-img');
                         if (profileImgEl) profileImgEl.src = avatarRes.photo_url;
+                        const sidebarImgEl = document.querySelector('.user-avatar-small');
+                        if (sidebarImgEl) sidebarImgEl.src = avatarRes.photo_url;
                     }
                 }
 
@@ -319,70 +323,6 @@ async function loadDashboardGallery() {
 }
 
 let selectedGalleryFiles = [];
-
-// Rask klient-side bildeoptimalisering (hindrer at store kamera-bilder fra mobil krasjer servergrensen)
-async function optimizeImageForUpload(file, maxWidth = 2048, quality = 0.85) {
-    return new Promise((resolve) => {
-        if (!file.type.startsWith('image/')) {
-            resolve(file);
-            return;
-        }
-
-        const img = new Image();
-        const url = URL.createObjectURL(file);
-        
-        img.onload = () => {
-            URL.revokeObjectURL(url);
-            let width = img.width;
-            let height = img.height;
-
-            if (width <= maxWidth && height <= maxWidth && file.size < 1.5 * 1024 * 1024) {
-                // Allerede passe størrelse
-                resolve(file);
-                return;
-            }
-
-            if (width > height) {
-                if (width > maxWidth) {
-                    height = Math.round((height * maxWidth) / width);
-                    width = maxWidth;
-                }
-            } else {
-                if (height > maxWidth) {
-                    width = Math.round((width * maxWidth) / height);
-                    height = maxWidth;
-                }
-            }
-
-            const canvas = document.createElement('canvas');
-            canvas.width = width;
-            canvas.height = height;
-            const ctx = canvas.getContext('2d');
-            ctx.drawImage(img, 0, 0, width, height);
-
-            canvas.toBlob(
-                (blob) => {
-                    if (blob) {
-                        const cleanName = file.name.replace(/\.[^/.]+$/, '') + '.jpg';
-                        const optimizedFile = new File([blob], cleanName, { type: 'image/jpeg' });
-                        resolve(optimizedFile);
-                    } else {
-                        resolve(file);
-                    }
-                },
-                'image/jpeg',
-                quality
-            );
-        };
-
-        img.onerror = () => {
-            URL.revokeObjectURL(url);
-            resolve(file);
-        };
-
-        img.src = url;
-    });
-}
 
 // Medlem Galleri-Modal ("Administrer bilder")
 function setupMemberGalleryModal() {
@@ -736,7 +676,8 @@ function setupAdminEditMemberForm() {
                     formData.append('password', password);
                 }
                 if (avatarInput && avatarInput.files && avatarInput.files[0]) {
-                    formData.append('photo', avatarInput.files[0]);
+                    const optimizedPhoto = await optimizeImageForUpload(avatarInput.files[0], 1024, 0.85);
+                    formData.append('photo', optimizedPhoto);
                 }
 
                 await MemberAPI.updateMember(formData);
