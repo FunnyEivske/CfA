@@ -626,6 +626,82 @@
         </div>
     </div>
 
+    <!-- Medlemsdetaljer Modal (Se profilbilde, navn og medlemstid for et medlem) -->
+    <div id="member-detail-modal" class="hidden modal-container" style="z-index: 3100;">
+        <div id="member-detail-modal-overlay" class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-500" style="overflow: hidden; border-radius: 20px; padding: 0;">
+            <!-- Modal Header -->
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding: 1rem 1.25rem;">
+                <h3 style="margin-bottom: 0; font-size: 1.15rem; font-weight: 700;">Medlemsprofil</h3>
+                <button type="button" id="close-member-detail-modal-x" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Profile Hero Section -->
+            <div style="background: linear-gradient(135deg, rgba(139, 29, 59, 0.09) 0%, rgba(234, 88, 12, 0.06) 100%); padding: 1.75rem 1.25rem 1.25rem; text-align: center; border-bottom: 1px solid var(--color-border);">
+                <!-- Stort profilbilde -->
+                <div style="position: relative; display: inline-block; margin-bottom: 0.75rem;">
+                    <a id="detail-member-avatar-link" href="#" target="_blank" rel="noopener noreferrer" style="display: inline-block; text-decoration: none;" title="Trykk for å se bildet i full størrelse">
+                        <img id="detail-member-avatar" src="" alt="Profilbilde" style="width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-primary); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transition: transform 0.2s ease;">
+                    </a>
+                </div>
+                <h3 id="detail-member-name" style="margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">...</h3>
+                <p id="detail-member-email" style="margin: 3px 0 0.75rem; font-size: 0.85rem; color: var(--color-text-muted);">...</p>
+                
+                <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
+                    <span id="detail-member-role-badge" class="badge text-xs" style="background: var(--color-primary); color: white; padding: 0.35rem 0.85rem; border-radius: 999px; font-weight: 600;">Medlem</span>
+                    <span id="detail-member-status-badge" class="badge text-xs" style="background: var(--color-bg-surface); border: 1px solid var(--color-border); color: var(--color-text-main); padding: 0.35rem 0.85rem; border-radius: 999px;">Aktivt medlem</span>
+                </div>
+            </div>
+
+            <div class="card-body" style="padding: 1.25rem 1.5rem;">
+                <!-- Medlemstid Info Kort -->
+                <div style="background: var(--color-bg-subtle); border-radius: 14px; border: 1px solid var(--color-border); padding: 1rem 1.25rem; display: flex; align-items: center; gap: 1rem; margin-bottom: 1.25rem;">
+                    <div style="width: 44px; height: 44px; border-radius: 12px; background: rgba(139, 29, 59, 0.12); display: flex; align-items: center; justify-content: center; color: var(--color-primary); flex-shrink: 0;">
+                        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                            <line x1="16" y1="2" x2="16" y2="6"></line>
+                            <line x1="8" y1="2" x2="8" y2="6"></line>
+                            <line x1="3" y1="10" x2="21" y2="10"></line>
+                        </svg>
+                    </div>
+                    <div>
+                        <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600;">Medlemstid</div>
+                        <div id="detail-member-duration" style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-main); margin-top: 1px;">-</div>
+                        <div id="detail-member-since-date" style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">Innmeldt: -</div>
+                    </div>
+                </div>
+
+                <!-- Medlemmets Galleri / Cosplay-bilder (hvis de har lastet opp bilder) -->
+                <div id="detail-member-gallery-section" class="hidden" style="margin-bottom: 1.25rem;">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 0.6rem;">
+                        <span style="font-size: 0.85rem; font-weight: 600; color: var(--color-text-main);">Bilder fra galleriet</span>
+                        <span id="detail-member-gallery-count" class="badge text-xs" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border);">0 bilder</span>
+                    </div>
+                    <div id="detail-member-gallery-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.5rem;">
+                        <!-- Miniatyrbilder fylles inn dynamisk -->
+                    </div>
+                </div>
+
+                <!-- Admin handlinger hvis innlogget bruker er admin -->
+                <div id="detail-member-admin-actions" class="hidden" style="margin-bottom: 1rem;">
+                    <button type="button" id="detail-member-edit-as-admin-btn" class="btn btn-secondary btn-full" style="font-size: 0.85rem; padding: 0.65rem; display: flex; align-items: center; justify-content: center; gap: 0.5rem; font-weight: 600;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path>
+                            <path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path>
+                        </svg>
+                        Rediger medlem (Admin)
+                    </button>
+                </div>
+
+                <button type="button" id="close-member-detail-modal-btn" class="btn btn-primary btn-full" style="font-weight: 600; padding: 0.75rem;">Lukk</button>
+            </div>
+        </div>
+    </div>
+
     <!-- Upload/Manage Gallery Modal -->
     <div id="upload-modal" class="hidden modal-container">
         <div id="upload-modal-overlay" class="modal-overlay"></div>

@@ -169,6 +169,9 @@ function setupModals() {
         document.getElementById('logout-button')?.click();
     });
 
+    bindClick('close-member-detail-modal-x', () => closeModal('member-detail-modal'));
+    bindClick('close-member-detail-modal-btn', () => closeModal('member-detail-modal'));
+
     const modalThemeRow = document.getElementById('modal-theme-toggle-row');
     if (modalThemeRow && !modalThemeRow.dataset.initialized) {
         modalThemeRow.dataset.initialized = 'true';
@@ -333,6 +336,148 @@ function setupProfileForm() {
     }
 }
 
+// Formater medlemstid
+function formatMemberDuration(dateStr) {
+    if (!dateStr) return { durationText: 'Aktivt medlem', dateFormatted: 'Ikke registrert' };
+    const joinDate = new Date(dateStr);
+    if (isNaN(joinDate.getTime())) return { durationText: 'Aktivt medlem', dateFormatted: 'Ikke registrert' };
+
+    const now = new Date();
+    const monthsNames = ['januar', 'februar', 'mars', 'april', 'mai', 'juni', 'juli', 'august', 'september', 'oktober', 'november', 'desember'];
+    const dateFormatted = `${joinDate.getDate()}. ${monthsNames[joinDate.getMonth()]} ${joinDate.getFullYear()}`;
+
+    let years = now.getFullYear() - joinDate.getFullYear();
+    let months = now.getMonth() - joinDate.getMonth();
+    if (now.getDate() < joinDate.getDate()) {
+        months--;
+    }
+    if (months < 0) {
+        years--;
+        months += 12;
+    }
+
+    let durationText = '';
+    if (years > 0 && months > 0) {
+        durationText = `${years} ${years === 1 ? 'år' : 'år'} og ${months} ${months === 1 ? 'måned' : 'måneder'}`;
+    } else if (years > 0) {
+        durationText = `${years} ${years === 1 ? 'år' : 'år'}`;
+    } else if (months > 0) {
+        durationText = `${months} ${months === 1 ? 'måned' : 'måneder'}`;
+    } else {
+        const diffDays = Math.max(1, Math.floor((now - joinDate) / (1000 * 60 * 60 * 24)));
+        if (diffDays <= 7) {
+            durationText = 'Helt nytt medlem (denne uken)';
+        } else {
+            durationText = `${diffDays} dager (Nytt medlem)`;
+        }
+    }
+
+    return { durationText, dateFormatted };
+}
+
+// Åpne medlemsdetaljer-modal for en person
+async function openMemberDetailModal(m) {
+    if (!m) return;
+
+    const avatarImg = document.getElementById('detail-member-avatar');
+    const avatarLink = document.getElementById('detail-member-avatar-link');
+    const avatarUrl = m.photo_url || (`https://ui-avatars.com/api/?name=${encodeURIComponent(m.display_name || 'Medlem')}&background=random`);
+    if (avatarImg) {
+        avatarImg.src = avatarUrl;
+        avatarImg.alt = m.display_name || 'Profilbilde';
+    }
+    if (avatarLink) {
+        avatarLink.href = avatarUrl;
+    }
+
+    const nameEl = document.getElementById('detail-member-name');
+    if (nameEl) nameEl.textContent = m.display_name || 'Ukjent medlem';
+
+    const emailEl = document.getElementById('detail-member-email');
+    if (emailEl) {
+        if (m.email) {
+            emailEl.textContent = m.email;
+            emailEl.style.display = 'block';
+        } else {
+            emailEl.style.display = 'none';
+        }
+    }
+
+    const roleBadge = document.getElementById('detail-member-role-badge');
+    if (roleBadge) {
+        if (m.role === 'admin') {
+            roleBadge.textContent = 'Styre / Administrator';
+            roleBadge.style.background = 'var(--color-primary)';
+            roleBadge.style.color = '#fff';
+            roleBadge.style.border = 'none';
+        } else {
+            roleBadge.textContent = 'Medlem';
+            roleBadge.style.background = 'var(--color-bg-surface)';
+            roleBadge.style.color = 'var(--color-text-main)';
+            roleBadge.style.border = '1px solid var(--color-border)';
+        }
+    }
+
+    const rawDate = m.member_since || m.created_at;
+    const { durationText, dateFormatted } = formatMemberDuration(rawDate);
+
+    const durEl = document.getElementById('detail-member-duration');
+    if (durEl) durEl.textContent = durationText;
+
+    const dateEl = document.getElementById('detail-member-since-date');
+    if (dateEl) {
+        dateEl.textContent = rawDate ? `Innmeldt: ${dateFormatted}` : 'Innmeldingsdato ikke registrert';
+    }
+
+    // Last inn medlemmets offentlige galleribilder (hvis de har noen)
+    const gallerySection = document.getElementById('detail-member-gallery-section');
+    const galleryGrid = document.getElementById('detail-member-gallery-grid');
+    const galleryCountBadge = document.getElementById('detail-member-gallery-count');
+    if (gallerySection && galleryGrid) {
+        galleryGrid.innerHTML = '';
+        gallerySection.classList.add('hidden');
+        try {
+            const res = await GalleryAPI.getGallery('public');
+            const userPhotos = (res.gallery || []).filter(item => 
+                (item.uploader_id && item.uploader_id == m.id) ||
+                (item.uploader_name && item.uploader_name.toLowerCase() === (m.display_name || '').toLowerCase())
+            );
+            if (userPhotos.length > 0) {
+                if (galleryCountBadge) galleryCountBadge.textContent = `${userPhotos.length} bilde${userPhotos.length > 1 ? 'r' : ''}`;
+                userPhotos.slice(0, 6).forEach(p => {
+                    const img = document.createElement('img');
+                    img.src = p.image_url;
+                    img.alt = p.title || 'Bilde fra medlemsgalleriet';
+                    img.style.cssText = 'width: 100%; height: 75px; object-fit: cover; border-radius: 8px; border: 1px solid var(--color-border); cursor: pointer;';
+                    img.title = p.title || 'Se bilde';
+                    img.onclick = () => window.open(p.image_url, '_blank');
+                    galleryGrid.appendChild(img);
+                });
+                gallerySection.classList.remove('hidden');
+            }
+        } catch (err) {
+            // Hvis galleri ikke er tilgjengelig, la seksjonen være skjult
+        }
+    }
+
+    // Admin handling: Dersom innlogget bruker er admin, vis "Rediger medlem (Admin)"
+    const adminActions = document.getElementById('detail-member-admin-actions');
+    const editAsAdminBtn = document.getElementById('detail-member-edit-as-admin-btn');
+    if (adminActions && editAsAdminBtn) {
+        if (currentUser && currentUser.role === 'admin') {
+            adminActions.classList.remove('hidden');
+            editAsAdminBtn.onclick = () => {
+                closeModal('member-detail-modal');
+                openAdminEditMemberModal(m);
+            };
+        } else {
+            adminActions.classList.add('hidden');
+        }
+    }
+
+    openModal('member-detail-modal');
+}
+
 // Sidepanel: Høyre medlemsliste
 async function loadSidebarMembers() {
     const listContainer = document.getElementById('sidebar-members-list');
@@ -350,14 +495,35 @@ async function loadSidebarMembers() {
 
         members.forEach(m => {
             const row = document.createElement('div');
-            row.style.cssText = 'display: flex; align-items: center; gap: 0.75rem;';
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.4rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease;';
+            row.setAttribute('role', 'button');
+            row.setAttribute('tabindex', '0');
+            row.setAttribute('title', `Trykk for å se profilen til ${m.display_name}`);
+            row.onmouseenter = () => row.style.background = 'var(--color-bg-subtle)';
+            row.onmouseleave = () => row.style.background = 'transparent';
+
+            const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
+            const roleText = m.role === 'admin' ? 'Administrator' : 'Medlem';
+
             row.innerHTML = `
-                <img src="${m.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name)}" alt="${m.display_name}" style="width: 32px; height: 32px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border);">
-                <div>
-                    <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
-                    <span style="font-size: 0.75rem; color: var(--color-text-muted);">${m.role === 'admin' ? 'Administrator' : 'Medlem'}</span>
+                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
+                    <div>
+                        <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
+                    </div>
                 </div>
+                <span style="color: var(--color-text-muted); font-size: 0.9rem;">›</span>
             `;
+
+            row.addEventListener('click', () => openMemberDetailModal(m));
+            row.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openMemberDetailModal(m);
+                }
+            });
+
             listContainer.appendChild(row);
         });
     } catch (e) {
@@ -1753,16 +1919,35 @@ async function loadPwaMembers() {
 
         list.forEach(m => {
             const row = document.createElement('div');
-            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border); gap: 0.75rem;';
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border); gap: 0.75rem; cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;';
+            row.setAttribute('role', 'button');
+            row.setAttribute('tabindex', '0');
+            row.setAttribute('aria-label', `Se profilen til ${m.display_name}`);
+
+            const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
+            const roleText = m.role === 'admin' ? 'Styre / Admin' : 'Medlem';
+
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.85rem;">
-                    <img src="${m.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name)}" alt="${m.display_name}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border);">
+                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0;">
                     <div>
                         <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${m.role === 'admin' ? 'Styre / Admin' : 'Medlem'}</span>
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
                     </div>
                 </div>
+                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                    <span style="color: var(--color-text-muted); font-size: 1.15rem; line-height: 1;">›</span>
+                </div>
             `;
+
+            row.addEventListener('click', () => openMemberDetailModal(m));
+            row.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' || e.key === ' ') {
+                    e.preventDefault();
+                    openMemberDetailModal(m);
+                }
+            });
+
             container.appendChild(row);
         });
     }
