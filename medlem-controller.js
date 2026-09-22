@@ -347,7 +347,7 @@ function formatMemberDuration(dateStr) {
 }
 
 // Åpne medlemsdetaljer-modal for en person
-async function openMemberDetailModal(m) {
+function openMemberDetailModal(m) {
     if (!m) return;
 
     const avatarImg = document.getElementById('detail-member-avatar');
@@ -400,15 +400,32 @@ async function openMemberDetailModal(m) {
         dateEl.textContent = rawDate ? `Innmeldt: ${dateFormatted}` : 'Innmeldingsdato ikke registrert';
     }
 
-    // Last inn medlemmets offentlige galleribilder (hvis de har noen)
+    // Admin handling: Dersom innlogget bruker er admin, vis "Rediger medlem (Admin)"
+    const adminActions = document.getElementById('detail-member-admin-actions');
+    const editAsAdminBtn = document.getElementById('detail-member-edit-as-admin-btn');
+    if (adminActions && editAsAdminBtn) {
+        if (currentUser && currentUser.role === 'admin') {
+            adminActions.classList.remove('hidden');
+            editAsAdminBtn.onclick = () => {
+                closeModal('member-detail-modal');
+                openAdminEditMemberModal(m);
+            };
+        } else {
+            adminActions.classList.add('hidden');
+        }
+    }
+
+    // ÅPNE MODAL UMIDDELBART NÅR BRUKER TRUKKER
+    openModal('member-detail-modal');
+
+    // Last inn medlemmets offentlige galleribilder asynkront i bakgrunnen
     const gallerySection = document.getElementById('detail-member-gallery-section');
     const galleryGrid = document.getElementById('detail-member-gallery-grid');
     const galleryCountBadge = document.getElementById('detail-member-gallery-count');
     if (gallerySection && galleryGrid) {
         galleryGrid.innerHTML = '';
         gallerySection.classList.add('hidden');
-        try {
-            const res = await GalleryAPI.getGallery('public');
+        GalleryAPI.getGallery('public').then(res => {
             const userPhotos = (res.gallery || []).filter(item => 
                 (item.uploader_id && item.uploader_id == m.id) ||
                 (item.uploader_name && item.uploader_name.toLowerCase() === (m.display_name || '').toLowerCase())
@@ -426,28 +443,10 @@ async function openMemberDetailModal(m) {
                 });
                 gallerySection.classList.remove('hidden');
             }
-        } catch (err) {
-            // Hvis galleri ikke er tilgjengelig, la seksjonen være skjult
-        }
+        }).catch(() => {});
     }
-
-    // Admin handling: Dersom innlogget bruker er admin, vis "Rediger medlem (Admin)"
-    const adminActions = document.getElementById('detail-member-admin-actions');
-    const editAsAdminBtn = document.getElementById('detail-member-edit-as-admin-btn');
-    if (adminActions && editAsAdminBtn) {
-        if (currentUser && currentUser.role === 'admin') {
-            adminActions.classList.remove('hidden');
-            editAsAdminBtn.onclick = () => {
-                closeModal('member-detail-modal');
-                openAdminEditMemberModal(m);
-            };
-        } else {
-            adminActions.classList.add('hidden');
-        }
-    }
-
-    openModal('member-detail-modal');
 }
+window.openMemberDetailModal = openMemberDetailModal;
 
 // Sidepanel: Høyre medlemsliste
 async function loadSidebarMembers() {
@@ -466,7 +465,7 @@ async function loadSidebarMembers() {
 
         members.forEach(m => {
             const row = document.createElement('div');
-            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.4rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease;';
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.4rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
             row.setAttribute('role', 'button');
             row.setAttribute('tabindex', '0');
             row.setAttribute('title', `Trykk for å se profilen til ${m.display_name}`);
@@ -477,16 +476,17 @@ async function loadSidebarMembers() {
             const roleText = m.role === 'admin' ? 'Administrator' : 'Medlem';
 
             row.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; pointer-events: none;">
                     <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
                     <div>
                         <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
                         <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
                     </div>
                 </div>
-                <span style="color: var(--color-text-muted); font-size: 0.9rem;">›</span>
+                <span style="color: var(--color-text-muted); font-size: 0.9rem; pointer-events: none;">›</span>
             `;
 
+            row.onclick = () => openMemberDetailModal(m);
             row.addEventListener('click', () => openMemberDetailModal(m));
             row.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
@@ -1890,7 +1890,7 @@ async function loadPwaMembers() {
 
         list.forEach(m => {
             const row = document.createElement('div');
-            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border); gap: 0.75rem; cursor: pointer; transition: transform 0.15s ease, background 0.15s ease;';
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border); gap: 0.75rem; cursor: pointer; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation; user-select: none;';
             row.setAttribute('role', 'button');
             row.setAttribute('tabindex', '0');
             row.setAttribute('aria-label', `Se profilen til ${m.display_name}`);
@@ -1899,18 +1899,22 @@ async function loadPwaMembers() {
             const roleText = m.role === 'admin' ? 'Styre / Admin' : 'Medlem';
 
             row.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                <div style="display: flex; align-items: center; gap: 0.85rem; pointer-events: none;">
                     <img src="${avatarUrl}" alt="${m.display_name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0;">
                     <div>
                         <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
                         <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
                     </div>
                 </div>
-                <div style="display: flex; align-items: center; gap: 0.5rem;">
+                <div style="display: flex; align-items: center; gap: 0.5rem; pointer-events: none;">
                     <span style="color: var(--color-text-muted); font-size: 1.15rem; line-height: 1;">›</span>
                 </div>
             `;
 
+            row.onclick = (e) => {
+                e.preventDefault();
+                openMemberDetailModal(m);
+            };
             row.addEventListener('click', () => openMemberDetailModal(m));
             row.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
