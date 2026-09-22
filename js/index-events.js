@@ -161,12 +161,22 @@ function openHomepageLightbox(src) {
     document.body.style.overflow = 'hidden';
 }
 
+function scheduleLoad() {
+    if ('requestIdleCallback' in window) {
+        requestIdleCallback(() => {
+            loadPublicEvents();
+            loadHomepageGalleryTeaser();
+        }, { timeout: 1500 });
+    } else {
+        setTimeout(() => {
+            loadPublicEvents();
+            loadHomepageGalleryTeaser();
+        }, 100);
+    }
+}
+
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => {
-        loadPublicEvents();
-        loadHomepageGalleryTeaser();
-    });
+    document.addEventListener('DOMContentLoaded', scheduleLoad);
 } else {
-    loadPublicEvents();
-    loadHomepageGalleryTeaser();
+    scheduleLoad();
 }

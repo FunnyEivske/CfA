@@ -6,8 +6,16 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kontakt - Cosplay for alle</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"></noscript>
+
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/theme-switcher.js"></script>
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#9a3412">
@@ -144,6 +152,7 @@
         </svg>
     </button>
 
+    <script defer src="js/theme-switcher.js"></script>
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/script.js"></script>
 </body>

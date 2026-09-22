@@ -6,13 +6,19 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Min side - Cosplay for alle</title>
-    <link rel="stylesheet" href="css/style.css?v=2.4">
-    <link rel="stylesheet" href="css/medlem.css?v=2.4">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:wght@600;700&display=swap"></noscript>
+
+    <link rel="stylesheet" href="css/style.css?v=2.5">
+    <link rel="stylesheet" href="css/medlem.css?v=2.5">
     <!-- Quill.js for Rich Text Editing -->
     <link href="https://cdn.quilljs.com/1.3.6/quill.snow.css" rel="stylesheet">
-    <!-- Tema-veksler (Laster tidlig for å unngå flash) -->
-    <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
-    <script src="js/theme-switcher.js"></script>
+    <!-- Tema-veksler inline for å unngå FOUC uten blokkering -->
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#9a3412">
@@ -1448,14 +1454,15 @@
     </nav>
 
     <!-- Firebase og hoved-script -->
+    <script defer src="js/theme-switcher.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/tagging.js"></script>
     <script type="module" src="js/script.js"></script>
     <script type="module" src="js/feed.js"></script>
-    <script type="module" src="js/arrangement.js?v=2.4"></script>
-    <script type="module" src="js/medlem-controller.js?v=2.4"></script>
+    <script type="module" src="js/arrangement.js?v=2.5"></script>
+    <script type="module" src="js/medlem-controller.js?v=2.5"></script>
 </body>
 
 </html>

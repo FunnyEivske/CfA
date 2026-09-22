@@ -553,7 +553,7 @@ function checkAndShowInstallBanner() {
             <div class="pwa-banner-info">
                 <img src="Media/Logo/icon-192.png" alt="App ikon" class="pwa-banner-icon">
                 <div>
-                    <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main);">Installer appen</h4>
+                    <div role="heading" aria-level="3" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main);">Installer appen</div>
                     <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--color-text-muted);">Få rask tilgang og varsler på hjemskjermen</p>
                 </div>
             </div>
@@ -606,7 +606,7 @@ function showIosInstallModal() {
     modal.innerHTML = `
         <div class="pwa-ios-card">
             <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
-                <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main);">Installer på iPhone</h4>
+                <div role="heading" aria-level="3" style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main);">Installer på iPhone</div>
                 <button type="button" id="close-ios-modal-btn" style="background: none; border: none; font-size: 1.25rem; color: var(--color-text-muted); cursor: pointer; padding: 0.2rem;">✕</button>
             </div>
             <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.88rem; color: var(--color-text-main);">

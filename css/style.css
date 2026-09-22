@@ -1,5 +1,4 @@
-/* --- Importer Fonter --- */
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap');
+/* --- Fonter lastes asynkront via HTML for maksimal ytelse --- */
 
 /*
 ==========================================
@@ -746,17 +745,32 @@ p {
   display: flex;
   align-items: center;
   justify-content: center;
-  background-size: cover;
-  background-position: center;
+  overflow: hidden;
   text-align: center;
   color: var(--palette-white);
   padding: 2rem;
+}
+
+.hero-bg-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
 }
 
 .hero-overlay {
   position: absolute;
   inset: 0;
   background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.65));
+  z-index: 2;
 }
 
 .hero-content {

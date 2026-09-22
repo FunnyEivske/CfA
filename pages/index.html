@@ -6,8 +6,23 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cosplay for alle (CfA)</title>
+
+    <!-- Preconnect og asynkron font-lasting for minimal FCP/LCP -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"></noscript>
+
+    <!-- Kjerne-stilark -->
     <link rel="stylesheet" href="css/style.css">
-    <script src="js/theme-switcher.js"></script>
+
+    <!-- Forhåndslast LCP Hero-bilde i WebP for maksimal LCP-score -->
+    <link rel="preload" as="image" href="Media/Bilder/cosplay-gruppe.webp" type="image/webp" fetchpriority="high">
+
+    <!-- Lynrask tema-sjekk for å unngå FOUC uten ekstern nettverksblokkering -->
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#9a3412">
@@ -24,7 +39,7 @@
         <nav class="container main-nav">
             <div class="nav-brand-group">
                 <a href="/#hjem" class="logo-link">
-                    <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="logo-img">
+                    <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="logo-img" width="48" height="48">
                     <span class="logo-text">CfA</span>
                 </a>
                 <button class="lang-toggle-btn" aria-label="Bytt språk" title="Bytt språk">
@@ -71,8 +86,12 @@
     </header>
 
     <main>
-        <!-- Hovedseksjon (Hero) -->
-        <section id="hjem" class="hero-section" style="background-image: url('Media/Bilder/cosplay-gruppe.jpg');">
+        <!-- Hovedseksjon (Hero) med semantisk WebP LCP bilde -->
+        <section id="hjem" class="hero-section">
+            <picture class="hero-bg-picture">
+                <source srcset="Media/Bilder/cosplay-gruppe.webp" type="image/webp">
+                <img src="Media/Bilder/cosplay-gruppe.jpg" alt="Cosplay for alle fellesskap" class="hero-bg-img" width="1024" height="576" fetchpriority="high" loading="eager" decoding="async">
+            </picture>
             <div class="hero-overlay"></div>
             <div class="hero-content" style="color: #FFFFFF !important;">
                 <h1 style="color: #FFFFFF !important; text-shadow: 0 2px 10px rgba(0,0,0,0.9);" data-i18n="welcome_title">Velkommen til Cosplay for alle</h1>
@@ -92,7 +111,10 @@
                     </div>
                     <a href="om-oss" class="button button-secondary button-lg" style="margin-top: 1.5rem;" data-i18n="btn_read_more">Les mer om oss</a>
                 </div>
-                <img src="Media/Bilder/cosplay-trapp.jpg" alt="Cosplayere i fellesskap" class="grid-image">
+                <picture>
+                    <source srcset="Media/Bilder/cosplay-trapp.webp" type="image/webp">
+                    <img src="Media/Bilder/cosplay-trapp.jpg" alt="Cosplayere i fellesskap" class="grid-image" width="960" height="540" loading="lazy" decoding="async">
+                </picture>
             </div>
         </section>
 
@@ -143,7 +165,7 @@
     <!-- Footer -->
     <footer class="main-footer">
         <div class="container">
-            <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="footer-logo">
+            <img src="Media/Logo/cfa-logo.jpg" alt="Cosplay for alle Logo" class="footer-logo" width="48" height="48" loading="lazy">
             <p class="footer-title">Cosplay for alle (CfA)</p>
             <p class="footer-address" data-i18n="footer_address">Norge • Org.nr: 938 323 143 • kontakt@cosplayforalle.no</p>
             <div class="social-links">
@@ -182,6 +204,8 @@
         </div>
     </div>
 
+    <!-- Scripts: lastes ikke-blokkerende -->
+    <script defer src="js/theme-switcher.js"></script>
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/script.js"></script>
     <script type="module" src="js/public-gallery.js"></script>
