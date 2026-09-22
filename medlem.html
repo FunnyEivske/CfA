@@ -237,19 +237,17 @@
 
             </aside>
             <div class="dashboard-main">
-                <div class="card mb-6">
-                    <div class="card-body" style="padding: 0.75rem;">
-                        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
-                            <button id="tab-posts" class="btn btn-primary text-sm">Innlegg</button>
-                            <button id="tab-events" class="btn btn-secondary text-sm">Kommende Conventions</button>
+                <!-- Hovedvisning / Hjem (Tabs + Push Onboarding + Feed + Events) -->
+                <div id="pwa-view-home" class="pwa-view active">
+                    <!-- Topp-faner: Innlegg (først) og Kommende Conventions -->
+                    <div class="card mb-6 pwa-top-tabs-card">
+                        <div class="card-body" style="padding: 0.65rem 0.75rem;">
+                            <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+                                <button id="tab-posts" class="btn btn-primary text-sm">Innlegg</button>
+                                <button id="tab-events" class="btn btn-secondary text-sm">Kommende Conventions</button>
+                            </div>
                         </div>
                     </div>
-                </div>
-
-                <!-- PWA-Visning 1: Hjem (Spotlight + Onboarding + Feed) -->
-                <div id="pwa-view-home" class="pwa-view active">
-                    <!-- PWA Event Spotlight (Kommende convention blikkfang) -->
-                    <div id="pwa-event-spotlight" class="pwa-only"></div>
 
                     <!-- PWA Push Varsler Onboarding-banner -->
                     <div id="pwa-push-onboarding" class="pwa-push-banner pwa-only hidden">
@@ -268,11 +266,11 @@
                         </div>
                     </div>
 
-                    <!-- Velkomst / Feed -->
+                    <!-- Innlegg / Feed Seksjon (aktiv som standard) -->
                     <section id="posts-section">
                         <!-- Feed Container -->
                         <div id="feed-container"
-                            style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+                            style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
                             <div id="feed-loading" class="text-center py-10 text-muted">Laster oppdateringer...</div>
                         </div>
 
@@ -281,31 +279,31 @@
                             <button id="load-more-btn" class="btn btn-secondary text-sm">Last flere</button>
                         </div>
                     </section>
-                </div>
 
-                <!-- Arrangementer Section (brukes i desktop-tabs) -->
-                <section id="events-section" class="hidden">
-                    <div id="upcoming-events-container"
-                        style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
-                        <div class="text-center py-10 text-muted">Laster conventions...</div>
-                    </div>
-
-                    <!-- Past Events (Archived) -->
-                    <div id="past-events-wrapper" class="mt-10">
-                        <button id="toggle-past-events" class="btn btn-ghost text-sm mb-4"
-                            style="width: 100%; justify-content: space-between;">
-                            <span>Tidligere conventions</span>
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                stroke-width="2">
-                                <path d="M19 9l-7 7-7-7" />
-                            </svg>
-                        </button>
-                        <div id="past-events-container" class="hidden"
-                            style="display: flex; flex-direction: column; gap: 1rem; opacity: 0.7;">
-                            <!-- Tidligere conventions her -->
+                    <!-- Kommende Conventions Seksjon -->
+                    <section id="events-section" class="hidden">
+                        <div id="upcoming-events-container"
+                            style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1rem;">
+                            <div class="text-center py-10 text-muted">Laster conventions...</div>
                         </div>
-                    </div>
-                </section>
+
+                        <!-- Past Events (Archived) -->
+                        <div id="past-events-wrapper" class="mt-10">
+                            <button id="toggle-past-events" class="btn btn-ghost text-sm mb-4"
+                                style="width: 100%; justify-content: space-between;">
+                                <span>Tidligere conventions</span>
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2">
+                                    <path d="M19 9l-7 7-7-7" />
+                                </svg>
+                            </button>
+                            <div id="past-events-container" class="hidden"
+                                style="display: flex; flex-direction: column; gap: 1rem; opacity: 0.7;">
+                                <!-- Tidligere conventions her -->
+                            </div>
+                        </div>
+                    </section>
+                </div>
 
                 <!-- PWA-Visning 2: Medlemmer (PWA-only) -->
                 <div id="pwa-view-members" class="pwa-view pwa-only">

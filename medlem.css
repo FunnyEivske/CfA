@@ -2477,10 +2477,9 @@ body.pwa-standalone .pwa-settings-item {
   -webkit-user-select: none;
 }
 
-/* I standalone-modus: skjul ordinære desktop-sidebarer og de gamle tabsene */
+/* I standalone-modus: skjul ordinære desktop-sidebarer */
 body.pwa-standalone .dashboard-sidebar,
-body.pwa-standalone .dashboard-sidebar-right,
-body.pwa-standalone .dashboard-main > .card.mb-6 {
+body.pwa-standalone .dashboard-sidebar-right {
   display: none !important;
 }
 
@@ -2516,29 +2515,30 @@ body.pwa-standalone .pwa-view.active {
   }
 }
 
-/* PWA Spotlight Card for Neste Convention */
-.pwa-spotlight-card {
+/* PWA Topp-faner (Innlegg / Kommende Conventions) */
+body.pwa-standalone .pwa-top-tabs-card {
+  margin-top: 0.25rem !important;
+  margin-bottom: 1.25rem !important;
+  border-radius: 16px;
   background: var(--color-bg-surface);
-  border: 1.5px solid var(--color-primary);
-  border-radius: 18px;
-  overflow: hidden;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.15);
-  position: relative;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.05);
 }
 
-.pwa-spotlight-badge {
-  display: inline-flex;
+body.pwa-standalone .pwa-top-tabs-card .card-body {
+  padding: 0.5rem !important;
+}
+
+body.pwa-standalone .pwa-top-tabs-card button {
+  border-radius: 12px;
+  font-weight: 600;
+  font-size: 0.88rem !important;
+  padding: 0.7rem 0.5rem !important;
+  text-align: center;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
   align-items: center;
-  gap: 0.35rem;
-  background: var(--color-primary);
-  color: #FFFFFF;
-  font-size: 0.72rem;
-  font-weight: 700;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  padding: 0.25rem 0.65rem;
-  border-radius: 9999px;
+  justify-content: center;
 }
 
 /* PWA Push Onboarding Banner */
