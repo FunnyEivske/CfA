@@ -1345,4 +1345,44 @@ body.pwa-standalone .pwa-logout-btn {
   text-align: left;
   margin-bottom: env(safe-area-inset-bottom, 1rem);
 }
+
+/* Like-knapp for innlegg */
+.like-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  padding: 0.45rem 0.95rem !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid var(--color-border) !important;
+  background: var(--color-bg-subtle) !important;
+  color: var(--color-text-main) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.like-btn:hover {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.like-btn.liked {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #ef4444 !important;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.25) !important;
+}
+
+.like-btn.liked .like-count {
+  color: #ef4444 !important;
+  font-weight: 700 !important;
+}
+
+.like-btn:active {
+  transform: scale(0.93) !important;
+}
+
 

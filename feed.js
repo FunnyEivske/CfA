@@ -169,8 +169,9 @@ export async function loadPosts() {
                     </div>
                 ` : ''}
                 <div class="post-actions" style="margin-top: 1rem; display: flex; align-items: center; gap: 1rem;">
-                    <button type="button" class="action-btn like-btn ${isLikedClass}" data-id="${post.id}" style="background: none; border: 1px solid var(--color-border); padding: 0.4rem 0.8rem; border-radius: 20px; cursor: pointer; color: var(--color-text-main);">
-                        ❤️ <span class="like-count">${post.likes_count || 0}</span>
+                    <button type="button" class="action-btn like-btn ${isLikedClass}" data-id="${post.id}" title="${post.is_liked ? 'Likt' : 'Lik innlegget'}">
+                        <span class="like-icon">${post.is_liked ? '❤️' : '🤍'}</span>
+                        <span class="like-count">${post.likes_count || 0}</span>
                     </button>
                 </div>
             `;
@@ -269,8 +270,17 @@ function setupFeedEvents() {
             try {
                 const res = await PostAPI.toggleLike(postId);
                 const countSpan = likeBtn.querySelector('.like-count');
+                const iconSpan = likeBtn.querySelector('.like-icon');
                 if (countSpan) countSpan.textContent = res.likes_count;
-                likeBtn.classList.toggle('liked', res.liked);
+                if (res.liked) {
+                    likeBtn.classList.add('liked');
+                    if (iconSpan) iconSpan.textContent = '❤️';
+                    likeBtn.setAttribute('title', 'Likt');
+                } else {
+                    likeBtn.classList.remove('liked');
+                    if (iconSpan) iconSpan.textContent = '🤍';
+                    likeBtn.setAttribute('title', 'Lik innlegget');
+                }
             } catch (err) {
                 alert('Vennligst logg inn for å like innlegg.');
             }
