@@ -46,6 +46,7 @@ export async function loadPublicEvents() {
             card.style.color = 'inherit';
 
             const imageUrl = event.image_url || '';
+            const webpUrl = imageUrl ? imageUrl.replace(/\.(jpe?g|png)$/i, '.webp') : '';
             const dateStr = event.date ? new Date(event.date).toLocaleDateString('nb-NO', { 
                 day: 'numeric', 
                 month: 'long', 
@@ -59,7 +60,10 @@ export async function loadPublicEvents() {
 
             card.innerHTML = `
                 ${imageUrl 
-                    ? `<img src="${imageUrl}" alt="${event.title}" class="kurs-card-image" style="width: 100%; height: 200px; object-fit: cover;">`
+                    ? `<picture>
+                         ${webpUrl ? `<source srcset="${webpUrl}" type="image/webp">` : ''}
+                         <img src="${imageUrl}" alt="${event.title}" class="kurs-card-image" width="400" height="200" loading="lazy" decoding="async" style="width: 100%; height: 200px; object-fit: cover;">
+                       </picture>`
                     : `<div class="kurs-card-image" style="background:var(--color-bg-alt);height:200px;display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Bilde mangler</span></div>`
                 }
                 <div class="kurs-card-content" style="padding: 1.25rem;">
@@ -108,8 +112,13 @@ export async function loadHomepageGalleryTeaser() {
             itemDiv.className = 'gallery-item';
             itemDiv.style.cssText = 'position: relative; overflow: hidden; border-radius: var(--radius-md); aspect-ratio: 1/1; cursor: pointer; background: var(--color-bg-subtle); box-shadow: var(--shadow-sm); transition: transform 0.2s ease;';
             
+            const webpUrl = img.image_url ? img.image_url.replace(/\.(jpe?g|png)$/i, '.webp') : '';
+
             itemDiv.innerHTML = `
-                <img src="${img.image_url}" alt="${img.title || 'Cosplay bilde'}" style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy">
+                <picture>
+                    ${webpUrl ? `<source srcset="${webpUrl}" type="image/webp">` : ''}
+                    <img src="${img.image_url}" alt="${img.title || 'Cosplay bilde'}" width="250" height="250" style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy" decoding="async">
+                </picture>
             `;
 
             itemDiv.addEventListener('mouseenter', () => {
@@ -161,22 +170,42 @@ function openHomepageLightbox(src) {
     document.body.style.overflow = 'hidden';
 }
 
-function scheduleLoad() {
-    if ('requestIdleCallback' in window) {
-        requestIdleCallback(() => {
+function initLazySections() {
+    const eventsContainer = document.getElementById('public-events-container');
+    const teaserContainer = document.getElementById('homepage-gallery-teaser');
+
+    if ('IntersectionObserver' in window) {
+        if (eventsContainer) {
+            const evObserver = new IntersectionObserver((entries, obs) => {
+                if (entries[0].isIntersecting) {
+                    obs.disconnect();
+                    loadPublicEvents();
+                }
+            }, { rootMargin: '300px 0px' });
+            evObserver.observe(eventsContainer);
+        } else {
             loadPublicEvents();
+        }
+
+        if (teaserContainer) {
+            const galObserver = new IntersectionObserver((entries, obs) => {
+                if (entries[0].isIntersecting) {
+                    obs.disconnect();
+                    loadHomepageGalleryTeaser();
+                }
+            }, { rootMargin: '300px 0px' });
+            galObserver.observe(teaserContainer);
+        } else {
             loadHomepageGalleryTeaser();
-        }, { timeout: 1500 });
+        }
     } else {
-        setTimeout(() => {
-            loadPublicEvents();
-            loadHomepageGalleryTeaser();
-        }, 100);
+        loadPublicEvents();
+        loadHomepageGalleryTeaser();
     }
 }
 
 if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', scheduleLoad);
+    document.addEventListener('DOMContentLoaded', initLazySections);
 } else {
-    scheduleLoad();
+    initLazySections();
 }

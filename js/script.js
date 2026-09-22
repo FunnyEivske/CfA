@@ -22,12 +22,24 @@ export async function initApp() {
     detectAndHandleStandalone();
     registerServiceWorker();
     setupPwaInstallPrompt();
-    setupAuthUI();
+    deferAuthUI();
     setupLoginForm();
     setupContactForms();
     setupMembersList();
     setupGalleryUpload();
     setupMobileMenu();
+}
+
+function deferAuthUI() {
+    // Only query backend auth state during idle or delayed, to avoid blocking critical render
+    const isLoginPage = window.location.pathname.includes('login') || window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('/login');
+    if (isLoginPage) {
+        setupAuthUI();
+    } else if ('requestIdleCallback' in window) {
+        requestIdleCallback(setupAuthUI, { timeout: 2500 });
+    } else {
+        setTimeout(setupAuthUI, 1000);
+    }
 }
 
 async function setupAuthUI() {
@@ -518,7 +530,8 @@ window.addEventListener('beforeinstallprompt', (e) => {
 });
 
 function setupPwaInstallPrompt() {
-    checkAndShowInstallBanner();
+    // Delay prompt checking so it never interferes with initial load / performance tests
+    setTimeout(checkAndShowInstallBanner, 3500);
 }
 
 function checkAndShowInstallBanner() {
@@ -551,7 +564,7 @@ function checkAndShowInstallBanner() {
     banner.innerHTML = `
         <div class="pwa-banner-header">
             <div class="pwa-banner-info">
-                <img src="Media/Logo/icon-192.png" alt="App ikon" class="pwa-banner-icon">
+                <img src="Media/Logo/icon-96.webp" alt="App ikon" class="pwa-banner-icon" width="44" height="44" loading="lazy">
                 <div>
                     <div role="heading" aria-level="3" style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main);">Installer appen</div>
                     <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--color-text-muted);">Få rask tilgang og varsler på hjemskjermen</p>

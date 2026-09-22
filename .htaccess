@@ -18,6 +18,11 @@ DirectoryIndex pages/index.html index.html index.php
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/pages/([^\s]+) [NC]
     RewriteRule ^ /%1 [R=301,L]
 
+    # Automatisk servering av WebP hvis nettleseren støtter det og .webp finnes i /uploads/
+    RewriteCond %{HTTP_ACCEPT} image/webp
+    RewriteCond %{DOCUMENT_ROOT}/uploads/$1.webp -f
+    RewriteRule ^uploads/(.+)\.(jpe?g|png)$ uploads/$1.webp [T=image/webp,E=accept:1,L]
+
     # Server .html-filen internt fra pages/ hvis forespørselen matcher en fil i pages/
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f

@@ -42,7 +42,7 @@ if (!file_exists($upload_dir)) {
  * Hvis bildet er for stort, reduseres oppløsning og kvalitet automatisk til det er optimalt.
  * Fikser også mobilkameraers EXIF-rotasjon automatisk.
  */
-function compressImageServerSide($srcPath, $destPath, $maxDim = 1024, $quality = 82) {
+function compressImageServerSide($srcPath, $destPath, $maxDim = 800, $quality = 75) {
     if (!extension_loaded('gd') || !file_exists($srcPath)) {
         return move_uploaded_file($srcPath, $destPath);
     }
@@ -115,6 +115,13 @@ function compressImageServerSide($srcPath, $destPath, $maxDim = 1024, $quality =
     imagecopyresampled($dstImg, $srcImg, 0, 0, 0, 0, $newWidth, $newHeight, $width, $height);
 
     $saved = imagejpeg($dstImg, $destPath, $quality);
+
+    // Lagre også WebP-kopi hvis støttet
+    if (function_exists('imagewebp')) {
+        $webpDest = preg_replace('/\.(jpe?g|png)$/i', '.webp', $destPath);
+        @imagewebp($dstImg, $webpDest, $quality);
+    }
+
     imagedestroy($srcImg);
     imagedestroy($dstImg);
 
