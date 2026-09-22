@@ -539,7 +539,7 @@ export function urlBase64ToUint8Array(base64String) {
 export async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
         try {
-            const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+            const reg = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
             return reg;
         } catch (err) {
             console.warn('Service Worker registrering feilet:', err);

@@ -1,16 +1,29 @@
 # Beskyttelse mot opplisting av mapper
 Options -Indexes
 
+DirectoryIndex pages/index.html index.html index.php
+
 # Rewrite Engine for pene URL-er (uten .html)
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteBase /
 
-    # Omadresser forespørsler med .html til ren URL i adressefeltet (f.eks. /galleri.html -> /galleri)
-    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s([^.]+)\.html [NC]
-    RewriteRule ^ %1 [R=301,L]
+    # Server pages/index.html ved rot-forespørsel (/)
+    RewriteRule ^$ pages/index.html [L]
 
-    # Server .html-filen internt hvis forespørselen matcher en eksisterende HTML-fil
+    # Omadresser forespørsler med /pages/ eller .html til ren URL i adressefeltet (f.eks. /pages/galleri.html -> /galleri)
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/(?:pages/)?([^.]+)\.html [NC]
+    RewriteRule ^ /%1 [R=301,L]
+
+    RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/pages/([^\s]+) [NC]
+    RewriteRule ^ /%1 [R=301,L]
+
+    # Server .html-filen internt fra pages/ hvis forespørselen matcher en fil i pages/
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
+    RewriteRule ^(.*?)/?$ pages/$1.html [L]
+
+    # Fallback: Server .html-filen internt hvis forespørselen matcher en fil i rotmappen
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{DOCUMENT_ROOT}/$1.html -f
     RewriteRule ^(.*?)/?$ $1.html [L]

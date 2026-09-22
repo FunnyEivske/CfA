@@ -2,11 +2,12 @@
 <html lang="no">
 
 <head>
+    <base href="/">
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Bli medlem - Cosplay for alle</title>
-    <link rel="stylesheet" href="style.css">
-    <script src="theme-switcher.js"></script>
+    <title>Kontakt - Cosplay for alle</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="js/theme-switcher.js"></script>
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
     <link rel="manifest" href="manifest.json">
     <meta name="theme-color" content="#9a3412">
@@ -14,26 +15,9 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
     <meta name="apple-mobile-web-app-title" content="CfA">
     <link rel="apple-touch-icon" href="Media/Logo/icon-192.png">
-    <style>
-        .google-form-iframe {
-            max-width: 100%;
-            border: none;
-            height: 2800px;
-        }
-
-        @media (max-width: 768px) {
-            .google-form-iframe {
-                height: 4200px;
-            }
-        }
-
-        [data-theme="dark"] .google-form-iframe {
-            filter: invert(0.9) hue-rotate(180deg);
-        }
-    </style>
 </head>
 
-<body class="bli-medlem-page">
+<body class="kontakt-page">
 
     <!-- Header & Navigasjon -->
     <header class="main-header">
@@ -58,7 +42,7 @@
                 <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
                 <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
                 <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
-                <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
+                <a href="kontakt" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
                 <a id="member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
                 <a id="login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
@@ -78,7 +62,7 @@
                 <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
                 <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
                 <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
-                <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
+                <a href="kontakt" class="nav-link-active" data-i18n="nav_contact">Kontakt</a>
                 <a id="mobile-member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
                 <a id="mobile-login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="mobile-logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
@@ -87,33 +71,40 @@
     </header>
 
     <main>
-        <!-- Bli medlem -->
-        <section id="bli-medlem" class="section section-bg-white" style="min-height: 70vh; display: flex; align-items: center;">
-            <div class="container" style="max-width: 700px; margin: 0 auto; text-align: center;">
-                <div class="card" style="padding: 3rem 2rem; border-radius: 16px; border: 1px solid var(--color-border); box-shadow: var(--shadow-lg); background: var(--color-bg-card);">
-                    <div style="width: 64px; height: 64px; margin: 0 auto 1.5rem auto; border-radius: 50%; background: var(--color-primary-light, rgba(235, 78, 118, 0.1)); display: flex; align-items: center; justify-content: center;">
-                        <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                            <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                            <polyline points="22,6 12,13 2,6"></polyline>
-                        </svg>
-                    </div>
-                    <h1 style="font-size: 2rem; margin-bottom: 1rem; color: var(--color-text-main);">Bli medlem i Cosplay for alle</h1>
-                    <p class="text-lg" style="color: var(--color-text-muted); margin-bottom: 2rem; line-height: 1.6;">
-                        Ønsker du å bli medlem i CfA Cosplay for Alle? For øyeblikket opprettes medlemskap direkte via styret. Ta kontakt med oss på e-post, så hjelper vi deg i gang!
+        <!-- Kontakt -->
+        <section id="kontakt" class="section section-bg-white">
+            <div class="container">
+                <div class="text-center" style="max-width: 600px; margin: 0 auto 2.5rem auto;">
+                    <h1 data-i18n="contact_page_title">Kontakt oss</h1>
+                    <p class="text-lg" data-i18n="contact_page_subtitle">Har du spørsmål om organisasjonen, våre samlinger eller vil bli medlem? Send oss en melding!</p>
+                    <p style="margin-top: 1rem; color: var(--color-text-muted); font-size: 1rem;">
+                        <span data-i18n="contact_direct_info">Du kan også nå oss direkte på e-post:</span>
+                        <a href="mailto:kontakt@cosplayforalle.no" data-i18n="contact_direct_email" style="color: var(--color-primary); font-weight: 600; text-decoration: none; margin-left: 0.35rem;">kontakt@cosplayforalle.no</a>
                     </p>
-                    
-                    <div style="display: flex; flex-direction: column; align-items: center; gap: 1rem;">
-                        <a href="mailto:kontakt@cosplayforalle.no" class="button button-primary" style="font-size: 1.1rem; padding: 0.9rem 2rem; display: inline-flex; align-items: center; gap: 0.75rem; text-decoration: none;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                <polyline points="22,6 12,13 2,6"></polyline>
-                            </svg>
-                            kontakt@cosplayforalle.no
-                        </a>
-                        <p class="text-sm text-muted" style="margin-top: 0.5rem;">
-                            Eller send en vanlig e-post til: <strong style="color: var(--color-text-main);">kontakt@cosplayforalle.no</strong>
-                        </p>
-                    </div>
+                </div>
+
+                <div class="form-container">
+                    <form id="contact-form">
+                        <div style="display:none;" aria-hidden="true">
+                            <input type="text" name="website" tabindex="-1" autocomplete="off">
+                        </div>
+                        <div class="form-group">
+                            <label for="name" class="form-label" data-i18n="form_name">Navn</label>
+                            <input type="text" id="name" name="name" class="form-input" required data-i18n="form_name_placeholder" placeholder="Ditt navn">
+                        </div>
+                        <div class="form-group">
+                            <label for="email" class="form-label" data-i18n="form_email">E-post</label>
+                            <input type="email" id="email" name="email" class="form-input" required data-i18n="form_email_placeholder" placeholder="din@epost.no">
+                        </div>
+                        <div class="form-group">
+                            <label for="message" class="form-label" data-i18n="form_message">Melding</label>
+                            <textarea id="message" name="message" class="form-textarea" required data-i18n="form_message_placeholder_contact" placeholder="Skriv din melding her..."></textarea>
+                        </div>
+                        <div id="contact-status" style="margin-bottom: 1rem;"></div>
+                        <div class="text-center">
+                            <button type="submit" id="contact-submit-btn" class="button button-primary button-lg" data-i18n="form_send_btn">Send Melding</button>
+                        </div>
+                    </form>
                 </div>
             </div>
         </section>
@@ -153,8 +144,8 @@
         </svg>
     </button>
 
-    <script type="module" src="i18n.js"></script>
-    <script type="module" src="script.js"></script>
+    <script type="module" src="js/i18n.js"></script>
+    <script type="module" src="js/script.js"></script>
 </body>
 
 </html>
