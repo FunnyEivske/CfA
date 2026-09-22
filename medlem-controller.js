@@ -159,10 +159,6 @@ function setupModals() {
     bindClick('close-profile-modal-x', () => closeModal('profile-modal'));
     bindClick('close-profile-modal', () => closeModal('profile-modal'));
     bindClick('cancel-profile-modal', () => closeModal('profile-modal'));
-    bindClick('modal-logout-button', () => {
-        closeModal('profile-modal');
-        document.getElementById('logout-button')?.click();
-    });
 
     bindClick('close-member-detail-modal-x', () => closeModal('member-detail-modal'));
     bindClick('close-member-detail-modal-btn', () => closeModal('member-detail-modal'));
