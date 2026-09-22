@@ -21,6 +21,7 @@ function detectAndHandleStandalone() {
 export async function initApp() {
     detectAndHandleStandalone();
     registerServiceWorker();
+    setupPwaInstallPrompt();
     setupAuthUI();
     setupLoginForm();
     setupContactForms();
@@ -504,4 +505,138 @@ if (document.readyState === 'loading') {
 } else {
     initApp();
 }
+
+// ----------------------------------------------------
+// PWA Mobil Installasjons-banner & Veiledning
+// ----------------------------------------------------
+let deferredPwaPrompt = null;
+
+window.addEventListener('beforeinstallprompt', (e) => {
+    e.preventDefault();
+    deferredPwaPrompt = e;
+    checkAndShowInstallBanner();
+});
+
+function setupPwaInstallPrompt() {
+    checkAndShowInstallBanner();
+}
+
+function checkAndShowInstallBanner() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) return;
+
+    // Kun på mobil eller nettbrett
+    const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    if (!isMobile) return;
+
+    // Sjekk om brukeren har lukket banneret nylig (14 dagers pause)
+    const dismissedUntil = localStorage.getItem('pwa_install_banner_dismissed_until');
+    if (dismissedUntil && Date.now() < Number(dismissedUntil)) {
+        return;
+    }
+
+    // Ikke vis på selve /app eller /app-start
+    const path = window.location.pathname;
+    if (path.includes('app.html') || path.includes('app-start.html') || path.endsWith('/app')) {
+        return;
+    }
+
+    if (document.getElementById('pwa-mobile-install-banner')) return;
+
+    const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+
+    const banner = document.createElement('div');
+    banner.id = 'pwa-mobile-install-banner';
+    banner.className = 'pwa-install-banner';
+    banner.innerHTML = `
+        <div class="pwa-banner-header">
+            <div class="pwa-banner-info">
+                <img src="Media/Logo/icon-192.png" alt="App ikon" class="pwa-banner-icon">
+                <div>
+                    <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main);">Installer appen</h4>
+                    <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--color-text-muted);">Få rask tilgang og varsler på hjemskjermen</p>
+                </div>
+            </div>
+        </div>
+        <div class="pwa-banner-actions">
+            <button type="button" class="pwa-banner-btn-close" id="pwa-dismiss-btn">Ikke nå</button>
+            <button type="button" class="pwa-banner-btn-install" id="pwa-install-action-btn">
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                ${isIos ? 'Vis hvordan' : 'Installer nå'}
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(banner);
+
+    const dismissBtn = document.getElementById('pwa-dismiss-btn');
+    if (dismissBtn) {
+        dismissBtn.onclick = () => {
+            banner.remove();
+            // Pause visning i 14 dager
+            localStorage.setItem('pwa_install_banner_dismissed_until', Date.now() + 14 * 24 * 60 * 60 * 1000);
+        };
+    }
+
+    const actionBtn = document.getElementById('pwa-install-action-btn');
+    if (actionBtn) {
+        actionBtn.onclick = async () => {
+            if (isIos) {
+                showIosInstallModal();
+            } else if (deferredPwaPrompt) {
+                deferredPwaPrompt.prompt();
+                const choice = await deferredPwaPrompt.userChoice;
+                if (choice.outcome === 'accepted') {
+                    banner.remove();
+                }
+                deferredPwaPrompt = null;
+            } else {
+                window.location.href = 'app';
+            }
+        };
+    }
+}
+
+function showIosInstallModal() {
+    if (document.getElementById('pwa-ios-modal')) return;
+
+    const modal = document.createElement('div');
+    modal.id = 'pwa-ios-modal';
+    modal.className = 'pwa-ios-modal';
+    modal.innerHTML = `
+        <div class="pwa-ios-card">
+            <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 1rem;">
+                <h4 style="margin: 0; font-size: 1.1rem; font-weight: 700; color: var(--color-text-main);">Installer på iPhone</h4>
+                <button type="button" id="close-ios-modal-btn" style="background: none; border: none; font-size: 1.25rem; color: var(--color-text-muted); cursor: pointer; padding: 0.2rem;">✕</button>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 0.85rem; font-size: 0.88rem; color: var(--color-text-main);">
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div style="background: var(--color-primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-top: 1px;">1</div>
+                    <div>Trykk på <strong>Del-knappen</strong> nederst i Safari (firkanten med pil opp).</div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div style="background: var(--color-primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-top: 1px;">2</div>
+                    <div>Bla litt ned og velg <strong>«Legg til på Hjem-skjerm»</strong>.</div>
+                </div>
+                <div style="display: flex; align-items: flex-start; gap: 0.75rem;">
+                    <div style="background: var(--color-primary); color: white; width: 22px; height: 22px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 0.75rem; font-weight: bold; flex-shrink: 0; margin-top: 1px;">3</div>
+                    <div>Trykk <strong>«Legg til»</strong> øverst til høyre. Nå finner du appen på hjemskjermen!</div>
+                </div>
+            </div>
+            <button type="button" id="ok-ios-modal-btn" class="button button-primary" style="width: 100%; margin-top: 1.25rem; justify-content: center; padding: 0.7rem;">
+                Den er grei!
+            </button>
+        </div>
+    `;
+
+    document.body.appendChild(modal);
+
+    const close = () => modal.remove();
+    document.getElementById('close-ios-modal-btn').onclick = close;
+    document.getElementById('ok-ios-modal-btn').onclick = close;
+    modal.onclick = (e) => {
+        if (e.target === modal) close();
+    };
+}
+
 

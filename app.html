@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Last ned Cosplay for alle Appen</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9a3412">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CfA">
+    <link rel="apple-touch-icon" href="Media/Logo/icon-192.png">
+    <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
+    <link rel="stylesheet" href="style.css">
+    <script src="theme-switcher.js"></script>
+    <style>
+        .app-landing-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem 1rem;
+            background: radial-gradient(circle at top, rgba(234, 88, 12, 0.12) 0%, transparent 60%), var(--color-bg-page);
+        }
+
+        .app-card {
+            max-width: 480px;
+            width: 100%;
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 20px;
+            padding: 2.5rem 2rem;
+            box-shadow: var(--shadow-xl);
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .app-icon-glow {
+            width: 100px;
+            height: 100px;
+            border-radius: 24px;
+            margin: 0 auto 1.5rem;
+            position: relative;
+            box-shadow: 0 12px 30px rgba(234, 88, 12, 0.35);
+        }
+
+        .app-icon-glow img {
+            width: 100%;
+            height: 100%;
+            border-radius: 24px;
+            object-fit: cover;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .feature-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 0.75rem;
+            margin: 2rem 0;
+            text-align: left;
+        }
+
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.75rem 1rem;
+            background: var(--color-bg-subtle);
+            border-radius: 12px;
+            font-size: 0.9rem;
+            color: var(--color-text-main);
+        }
+
+        .feature-icon {
+            font-size: 1.25rem;
+            flex-shrink: 0;
+        }
+
+        .platform-box {
+            background: var(--color-bg-subtle);
+            border: 1px solid var(--color-border);
+            border-radius: 14px;
+            padding: 1.25rem;
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .step-row {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            margin-bottom: 0.85rem;
+            font-size: 0.9rem;
+        }
+
+        .step-row:last-child {
+            margin-bottom: 0;
+        }
+
+        .step-badge {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--color-primary);
+            color: white;
+            font-size: 0.75rem;
+            font-weight: bold;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            margin-top: 2px;
+        }
+
+        .qr-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 1rem;
+            background: white;
+            border-radius: 12px;
+            width: fit-content;
+            margin: 1rem auto;
+        }
+
+        .qr-container img {
+            width: 160px;
+            height: 160px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div class="app-landing-wrapper">
+        <div class="app-card">
+            <div class="app-icon-glow">
+                <img src="Media/Logo/icon-192.png" alt="Cosplay for alle Logo">
+            </div>
+
+            <h1 style="font-size: 1.75rem; font-weight: 800; margin-bottom: 0.4rem; color: var(--color-text-main);">
+                Cosplay for alle
+            </h1>
+            <p style="font-size: 0.95rem; color: var(--color-text-muted); margin: 0;">
+                Offisiell PWA-app for medlemmer
+            </p>
+
+            <div class="feature-grid">
+                <div class="feature-item">
+                    <span class="feature-icon">⚡</span>
+                    <span><strong>Lynrask tilgang:</strong> Åpnes direkte fra hjemskjermen uten adressefelt.</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔔</span>
+                    <span><strong>Push-varsler:</strong> Få beskjed med en gang nye innlegg publiseres.</span>
+                </div>
+                <div class="feature-item">
+                    <span class="feature-icon">🔒</span>
+                    <span><strong>100% Privat:</strong> Selvhostet på vår egen server uten sporing.</span>
+                </div>
+            </div>
+
+            <!-- Dynamisk plattform-instruksjon -->
+            <div id="platform-android" class="platform-box hidden">
+                <p style="font-weight: 600; margin-bottom: 0.75rem; color: var(--color-text-main);">📱 Installer på Android:</p>
+                <button type="button" id="android-install-btn" class="button button-primary" style="width: 100%; padding: 0.9rem 1.25rem; font-size: 1rem; justify-content: center; gap: 0.5rem; font-weight: bold;">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+                        <polyline points="7 10 12 15 17 10"/>
+                        <line x1="12" y1="15" x2="12" y2="3"/>
+                    </svg>
+                    Installer appen nå
+                </button>
+                <p id="android-alt-instructions" class="text-xs text-muted mt-2" style="text-align: center; margin-top: 0.75rem;">
+                    Dersom knappen ikke reagerer, trykk på menyen (<strong>⋮</strong>) øverst i Chrome og velg <strong>«Installer app»</strong> eller <strong>«Legg til på startsiden»</strong>.
+                </p>
+            </div>
+
+            <div id="platform-ios" class="platform-box hidden">
+                <p style="font-weight: 600; margin-bottom: 0.75rem; color: var(--color-text-main);">🍏 Installer på iPhone / iPad:</p>
+                <div class="step-row">
+                    <div class="step-badge">1</div>
+                    <div>Trykk på <strong>Del-knappen</strong> nederst i Safari (firkant med pil opp: <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="display:inline; vertical-align:middle;"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="15" x2="12" y2="15"/></svg>).</div>
+                </div>
+                <div class="step-row">
+                    <div class="step-badge">2</div>
+                    <div>Bla ned i menyen og trykk på <strong>«Legg til på Hjem-skjerm»</strong>.</div>
+                </div>
+                <div class="step-row">
+                    <div class="step-badge">3</div>
+                    <div>Trykk <strong>«Legg til»</strong> øverst i høyre hjørne. Appen er klar!</div>
+                </div>
+            </div>
+
+            <div id="platform-desktop" class="platform-box hidden" style="text-align: center;">
+                <p style="font-weight: 600; margin-bottom: 0.5rem; color: var(--color-text-main);">📱 Åpne på mobilen for å installere:</p>
+                <p class="text-xs text-muted">Scan QR-koden med kameraet på telefonen din:</p>
+                <div class="qr-container">
+                    <img id="qr-code-img" src="https://api.qrserver.com/v1/create-qr-code/?size=160x160&data=https://cosplayforalle.no/app" alt="QR-kode til appen">
+                </div>
+                <p class="text-xs text-muted" style="margin: 0;">Eller åpne <strong>cosplayforalle.no/app</strong> i mobilnettleseren.</p>
+            </div>
+
+            <div style="margin-top: 1.5rem; display: flex; flex-direction: column; gap: 0.6rem;">
+                <a href="login" class="button button-secondary" style="width: 100%; justify-content: center; text-decoration: none;">
+                    Fortsett til innlogging i nettleser
+                </a>
+                <a href="/" style="font-size: 0.85rem; color: var(--color-text-muted); text-decoration: none; margin-top: 0.4rem;">
+                    ← Tilbake til forsiden
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { registerServiceWorker } from './api-client.js';
+
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        if (isStandalone) {
+            window.location.replace('app-start.html');
+        }
+
+        registerServiceWorker();
+
+        let deferredPrompt = null;
+        const androidBox = document.getElementById('platform-android');
+        const iosBox = document.getElementById('platform-ios');
+        const desktopBox = document.getElementById('platform-desktop');
+        const installBtn = document.getElementById('android-install-btn');
+
+        const isIos = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+        const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+
+        if (isIos) {
+            iosBox.classList.remove('hidden');
+        } else if (isMobile) {
+            androidBox.classList.remove('hidden');
+        } else {
+            desktopBox.classList.remove('hidden');
+        }
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (androidBox) androidBox.classList.remove('hidden');
+            if (desktopBox) desktopBox.classList.add('hidden');
+        });
+
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const choiceResult = await deferredPrompt.userChoice;
+                    if (choiceResult.outcome === 'accepted') {
+                        installBtn.textContent = 'Installerer...';
+                        installBtn.disabled = true;
+                    }
+                    deferredPrompt = null;
+                } else {
+                    alert('For å installere: Trykk på meny-ikonet (tre prikker) øverst til høyre i nettleseren og velg "Installer app" eller "Legg til på startsiden".');
+                }
+            });
+        }
+    </script>
+</body>
+
+</html>
