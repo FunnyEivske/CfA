@@ -47,4 +47,6 @@ cfa_webhuset_klar_til_opplasting/
 cfa_webhuset_klar_til_opplasting*
 deploy.ps1
 *.zip
+scratch/
+backend/vapid_keys.php
 

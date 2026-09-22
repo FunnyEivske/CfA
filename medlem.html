@@ -13,8 +13,14 @@
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script src="theme-switcher.js"></script>
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.jpg">
-<script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
-    </head>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#9a3412">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CfA">
+    <link rel="apple-touch-icon" href="Media/Logo/icon-192.png">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/dompurify/3.0.6/purify.min.js"></script>
+</head>
 
 <body>
 
@@ -129,12 +135,40 @@
                     </div>
                 </div>
 
+                <!-- Push-varsler kort -->
+                <div id="push-notification-card" class="card mb-4">
+                    <div class="card-body" style="padding: 0.85rem 1rem;">
+                        <div style="display: flex; align-items: center; justify-content: space-between; gap: 0.75rem;">
+                            <div style="display: flex; align-items: center; gap: 0.6rem;">
+                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0;">
+                                    <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                    <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                                </svg>
+                                <div>
+                                    <p class="text-xs font-semibold" style="margin: 0;">Push-varsler</p>
+                                    <p id="push-status-text" class="text-xs text-muted" style="margin: 0;">Varsel ved nye innlegg</p>
+                                </div>
+                            </div>
+                            <button type="button" id="toggle-push-btn" class="btn btn-secondary btn-sm" style="font-size: 0.75rem; padding: 0.35rem 0.65rem; flex-shrink: 0;">
+                                Aktiver
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
                 <!-- Admin Publish Card (Vis kun for leder/admin) -->
                 <div id="admin-publish-card" class="card hidden mb-4">
                     <div class="card-header">
                         <h4 id="publish-card-title" class="text-lg">Publiser (Leder)</h4>
                     </div>
                     <div class="card-body">
+                        <button id="send-test-push-btn" class="btn btn-secondary btn-full text-xs mb-2" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"></path>
+                                <path d="M13.73 21a2 2 0 0 1-3.46 0"></path>
+                            </svg>
+                            Test push-varsel
+                        </button>
                         <button id="new-post-btn" class="btn btn-primary btn-full text-sm mb-2" style="display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
                             <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                                 <path d="M12 5v14M5 12h14" />

@@ -1,6 +1,24 @@
 <?php
 // backend/api.php
 require_once 'config.php';
+require_once 'webpush.php';
+
+// Sikre at tabell for Web Push-abonnementer eksisterer
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id VARCHAR(128) NOT NULL,
+        endpoint TEXT NOT NULL,
+        p256dh VARCHAR(255) NOT NULL,
+        auth VARCHAR(255) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        INDEX idx_user (user_id),
+        UNIQUE KEY uniq_endpoint (endpoint(191))
+    )");
+} catch (Exception $e) {
+    // Ignorer hvis tabellen allerede eksisterer
+}
 
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
@@ -358,7 +376,20 @@ switch ($action) {
             $category
         ]);
         
-        jsonResponse(['success' => true, 'post_id' => $pdo->lastInsertId()]);
+        $postId = $pdo->lastInsertId();
+
+        // Send Web Push-varsel direkte til alle aktive abonnenter
+        try {
+            $snippet = strip_tags($content);
+            if (mb_strlen($snippet) > 120) {
+                $snippet = mb_substr($snippet, 0, 117) . '...';
+            }
+            WebPushServer::broadcastPush($pdo, 'Nytt innlegg: ' . $title, $snippet, '/medlem');
+        } catch (Exception $e) {
+            error_log('WebPush notification error on create_post: ' . $e->getMessage());
+        }
+        
+        jsonResponse(['success' => true, 'post_id' => $postId]);
         break;
 
     case 'update_post':
@@ -997,6 +1028,64 @@ switch ($action) {
             'success' => true,
             'message' => 'Meldingen din er sendt! Vi svarer deg så snart vi kan.'
         ]);
+        break;
+
+    case 'get_vapid_public_key':
+        try {
+            $pubKey = WebPushServer::getPublicKey();
+            jsonResponse(['publicKey' => $pubKey]);
+        } catch (Exception $e) {
+            jsonResponse(['error' => 'Kunne ikke hente VAPID-nøkkel: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'save_push_subscription':
+        requireAuth();
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        
+        $endpoint = trim($data['endpoint'] ?? '');
+        $p256dh = trim($data['keys']['p256dh'] ?? $data['p256dh'] ?? '');
+        $auth = trim($data['keys']['auth'] ?? $data['auth'] ?? '');
+
+        if (empty($endpoint) || empty($p256dh) || empty($auth)) {
+            jsonResponse(['error' => 'Mangler påkrevde abonnementsdata (endpoint, p256dh, auth)'], 400);
+        }
+
+        try {
+            $userId = $_SESSION['user_id'];
+            $stmt = $pdo->prepare("INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth) 
+                                   VALUES (?, ?, ?, ?) 
+                                   ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), p256dh = VALUES(p256dh), auth = VALUES(auth), updated_at = CURRENT_TIMESTAMP");
+            $stmt->execute([$userId, $endpoint, $p256dh, $auth]);
+            jsonResponse(['success' => true]);
+        } catch (Exception $e) {
+            jsonResponse(['error' => 'Databasefeil ved lagring av push-abonnement: ' . $e->getMessage()], 500);
+        }
+        break;
+
+    case 'unsubscribe_push':
+        requireAuth();
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? $_POST;
+        $endpoint = trim($data['endpoint'] ?? '');
+
+        if ($endpoint) {
+            try {
+                $stmt = $pdo->prepare("DELETE FROM push_subscriptions WHERE endpoint = ?");
+                $stmt->execute([$endpoint]);
+            } catch (Exception $e) {
+                // Ignorer
+            }
+        }
+        jsonResponse(['success' => true]);
+        break;
+
+    case 'send_test_push':
+        requireAuth();
+        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        $res = WebPushServer::broadcastPush($pdo, 'Testvarsel fra Cosplay for alle', 'Gratulerer! Web Push fungerer perfekt på enheten din.', '/medlem');
+        jsonResponse(['success' => true, 'result' => $res]);
         break;
 
     default:

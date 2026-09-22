@@ -1,4 +1,4 @@
-import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI, optimizeImageForUpload } from './api-client.js';
+import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI, optimizeImageForUpload, PushAPI, registerServiceWorker, subscribeUserToPush } from './api-client.js';
 
 let currentUser = null;
 let currentWorkshopData = null;
@@ -24,9 +24,12 @@ export function closeModal(modalId) {
 }
 
 export async function initMedlemPage() {
+    detectAndApplyStandaloneMode();
+    registerServiceWorker();
     setupTabSwitching();
     setupModals();
     setupNotificationsToggle();
+    setupPushNotificationUI();
     await setupProfileData();
     setupProfileForm();
     setupAdminEditMemberForm();
@@ -162,7 +165,8 @@ function setupModals() {
         } catch (e) {
             console.error('Logout error:', e);
         }
-        window.location.href = '/';
+        const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+        window.location.href = isStandalone ? 'login' : '/';
     };
     bindClick('logout-button', handleLogout);
     bindClick('dropdown-logout-button', handleLogout);
@@ -1324,6 +1328,116 @@ function setupStatusManagement() {
 }
 
 
+
+export function detectAndApplyStandaloneMode() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) {
+        document.body.classList.add('pwa-standalone');
+    }
+}
+
+async function setupPushNotificationUI() {
+    const toggleBtn = document.getElementById('toggle-push-btn');
+    const statusText = document.getElementById('push-status-text');
+    const testPushBtn = document.getElementById('send-test-push-btn');
+
+    if (testPushBtn) {
+        testPushBtn.onclick = async () => {
+            testPushBtn.disabled = true;
+            testPushBtn.textContent = 'Sender testvarsel...';
+            try {
+                const res = await PushAPI.sendTestPush();
+                if (res && res.success) {
+                    alert(`Test-pushvarsel ble sendt! Mottakere: ${res.result?.sent || 0}`);
+                } else {
+                    alert('Kunne ikke sende testvarsel: ' + (res?.error || 'Ukjent feil'));
+                }
+            } catch (err) {
+                alert('Feil ved sending av testvarsel: ' + err.message);
+            } finally {
+                testPushBtn.disabled = false;
+                testPushBtn.textContent = 'Test push-varsel';
+            }
+        };
+    }
+
+    if (!toggleBtn || !statusText) return;
+
+    if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
+        toggleBtn.disabled = true;
+        toggleBtn.textContent = 'Ikke støttet';
+        statusText.textContent = 'Støttes ikke i denne nettleseren';
+        return;
+    }
+
+    let currentSubscription = null;
+
+    // Sjekk nåværende abonnement
+    try {
+        const reg = await registerServiceWorker();
+        if (reg) {
+            currentSubscription = await reg.pushManager.getSubscription();
+            if (currentSubscription) {
+                toggleBtn.textContent = 'Slå av';
+                toggleBtn.classList.remove('btn-primary');
+                toggleBtn.classList.add('btn-secondary');
+                statusText.textContent = 'Varsler er aktivert';
+            } else if (Notification.permission === 'denied') {
+                toggleBtn.disabled = true;
+                toggleBtn.textContent = 'Blokkert';
+                statusText.textContent = 'Varsler er blokkert i nettleseren';
+            } else {
+                toggleBtn.textContent = 'Aktiver';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-primary');
+                statusText.textContent = 'Varsel ved nye innlegg';
+            }
+        }
+    } catch (e) {
+        console.warn('Feil ved sjekk av push-status:', e);
+    }
+
+    toggleBtn.onclick = async () => {
+        toggleBtn.disabled = true;
+        const origText = toggleBtn.textContent;
+
+        if (currentSubscription) {
+            toggleBtn.textContent = 'Slår av...';
+            try {
+                const endpoint = currentSubscription.endpoint;
+                await currentSubscription.unsubscribe();
+                await PushAPI.unsubscribe(endpoint);
+                currentSubscription = null;
+                toggleBtn.textContent = 'Aktiver';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-primary');
+                statusText.textContent = 'Varsel ved nye innlegg';
+            } catch (err) {
+                console.error('Avmelding feilet:', err);
+                alert('Kunne ikke slå av varsler: ' + err.message);
+                toggleBtn.textContent = origText;
+            } finally {
+                toggleBtn.disabled = false;
+            }
+        } else {
+            toggleBtn.textContent = 'Aktiverer...';
+            try {
+                currentSubscription = await subscribeUserToPush();
+                toggleBtn.textContent = 'Slå av';
+                toggleBtn.classList.remove('btn-primary');
+                toggleBtn.classList.add('btn-secondary');
+                statusText.textContent = 'Varsler er aktivert';
+                alert('Push-varsler er nå aktivert! Du vil få varsel når nye innlegg legges ut.');
+            } catch (err) {
+                console.error('Push aktivering feilet:', err);
+                alert('Kunne ikke aktivere varsler: ' + err.message);
+                toggleBtn.textContent = origText;
+            } finally {
+                toggleBtn.disabled = false;
+            }
+        }
+    };
+}
 
 function setupNotificationsToggle() {
     const notifWrapper = document.getElementById('notifications-wrapper');

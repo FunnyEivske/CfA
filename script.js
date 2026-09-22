@@ -1,12 +1,26 @@
-import { AuthAPI, MemberAPI, GalleryAPI, ContactAPI } from './api-client.js';
+import { AuthAPI, MemberAPI, GalleryAPI, ContactAPI, registerServiceWorker } from './api-client.js';
 
 export let authState = {
     user: null,
     role: null
 };
 
+function detectAndHandleStandalone() {
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (isStandalone) {
+        document.body.classList.add('pwa-standalone');
+        const path = window.location.pathname;
+        const isHome = path === '/' || path.endsWith('/index.html') || path.endsWith('/index');
+        if (isHome) {
+            window.location.replace('app-start.html');
+        }
+    }
+}
+
 // UI Initialization
 export async function initApp() {
+    detectAndHandleStandalone();
+    registerServiceWorker();
     setupAuthUI();
     setupLoginForm();
     setupContactForms();
@@ -47,13 +61,15 @@ function updateHeaderUI(user) {
     const mobileLogoutBtns = document.querySelectorAll('#mobile-logout-button');
     const mobileMemberLink = document.getElementById('mobile-member-link');
 
+    const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+
     if (user) {
         if (loginLink) loginLink.classList.add('hidden');
         logoutBtns.forEach(btn => {
             btn.classList.remove('hidden');
             btn.onclick = async () => {
                 await AuthAPI.logout();
-                window.location.href = '/';
+                window.location.href = isStandalone ? 'login' : '/';
             };
         });
         if (memberLink) {
@@ -67,7 +83,7 @@ function updateHeaderUI(user) {
             btn.classList.remove('hidden');
             btn.onclick = async () => {
                 await AuthAPI.logout();
-                window.location.href = '/';
+                window.location.href = isStandalone ? 'login' : '/';
             };
         });
         if (mobileMemberLink) {

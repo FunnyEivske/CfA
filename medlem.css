@@ -2382,3 +2382,67 @@ textarea {
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
+
+/* ==========================================
+   PWA / Standalone-modus (åpnet fra hjemskjerm)
+   ========================================== */
+@media (display-mode: standalone) {
+  /* Skjul alle ordinære navigasjonslenker og elementer i toppmenyen */
+  .nav-desktop .nav-link,
+  .nav-menu-desktop .nav-link,
+  .mobile-menu-button,
+  .mobile-toggle,
+  .mobile-menu,
+  .nav-menu-mobile,
+  .lang-toggle-btn {
+    display: none !important;
+  }
+
+  /* Vis kun logo og en ren Logg ut-knapp */
+  .nav-desktop,
+  .nav-menu-desktop {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  #logout-button,
+  .pwa-logout-btn {
+    display: inline-flex !important;
+    padding: 0.4rem 0.85rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Safe Area tilpasning */
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+
+  header.header {
+    padding-top: calc(0.5rem + env(safe-area-inset-top, 0px));
+  }
+}
+
+body.pwa-standalone .nav-desktop .nav-link,
+body.pwa-standalone .nav-menu-desktop .nav-link,
+body.pwa-standalone .mobile-menu-button,
+body.pwa-standalone .mobile-toggle,
+body.pwa-standalone .mobile-menu,
+body.pwa-standalone .nav-menu-mobile,
+body.pwa-standalone .lang-toggle-btn {
+  display: none !important;
+}
+
+body.pwa-standalone .nav-desktop,
+body.pwa-standalone .nav-menu-desktop {
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.5rem !important;
+}
+
+body.pwa-standalone #logout-button,
+body.pwa-standalone .pwa-logout-btn {
+  display: inline-flex !important;
+}
+

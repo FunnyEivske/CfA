@@ -230,6 +230,14 @@ function handleMockRequest(action, data) {
         case 'send_contact':
             return { success: true, message: 'Meldingen din har blitt sendt!' };
 
+        case 'get_vapid_public_key':
+            return { publicKey: 'BEl62iUYgUivxIkv69yViEuiBIa-Ib9-SkvMeAtA3LFgDzkrxZJjSgSnfckjZJuNn08W9vDY9m00Z87_7g' };
+
+        case 'save_push_subscription':
+        case 'unsubscribe_push':
+        case 'send_test_push':
+            return { success: true };
+
         case 'get_workshop_status': {
             return {
                 status: db.workshop_status || 'auto',
@@ -499,4 +507,87 @@ export const DocumentAPI = {
 export const ContactAPI = {
     sendMessage: (name, email, message, website = '') => request('send_contact', 'POST', { name, email, message, website })
 };
+
+export const PushAPI = {
+    getPublicKey: () => request('get_vapid_public_key'),
+    saveSubscription: (subscription) => request('save_push_subscription', 'POST', subscription),
+    unsubscribe: (endpoint) => request('unsubscribe_push', 'POST', { endpoint }),
+    sendTestPush: () => request('send_test_push', 'POST')
+};
+
+/**
+ * Konverterer en Base64URL-streng til en Uint8Array (påkrevd av pushManager.subscribe)
+ */
+export function urlBase64ToUint8Array(base64String) {
+    const padding = '='.repeat((4 - (base64String.length % 4)) % 4);
+    const base64 = (base64String + padding)
+        .replace(/\-/g, '+')
+        .replace(/_/g, '/');
+
+    const rawData = window.atob(base64);
+    const outputArray = new Uint8Array(rawData.length);
+
+    for (let i = 0; i < rawData.length; ++i) {
+        outputArray[i] = rawData.charCodeAt(i);
+    }
+    return outputArray;
+}
+
+/**
+ * Registrerer service worker hvis støttet
+ */
+export async function registerServiceWorker() {
+    if ('serviceWorker' in navigator) {
+        try {
+            const reg = await navigator.serviceWorker.register('./service-worker.js', { scope: './' });
+            return reg;
+        } catch (err) {
+            console.warn('Service Worker registrering feilet:', err);
+            return null;
+        }
+    }
+    return null;
+}
+
+/**
+ * Abonnerer brukeren på Web Push (VAPID) og sender til backend
+ */
+export async function subscribeUserToPush() {
+    if (!('serviceWorker' in navigator) || !('PushManager' in window) || !('Notification' in window)) {
+        throw new Error('Nettleseren din støtter dessverre ikke Web Push-varsler.');
+    }
+
+    const reg = await registerServiceWorker();
+    if (!reg) {
+        throw new Error('Kunne ikke registrere Service Worker.');
+    }
+
+    const permission = await Notification.requestPermission();
+    if (permission !== 'granted') {
+        throw new Error('Varslingstillatelse ble ikke innvilget.');
+    }
+
+    // Hent VAPID offentlig nøkkel fra backend
+    const vapidRes = await PushAPI.getPublicKey();
+    if (!vapidRes || !vapidRes.publicKey) {
+        throw new Error('Mottok ingen VAPID-nøkkel fra serveren.');
+    }
+
+    const applicationServerKey = urlBase64ToUint8Array(vapidRes.publicKey);
+
+    // Sjekk om abonnement allerede finnes
+    let subscription = await reg.pushManager.getSubscription();
+    if (!subscription) {
+        subscription = await reg.pushManager.subscribe({
+            userVisibleOnly: true,
+            applicationServerKey: applicationServerKey
+        });
+    }
+
+    // Send til backend
+    const subJson = subscription.toJSON();
+    await PushAPI.saveSubscription(subJson);
+    return subscription;
+}
+
 

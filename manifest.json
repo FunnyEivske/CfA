@@ -1,0 +1,29 @@
+{
+  "name": "Cosplay for alle",
+  "short_name": "CfA",
+  "description": "Progressive Web App for Cosplay for alle (CfA) - arrangementer, verksted og medlemsportal.",
+  "start_url": "app-start.html",
+  "display": "standalone",
+  "background_color": "#1c1917",
+  "theme_color": "#9a3412",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "Media/Logo/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "Media/Logo/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": [
+    "social",
+    "community",
+    "entertainment"
+  ]
+}
