@@ -118,16 +118,22 @@ function setupModals() {
     bindClick('close-admin-status-footer', () => closeModal('admin-status-modal'));
 
     // 5. Profil Modal
-    bindClick('open-profile-modal', () => {
+    const openProfileHandler = () => {
         const nameInput = document.getElementById('display-name-input');
         if (nameInput && currentUser) {
             nameInput.value = currentUser.display_name || '';
         }
         openModal('profile-modal');
-    });
+    };
+    bindClick('open-profile-modal', openProfileHandler);
+    bindClick('pwa-header-profile-btn', openProfileHandler);
     bindClick('close-profile-modal-x', () => closeModal('profile-modal'));
     bindClick('close-profile-modal', () => closeModal('profile-modal'));
     bindClick('cancel-profile-modal', () => closeModal('profile-modal'));
+    bindClick('modal-logout-button', () => {
+        closeModal('profile-modal');
+        document.getElementById('logout-button')?.click();
+    });
 
     // 6. Innlegg & Convention knapper
     bindClick('new-post-btn', () => openModal('post-modal'));
@@ -245,8 +251,15 @@ function setupProfileForm() {
                         if (profileImgEl) profileImgEl.src = avatarRes.photo_url;
                         const sidebarImgEl = document.querySelector('.user-avatar-small');
                         if (sidebarImgEl) sidebarImgEl.src = avatarRes.photo_url;
+                        const pwaHeaderAvatar = document.getElementById('pwa-header-avatar');
+                        if (pwaHeaderAvatar) pwaHeaderAvatar.src = avatarRes.photo_url;
+                        const pwaSettingsAvatar = document.getElementById('pwa-settings-avatar');
+                        if (pwaSettingsAvatar) pwaSettingsAvatar.src = avatarRes.photo_url;
                     }
                 }
+
+                const pwaSettingsName = document.getElementById('pwa-settings-name');
+                if (pwaSettingsName) pwaSettingsName.textContent = newName;
 
                 alert('Profilen din ble oppdatert!');
                 closeModal('profile-modal');
@@ -1587,6 +1600,10 @@ async function setupProfileData() {
             if (profileName) profileName.textContent = authRes.user.display_name || authRes.user.email.split('@')[0];
             if (profileRole) profileRole.textContent = authRes.user.role === 'admin' ? 'Administrator' : 'Medlem';
             if (profileImg && authRes.user.photo_url) profileImg.src = authRes.user.photo_url;
+            const pwaHeaderAvatar = document.getElementById('pwa-header-avatar');
+            if (pwaHeaderAvatar) {
+                pwaHeaderAvatar.src = authRes.user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(authRes.user.display_name || authRes.user.email)}&background=random`;
+            }
 
             if (authRes.user.member_since && memberDurationEl) {
                 const joinDate = new Date(authRes.user.member_since);
