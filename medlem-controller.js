@@ -119,9 +119,38 @@ function setupModals() {
 
     // 5. Profil Modal
     const openProfileHandler = () => {
-        const nameInput = document.getElementById('display-name-input');
-        if (nameInput && currentUser) {
-            nameInput.value = currentUser.display_name || '';
+        if (currentUser) {
+            const nameInput = document.getElementById('display-name-input');
+            if (nameInput) nameInput.value = currentUser.display_name || '';
+
+            const modalAvatar = document.getElementById('profile-modal-avatar');
+            if (modalAvatar) {
+                modalAvatar.src = currentUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.display_name || currentUser.email)}&background=random`;
+            }
+
+            const modalName = document.getElementById('profile-modal-display-name');
+            if (modalName) modalName.textContent = currentUser.display_name || currentUser.email.split('@')[0];
+
+            const modalEmail = document.getElementById('profile-modal-email');
+            if (modalEmail) modalEmail.textContent = currentUser.email || '';
+
+            const modalRoleBadge = document.getElementById('profile-modal-role-badge');
+            if (modalRoleBadge) {
+                modalRoleBadge.textContent = currentUser.role === 'admin' ? 'Styre / Leder' : 'Medlem';
+                modalRoleBadge.style.background = currentUser.role === 'admin' ? 'var(--color-primary)' : 'var(--color-secondary)';
+            }
+
+            const modalDuration = document.getElementById('profile-modal-duration-badge');
+            if (modalDuration) {
+                if (currentUser.member_since) {
+                    const joinDate = new Date(currentUser.member_since);
+                    const now = new Date();
+                    const months = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
+                    modalDuration.textContent = months > 0 ? `Medlem i ${months} mnd` : 'Nytt medlem';
+                } else {
+                    modalDuration.textContent = 'Aktivt medlem';
+                }
+            }
         }
         openModal('profile-modal');
     };
@@ -260,6 +289,8 @@ function setupProfileForm() {
 
                 const pwaSettingsName = document.getElementById('pwa-settings-name');
                 if (pwaSettingsName) pwaSettingsName.textContent = newName;
+                const modalName = document.getElementById('profile-modal-display-name');
+                if (modalName) modalName.textContent = newName;
 
                 alert('Profilen din ble oppdatert!');
                 closeModal('profile-modal');
@@ -1784,6 +1815,12 @@ function loadPwaSettings() {
             if (currentUser.role === 'admin') adminSection.classList.remove('hidden');
             else adminSection.classList.add('hidden');
         }
+
+        const publishSection = document.getElementById('pwa-admin-publish-section');
+        if (publishSection) {
+            if (currentUser.role === 'admin') publishSection.classList.remove('hidden');
+            else publishSection.classList.add('hidden');
+        }
     }
 
     // Verksted status tekst
@@ -1801,6 +1838,8 @@ function loadPwaSettings() {
     }
 
     // Knytt handlinger
+    bindClick('pwa-btn-new-post', () => openModal('post-modal'));
+    bindClick('pwa-btn-new-event', () => openModal('event-modal'));
     bindClick('pwa-open-edit-profile-btn', () => openModal('profile-modal'));
     bindClick('pwa-btn-referater', () => document.getElementById('btn-referater')?.click());
     bindClick('pwa-btn-retningslinjer', () => document.getElementById('btn-retningslinjer')?.click());
