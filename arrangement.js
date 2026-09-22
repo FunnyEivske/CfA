@@ -6,7 +6,74 @@ let currentEventImageUrl = '';
 
 export async function initEvents() {
     loadMemberEvents();
+    loadPwaSpotlightEvent();
     setupNewEventForm();
+}
+
+export async function loadPwaSpotlightEvent() {
+    const spotlightEl = document.getElementById('pwa-event-spotlight');
+    if (!spotlightEl) return;
+
+    try {
+        const data = await EventAPI.getEvents();
+        const events = data.events || [];
+        if (events.length === 0) {
+            spotlightEl.innerHTML = '';
+            return;
+        }
+
+        const nextEvent = events[0];
+        const eventDateFormatted = nextEvent.date ? new Date(nextEvent.date).toLocaleDateString('nb-NO', { 
+            weekday: 'short', 
+            day: 'numeric', 
+            month: 'short' 
+        }) : 'Dato ikke satt';
+
+        spotlightEl.innerHTML = `
+            <div class="pwa-spotlight-card">
+                ${nextEvent.image_url ? `
+                    <div style="position: relative; height: 160px; overflow: hidden;">
+                        <img src="${nextEvent.image_url}" alt="${nextEvent.title}" style="width: 100%; height: 100%; object-fit: cover;">
+                        <div style="position: absolute; inset: 0; background: linear-gradient(to top, rgba(0,0,0,0.75) 0%, transparent 60%);"></div>
+                        <div style="position: absolute; bottom: 0.75rem; left: 1rem; right: 1rem;">
+                            <span class="pwa-spotlight-badge">⭐ Neste Convention</span>
+                            <h3 style="margin: 0.35rem 0 0; color: #FFFFFF; font-size: 1.25rem; font-weight: 700; text-shadow: 0 2px 4px rgba(0,0,0,0.6);">${nextEvent.title}</h3>
+                        </div>
+                    </div>
+                ` : `
+                    <div style="padding: 1.25rem 1.25rem 0.5rem;">
+                        <span class="pwa-spotlight-badge">⭐ Neste Convention</span>
+                        <h3 style="margin: 0.5rem 0 0; color: var(--color-text-main); font-size: 1.2rem; font-weight: 700;">${nextEvent.title}</h3>
+                    </div>
+                `}
+                <div style="padding: 1rem 1.25rem; display: flex; align-items: center; justify-content: space-between; gap: 0.5rem;">
+                    <div>
+                        <div style="color: var(--color-primary); font-weight: 600; font-size: 0.88rem;">
+                            📅 ${eventDateFormatted}
+                        </div>
+                        ${nextEvent.location ? `
+                            <div style="color: var(--color-text-muted); font-size: 0.8rem; margin-top: 2px;">
+                                📍 ${nextEvent.location}
+                            </div>
+                        ` : ''}
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-xs" id="pwa-view-event-details-btn" style="font-size: 0.8rem; padding: 0.4rem 0.75rem;">
+                        Les mer
+                    </button>
+                </div>
+            </div>
+        `;
+
+        const detailsBtn = spotlightEl.querySelector('#pwa-view-event-details-btn');
+        if (detailsBtn) {
+            detailsBtn.onclick = () => {
+                const desc = nextEvent.description ? nextEvent.description.replace(/<[^>]*>?/gm, '') : 'Ingen beskrivelse tilgjengelig.';
+                alert(`${nextEvent.title}\n\n📅 Dato: ${eventDateFormatted}\n📍 Sted: ${nextEvent.location || 'Ikke oppgitt'}\n\n${desc}`);
+            };
+        }
+    } catch (e) {
+        console.warn('Could not load PWA spotlight event:', e);
+    }
 }
 
 /**

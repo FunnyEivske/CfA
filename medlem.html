@@ -246,24 +246,44 @@
                     </div>
                 </div>
 
-                <!-- Velkomst / Feed -->
-                <section id="posts-section">
+                <!-- PWA-Visning 1: Hjem (Spotlight + Onboarding + Feed) -->
+                <div id="pwa-view-home" class="pwa-view active">
+                    <!-- PWA Event Spotlight (Kommende convention blikkfang) -->
+                    <div id="pwa-event-spotlight" class="pwa-only"></div>
 
-
-
-                    <!-- Feed Container -->
-                    <div id="feed-container"
-                        style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
-                        <div id="feed-loading" class="text-center py-10 text-muted">Laster oppdateringer...</div>
+                    <!-- PWA Push Varsler Onboarding-banner -->
+                    <div id="pwa-push-onboarding" class="pwa-push-banner pwa-only hidden">
+                        <div style="display: flex; align-items: center; gap: 0.75rem;">
+                            <div style="width: 38px; height: 38px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; flex-shrink: 0; font-size: 1.1rem;">
+                                🔔
+                            </div>
+                            <div>
+                                <h4 style="margin: 0; font-size: 0.92rem; font-weight: 700; color: var(--color-text-main);">Få varsler på mobilen</h4>
+                                <p style="margin: 2px 0 0; font-size: 0.78rem; color: var(--color-text-muted);">Motta varsel om nye innlegg og conventions.</p>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0;">
+                            <button type="button" id="pwa-onboarding-dismiss-btn" class="btn btn-ghost btn-xs" style="color: var(--color-text-muted);">Senere</button>
+                            <button type="button" id="pwa-onboarding-enable-btn" class="btn btn-primary btn-xs" style="font-weight: 600; padding: 0.4rem 0.75rem;">Skru på</button>
+                        </div>
                     </div>
 
-                    <!-- Load More Button -->
-                    <div id="load-more-container" class="text-center mt-6 hidden">
-                        <button id="load-more-btn" class="btn btn-secondary text-sm">Last flere</button>
-                    </div>
-                </section>
+                    <!-- Velkomst / Feed -->
+                    <section id="posts-section">
+                        <!-- Feed Container -->
+                        <div id="feed-container"
+                            style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
+                            <div id="feed-loading" class="text-center py-10 text-muted">Laster oppdateringer...</div>
+                        </div>
 
-                <!-- Arrangementer Section -->
+                        <!-- Load More Button -->
+                        <div id="load-more-container" class="text-center mt-6 hidden">
+                            <button id="load-more-btn" class="btn btn-secondary text-sm">Last flere</button>
+                        </div>
+                    </section>
+                </div>
+
+                <!-- Arrangementer Section (brukes i desktop-tabs) -->
                 <section id="events-section" class="hidden">
                     <div id="upcoming-events-container"
                         style="display: flex; flex-direction: column; gap: 1.5rem; margin-top: 1.5rem;">
@@ -286,6 +306,143 @@
                         </div>
                     </div>
                 </section>
+
+                <!-- PWA-Visning 2: Medlemmer (PWA-only) -->
+                <div id="pwa-view-members" class="pwa-view pwa-only">
+                    <div class="card mb-4">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 class="text-lg" style="margin: 0;">Medlemmer</h3>
+                            <span id="pwa-member-count" class="badge text-xs" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border);">0 medlemmer</span>
+                        </div>
+                        <div class="card-body">
+                            <input type="text" id="pwa-member-search" class="form-input mb-4" placeholder="Søk etter medlem..." style="width: 100%; font-size: 0.9rem;">
+                            <div id="pwa-members-list-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
+                                <p class="text-center text-muted py-4">Laster medlemmer...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PWA-Visning 3: Galleri (PWA-only) -->
+                <div id="pwa-view-gallery" class="pwa-view pwa-only">
+                    <div class="card mb-4">
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
+                            <h3 class="text-lg" style="margin: 0;">Mitt galleri</h3>
+                            <button id="pwa-upload-gallery-btn" class="btn btn-primary btn-xs" style="padding: 0.4rem 0.8rem; font-weight: 600;">+ Last opp</button>
+                        </div>
+                        <div class="card-body">
+                            <p class="text-xs text-muted mb-4">Bilder du laster opp her vises i medlemsgalleriet på nettsiden.</p>
+                            <div id="pwa-gallery-grid-container" class="gallery-preview-grid mb-4" style="grid-template-columns: repeat(2, 1fr); gap: 0.75rem;">
+                                <p class="text-muted text-sm" style="grid-column: 1/-1;">Laster galleri...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PWA-Visning 4: Innstillinger (PWA-only) -->
+                <div id="pwa-view-settings" class="pwa-view pwa-only">
+                    <!-- Brukerprofil kort -->
+                    <div class="card mb-4">
+                        <div class="card-body" style="display: flex; align-items: center; justify-content: space-between; gap: 1rem;">
+                            <div style="display: flex; align-items: center; gap: 0.85rem;">
+                                <img id="pwa-settings-avatar" src="https://ui-avatars.com/api/?name=Medlem&background=random" alt="Profilbilde" style="width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
+                                <div>
+                                    <h4 id="pwa-settings-name" style="margin: 0; font-size: 1.05rem; font-weight: 700; color: var(--color-text-main);">Laster...</h4>
+                                    <p id="pwa-settings-role" style="margin: 2px 0 0; font-size: 0.78rem; color: var(--color-text-muted);">Medlem</p>
+                                </div>
+                            </div>
+                            <button type="button" id="pwa-open-edit-profile-btn" class="btn btn-secondary btn-xs" style="padding: 0.4rem 0.75rem;">Rediger</button>
+                        </div>
+                    </div>
+
+                    <!-- Push-varsler innstilling -->
+                    <div class="pwa-settings-group">
+                        <div class="pwa-settings-item" style="cursor: default;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">🔔</span>
+                                <div>
+                                    <div style="font-weight: 600; font-size: 0.95rem;">Push-varsler</div>
+                                    <div id="pwa-settings-push-desc" style="font-size: 0.78rem; color: var(--color-text-muted);">Varsle ved nye innlegg og conventions</div>
+                                </div>
+                            </div>
+                            <label class="pwa-switch" style="position: relative; display: inline-block; width: 48px; height: 26px; margin: 0;">
+                                <input type="checkbox" id="pwa-push-toggle-checkbox" style="opacity: 0; width: 0; height: 0;">
+                                <span class="pwa-slider"></span>
+                            </label>
+                        </div>
+                    </div>
+
+                    <!-- Klubb & Dokumenter -->
+                    <div class="pwa-settings-group">
+                        <div class="pwa-settings-item" id="pwa-btn-referater">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">📄</span>
+                                <span style="font-weight: 500; font-size: 0.95rem;">Referater</span>
+                            </div>
+                            <span style="color: var(--color-text-muted);">›</span>
+                        </div>
+                        <div class="pwa-settings-item" id="pwa-btn-retningslinjer">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">🛡️</span>
+                                <span style="font-weight: 500; font-size: 0.95rem;">Retningslinjer & Ordensregler</span>
+                            </div>
+                            <span style="color: var(--color-text-muted);">›</span>
+                        </div>
+                        <div class="pwa-settings-item" id="pwa-btn-vedtekter">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">📜</span>
+                                <span style="font-weight: 500; font-size: 0.95rem;">Vedtekter</span>
+                            </div>
+                            <span style="color: var(--color-text-muted);">›</span>
+                        </div>
+                    </div>
+
+                    <!-- Verksted & Status Info -->
+                    <div class="pwa-settings-group">
+                        <div class="pwa-settings-item" id="pwa-btn-workshop-info" style="cursor: default;">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">🚪</span>
+                                <div>
+                                    <div style="font-weight: 500; font-size: 0.95rem;">Verkstedstatus</div>
+                                    <div id="pwa-settings-workshop-status" style="font-size: 0.78rem; color: var(--color-text-muted);">Laster...</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Utseende / Tema -->
+                    <div class="pwa-settings-group">
+                        <div class="pwa-settings-item" id="pwa-theme-toggle-row">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">🌓</span>
+                                <span style="font-weight: 500; font-size: 0.95rem;">Utseende</span>
+                            </div>
+                            <span id="pwa-current-theme-label" style="font-size: 0.85rem; color: var(--color-text-muted);">Mørk</span>
+                        </div>
+                    </div>
+
+                    <!-- Administrasjon (kun synlig for admin) -->
+                    <div id="pwa-admin-section" class="pwa-settings-group hidden">
+                        <div class="pwa-settings-item" id="pwa-open-admin-modal-btn">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">⚙️</span>
+                                <span style="font-weight: 600; font-size: 0.95rem; color: var(--color-primary);">Administrasjon</span>
+                            </div>
+                            <span style="color: var(--color-primary);">›</span>
+                        </div>
+                    </div>
+
+                    <!-- Logg ut -->
+                    <div class="pwa-settings-group">
+                        <div class="pwa-settings-item" id="pwa-logout-row" style="color: var(--color-error);">
+                            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                                <span style="font-size: 1.25rem;">🚪</span>
+                                <span style="font-weight: 600; font-size: 0.95rem;">Logg ut</span>
+                            </div>
+                            <span style="color: var(--color-error);">→</span>
+                        </div>
+                    </div>
+                </div>
 
                 
 
@@ -1129,6 +1286,41 @@
             </div>
         </div>
     </div>
+
+    <!-- PWA Native Bottom Navigation Bar (kun synlig i standalone-modus) -->
+    <nav id="pwa-bottom-nav" class="pwa-bottom-nav pwa-only" aria-label="App navigasjon">
+        <button type="button" class="pwa-nav-item active" data-target="pwa-view-home" id="pwa-tab-home">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path>
+                <polyline points="9 22 9 12 15 12 15 22"></polyline>
+            </svg>
+            <span>Hjem</span>
+        </button>
+        <button type="button" class="pwa-nav-item" data-target="pwa-view-members" id="pwa-tab-members">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
+                <circle cx="9" cy="7" r="4"></circle>
+                <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
+                <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
+            </svg>
+            <span>Medlemmer</span>
+        </button>
+        <button type="button" class="pwa-nav-item" data-target="pwa-view-gallery" id="pwa-tab-gallery">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+            <span>Galleri</span>
+        </button>
+        <button type="button" class="pwa-nav-item" data-target="pwa-view-settings" id="pwa-tab-settings">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="12" cy="12" r="3"></circle>
+                <path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1 0 2.83 2 2 0 0 1-2.83 0l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83 0 2 2 0 0 1 0-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1-2-2 2 2 0 0 1 2-2h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 0-2.83 2 2 0 0 1 2.83 0l.06.06a1.65 1.65 0 0 0 1.82.33H9a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 0 2 2 0 0 1 0 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 2 2 2 2 0 0 1-2 2h-.09a1.65 1.65 0 0 0-1.51 1z"></path>
+            </svg>
+            <span>Innstillinger</span>
+        </button>
+    </nav>
 
     <!-- Firebase og hoved-script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>

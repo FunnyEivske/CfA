@@ -26,6 +26,7 @@ export function closeModal(modalId) {
 export async function initMedlemPage() {
     detectAndApplyStandaloneMode();
     registerServiceWorker();
+    setupPwaNavigation();
     setupTabSwitching();
     setupModals();
     setupNotificationsToggle();
@@ -1361,6 +1362,14 @@ async function setupPushNotificationUI() {
         };
     }
 
+    // Sjekk PC-visning: Skjul push-kort på PC dersom det ikke er mobil eller PWA
+    const isMobileDevice = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+    const isStandaloneMode = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    if (!isMobileDevice && !isStandaloneMode) {
+        const pushCard = document.getElementById('push-notification-card');
+        if (pushCard) pushCard.style.display = 'none';
+    }
+
     if (!toggleBtn || !statusText) return;
 
     if (!('serviceWorker' in navigator) || !('PushManager' in window)) {
@@ -1372,29 +1381,110 @@ async function setupPushNotificationUI() {
 
     let currentSubscription = null;
 
+    const pwaPushToggle = document.getElementById('pwa-push-toggle-checkbox');
+    const pwaPushDesc = document.getElementById('pwa-settings-push-desc');
+    const pwaOnboardingBanner = document.getElementById('pwa-push-onboarding');
+
+    function syncPushUI(isSubscribed) {
+        if (isSubscribed) {
+            toggleBtn.textContent = 'Slå av';
+            toggleBtn.classList.remove('btn-primary');
+            toggleBtn.classList.add('btn-secondary');
+            statusText.textContent = 'Varsler er aktivert';
+            if (pwaPushToggle) pwaPushToggle.checked = true;
+            if (pwaPushDesc) pwaPushDesc.textContent = 'Påslått (du mottar varsler om innlegg og conventions)';
+            if (pwaOnboardingBanner) pwaOnboardingBanner.classList.add('hidden');
+        } else {
+            toggleBtn.textContent = 'Aktiver';
+            toggleBtn.classList.remove('btn-secondary');
+            toggleBtn.classList.add('btn-primary');
+            statusText.textContent = 'Varsel ved nye innlegg';
+            if (pwaPushToggle) pwaPushToggle.checked = false;
+            if (pwaPushDesc) pwaPushDesc.textContent = 'Avslått (trykk for å motta varsler)';
+        }
+    }
+
     // Sjekk nåværende abonnement
     try {
         const reg = await registerServiceWorker();
         if (reg) {
             currentSubscription = await reg.pushManager.getSubscription();
             if (currentSubscription) {
-                toggleBtn.textContent = 'Slå av';
-                toggleBtn.classList.remove('btn-primary');
-                toggleBtn.classList.add('btn-secondary');
-                statusText.textContent = 'Varsler er aktivert';
+                syncPushUI(true);
             } else if (Notification.permission === 'denied') {
                 toggleBtn.disabled = true;
                 toggleBtn.textContent = 'Blokkert';
                 statusText.textContent = 'Varsler er blokkert i nettleseren';
+                if (pwaPushToggle) pwaPushToggle.disabled = true;
+                if (pwaPushDesc) pwaPushDesc.textContent = 'Blokkert i telefonens innstillinger';
+                if (pwaOnboardingBanner) pwaOnboardingBanner.classList.add('hidden');
             } else {
-                toggleBtn.textContent = 'Aktiver';
-                toggleBtn.classList.remove('btn-secondary');
-                toggleBtn.classList.add('btn-primary');
-                statusText.textContent = 'Varsel ved nye innlegg';
+                syncPushUI(false);
+                // Vis PWA Onboarding hvis i standalone-modus og ikke avvist denne økten
+                if (isStandaloneMode && pwaOnboardingBanner && sessionStorage.getItem('pwa_push_onboarding_dismissed') !== 'true') {
+                    pwaOnboardingBanner.classList.remove('hidden');
+                }
             }
         }
     } catch (e) {
         console.warn('Feil ved sjekk av push-status:', e);
+    }
+
+    // Onboarding-banner knapper
+    if (pwaOnboardingBanner) {
+        const onbEnableBtn = document.getElementById('pwa-onboarding-enable-btn');
+        if (onbEnableBtn) {
+            onbEnableBtn.onclick = async () => {
+                onbEnableBtn.disabled = true;
+                onbEnableBtn.textContent = 'Aktiverer...';
+                try {
+                    currentSubscription = await subscribeUserToPush();
+                    syncPushUI(true);
+                    alert('Push-varsler er nå aktivert på telefonen din!');
+                } catch (e) {
+                    alert('Kunne ikke aktivere varsler: ' + e.message);
+                } finally {
+                    onbEnableBtn.disabled = false;
+                    onbEnableBtn.textContent = 'Skru på';
+                }
+            };
+        }
+
+        const onbDismissBtn = document.getElementById('pwa-onboarding-dismiss-btn');
+        if (onbDismissBtn) {
+            onbDismissBtn.onclick = () => {
+                pwaOnboardingBanner.classList.add('hidden');
+                sessionStorage.setItem('pwa_push_onboarding_dismissed', 'true');
+            };
+        }
+    }
+
+    // PWA Innstillinger Switch-bryter
+    if (pwaPushToggle) {
+        pwaPushToggle.onchange = async () => {
+            if (pwaPushToggle.checked) {
+                try {
+                    currentSubscription = await subscribeUserToPush();
+                    syncPushUI(true);
+                } catch (err) {
+                    pwaPushToggle.checked = false;
+                    alert('Kunne ikke aktivere varsler: ' + err.message);
+                }
+            } else {
+                if (currentSubscription) {
+                    try {
+                        const ep = currentSubscription.endpoint;
+                        await currentSubscription.unsubscribe();
+                        await PushAPI.unsubscribe(ep);
+                        currentSubscription = null;
+                        syncPushUI(false);
+                    } catch (err) {
+                        pwaPushToggle.checked = true;
+                        alert('Kunne ikke slå av varsler: ' + err.message);
+                    }
+                }
+            }
+        };
     }
 
     toggleBtn.onclick = async () => {
@@ -1408,10 +1498,7 @@ async function setupPushNotificationUI() {
                 await currentSubscription.unsubscribe();
                 await PushAPI.unsubscribe(endpoint);
                 currentSubscription = null;
-                toggleBtn.textContent = 'Aktiver';
-                toggleBtn.classList.remove('btn-secondary');
-                toggleBtn.classList.add('btn-primary');
-                statusText.textContent = 'Varsel ved nye innlegg';
+                syncPushUI(false);
             } catch (err) {
                 console.error('Avmelding feilet:', err);
                 alert('Kunne ikke slå av varsler: ' + err.message);
@@ -1423,10 +1510,7 @@ async function setupPushNotificationUI() {
             toggleBtn.textContent = 'Aktiverer...';
             try {
                 currentSubscription = await subscribeUserToPush();
-                toggleBtn.textContent = 'Slå av';
-                toggleBtn.classList.remove('btn-primary');
-                toggleBtn.classList.add('btn-secondary');
-                statusText.textContent = 'Varsler er aktivert';
+                syncPushUI(true);
                 alert('Push-varsler er nå aktivert! Du vil få varsel når nye innlegg legges ut.');
             } catch (err) {
                 console.error('Push aktivering feilet:', err);
@@ -1495,6 +1579,200 @@ async function setupProfileData() {
         }
     } catch (e) {
         console.warn("Error setting up profile data:", e);
+    }
+}
+
+// ----------------------------------------------------
+// PWA Standalone App-navigasjon & Visninger
+// ----------------------------------------------------
+function setupPwaNavigation() {
+    const navItems = document.querySelectorAll('#pwa-bottom-nav .pwa-nav-item');
+    if (!navItems.length) return;
+
+    navItems.forEach(item => {
+        item.addEventListener('click', () => {
+            const targetId = item.dataset.target;
+            if (!targetId) return;
+
+            // Oppdater aktiv fane
+            navItems.forEach(n => n.classList.remove('active'));
+            item.classList.add('active');
+
+            // Oppdater aktivt view
+            document.querySelectorAll('.pwa-view').forEach(v => v.classList.remove('active'));
+            const targetView = document.getElementById(targetId);
+            if (targetView) {
+                targetView.classList.add('active');
+            }
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            // Lazy-load data for visningen
+            if (targetId === 'pwa-view-members') {
+                loadPwaMembers();
+            } else if (targetId === 'pwa-view-gallery') {
+                loadPwaGallery();
+            } else if (targetId === 'pwa-view-settings') {
+                loadPwaSettings();
+            }
+        });
+    });
+}
+
+let pwaAllMembers = [];
+
+async function loadPwaMembers() {
+    const container = document.getElementById('pwa-members-list-container');
+    const countEl = document.getElementById('pwa-member-count');
+    const searchInput = document.getElementById('pwa-member-search');
+    if (!container) return;
+
+    if (pwaAllMembers.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4">Laster medlemmer...</p>';
+        try {
+            const res = await MemberAPI.getMembers();
+            pwaAllMembers = res.members || [];
+        } catch (e) {
+            container.innerHTML = '<p class="text-center text-error py-4">Kunne ikke laste medlemmer.</p>';
+            return;
+        }
+    }
+
+    function renderList(list) {
+        container.innerHTML = '';
+        if (countEl) countEl.textContent = `${list.length} medlemmer`;
+
+        if (list.length === 0) {
+            container.innerHTML = '<p class="text-center text-muted py-4">Ingen medlemmer matcher søket.</p>';
+            return;
+        }
+
+        list.forEach(m => {
+            const row = document.createElement('div');
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border); gap: 0.75rem;';
+            row.innerHTML = `
+                <div style="display: flex; align-items: center; gap: 0.85rem;">
+                    <img src="${m.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name)}" alt="${m.display_name}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border);">
+                    <div>
+                        <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
+                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${m.role === 'admin' ? 'Styre / Admin' : 'Medlem'}</span>
+                    </div>
+                </div>
+                ${m.role === 'admin' ? '<span class="badge text-xs" style="background: var(--color-primary); color: white;">Admin</span>' : ''}
+            `;
+            container.appendChild(row);
+        });
+    }
+
+    renderList(pwaAllMembers);
+
+    if (searchInput && !searchInput.dataset.initialized) {
+        searchInput.dataset.initialized = 'true';
+        searchInput.oninput = () => {
+            const q = searchInput.value.toLowerCase().trim();
+            const filtered = pwaAllMembers.filter(m => (m.display_name && m.display_name.toLowerCase().includes(q)) || (m.email && m.email.toLowerCase().includes(q)));
+            renderList(filtered);
+        };
+    }
+}
+
+async function loadPwaGallery() {
+    const container = document.getElementById('pwa-gallery-grid-container');
+    const uploadBtn = document.getElementById('pwa-upload-gallery-btn');
+    if (!container) return;
+
+    if (uploadBtn && !uploadBtn.dataset.initialized) {
+        uploadBtn.dataset.initialized = 'true';
+        uploadBtn.onclick = () => {
+            openModal('upload-modal');
+            loadModalGallery();
+        };
+    }
+
+    try {
+        const res = await GalleryAPI.getGallery('my');
+        const items = res.gallery || [];
+        container.innerHTML = '';
+
+        if (items.length === 0) {
+            container.innerHTML = '<p class="text-muted text-sm" style="grid-column: 1/-1; text-align: center; padding: 2rem 0;">Ingen bilder lastet opp ennå.<br><br><button type="button" class="btn btn-secondary btn-xs" onclick="document.getElementById(\'pwa-upload-gallery-btn\').click()">Last opp ditt første bilde</button></p>';
+            return;
+        }
+
+        items.forEach(img => {
+            const item = document.createElement('div');
+            item.style.cssText = 'aspect-ratio: 1; border-radius: 10px; overflow: hidden; border: 1px solid var(--color-border); position: relative; cursor: pointer;';
+            item.innerHTML = `
+                <img src="${img.image_url}" alt="${img.title || 'Galleri'}" style="width: 100%; height: 100%; object-fit: cover;">
+            `;
+            item.onclick = () => {
+                const lightbox = document.getElementById('image-lightbox');
+                const lightboxImg = document.getElementById('lightbox-img');
+                const lightboxDesc = document.getElementById('lightbox-description');
+                if (lightbox && lightboxImg) {
+                    lightboxImg.src = img.image_url;
+                    if (lightboxDesc) lightboxDesc.textContent = img.title || '';
+                    lightbox.classList.remove('hidden');
+                }
+            };
+            container.appendChild(item);
+        });
+    } catch (e) {
+        container.innerHTML = '<p class="text-muted text-xs" style="grid-column: 1/-1;">Kunne ikke laste galleri.</p>';
+    }
+}
+
+function loadPwaSettings() {
+    if (currentUser) {
+        const avatarEl = document.getElementById('pwa-settings-avatar');
+        const nameEl = document.getElementById('pwa-settings-name');
+        const roleEl = document.getElementById('pwa-settings-role');
+        const adminSection = document.getElementById('pwa-admin-section');
+
+        if (avatarEl && currentUser.photo_url) avatarEl.src = currentUser.photo_url;
+        if (nameEl) nameEl.textContent = currentUser.display_name || currentUser.email;
+        if (roleEl) roleEl.textContent = currentUser.role === 'admin' ? 'Administrator' : 'Medlem';
+
+        if (adminSection) {
+            if (currentUser.role === 'admin') adminSection.classList.remove('hidden');
+            else adminSection.classList.add('hidden');
+        }
+    }
+
+    // Verksted status tekst
+    const wsStatusEl = document.getElementById('pwa-settings-workshop-status');
+    const wsMainText = document.getElementById('workshop-status-text');
+    if (wsStatusEl && wsMainText) {
+        wsStatusEl.textContent = wsMainText.textContent;
+    }
+
+    // Tema-indikator
+    const themeLabel = document.getElementById('pwa-current-theme-label');
+    if (themeLabel) {
+        const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+        themeLabel.textContent = isDark ? 'Mørkt tema' : 'Lyst tema';
+    }
+
+    // Knytt handlinger
+    bindClick('pwa-open-edit-profile-btn', () => openModal('profile-modal'));
+    bindClick('pwa-btn-referater', () => document.getElementById('btn-referater')?.click());
+    bindClick('pwa-btn-retningslinjer', () => document.getElementById('btn-retningslinjer')?.click());
+    bindClick('pwa-btn-vedtekter', () => document.getElementById('btn-vedtekter')?.click());
+    bindClick('pwa-open-admin-modal-btn', () => openModal('admin-control-modal'));
+    bindClick('pwa-logout-row', () => {
+        document.getElementById('logout-button')?.click();
+    });
+
+    const themeRow = document.getElementById('pwa-theme-toggle-row');
+    if (themeRow && !themeRow.dataset.initialized) {
+        themeRow.dataset.initialized = 'true';
+        themeRow.onclick = () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('cfa-theme', newTheme);
+            if (themeLabel) themeLabel.textContent = newTheme === 'dark' ? 'Mørkt tema' : 'Lyst tema';
+        };
     }
 }
 

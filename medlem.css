@@ -2446,3 +2446,275 @@ body.pwa-standalone .pwa-logout-btn {
   display: inline-flex !important;
 }
 
+/* ====================================================
+   PWA & MOBIL-APP OPPLEVELSE
+   ==================================================== */
+
+/* Skjul push-varsler på PC (både kort og støy) */
+@media (min-width: 769px) {
+  #push-notification-card {
+    display: none !important;
+  }
+}
+
+/* Skjul PWA-spesifikke views og bunnmeny i vanlig nettleser */
+.pwa-only {
+  display: none !important;
+}
+
+/* Standalone / PWA app-modus */
+body.pwa-standalone {
+  touch-action: pan-y;
+  -webkit-tap-highlight-color: transparent;
+  padding-bottom: calc(75px + env(safe-area-inset-bottom, 0px)) !important;
+}
+
+body.pwa-standalone button,
+body.pwa-standalone .pwa-nav-item,
+body.pwa-standalone .badge,
+body.pwa-standalone .pwa-settings-item {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+/* I standalone-modus: skjul ordinære desktop-sidebarer og de gamle tabsene */
+body.pwa-standalone .dashboard-sidebar,
+body.pwa-standalone .dashboard-sidebar-right,
+body.pwa-standalone .dashboard-main > .card.mb-6 {
+  display: none !important;
+}
+
+/* Gjør layouten til en ren mobil app-kolonne */
+body.pwa-standalone .dashboard-grid {
+  display: block !important;
+  max-width: 620px;
+  margin: 0 auto;
+  padding: 0 0.5rem;
+}
+
+body.pwa-standalone .pwa-only {
+  display: block !important;
+}
+
+body.pwa-standalone .pwa-view {
+  display: none;
+}
+
+body.pwa-standalone .pwa-view.active {
+  display: block;
+  animation: pwaViewFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes pwaViewFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* PWA Spotlight Card for Neste Convention */
+.pwa-spotlight-card {
+  background: var(--color-bg-surface);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 18px;
+  overflow: hidden;
+  margin-bottom: 1.5rem;
+  box-shadow: 0 8px 24px rgba(234, 88, 12, 0.15);
+  position: relative;
+}
+
+.pwa-spotlight-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  background: var(--color-primary);
+  color: #FFFFFF;
+  font-size: 0.72rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  padding: 0.25rem 0.65rem;
+  border-radius: 9999px;
+}
+
+/* PWA Push Onboarding Banner */
+.pwa-push-banner {
+  background: linear-gradient(135deg, rgba(234, 88, 12, 0.14), rgba(154, 52, 18, 0.08));
+  border: 1px solid var(--color-primary);
+  border-radius: 16px;
+  padding: 0.9rem 1.15rem;
+  margin-bottom: 1.5rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+/* PWA "Vis mer / Tidligere innlegg"-knapp */
+.pwa-show-more-container {
+  margin-top: 1rem;
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.pwa-show-more-btn {
+  width: 100%;
+  padding: 0.85rem 1rem;
+  background: var(--color-bg-subtle);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  border-radius: 14px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.pwa-show-more-btn:hover {
+  background: var(--color-bg-surface);
+  border-color: var(--color-primary);
+}
+
+/* PWA Native Bottom Navigation Bar */
+.pwa-bottom-nav {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background: var(--color-bg-surface);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-top: 1px solid var(--color-border);
+  display: none;
+  justify-content: space-around;
+  align-items: center;
+  height: calc(58px + env(safe-area-inset-bottom, 0px));
+  padding-bottom: env(safe-area-inset-bottom, 0px);
+  z-index: 2500;
+  box-shadow: 0 -4px 20px rgba(0, 0, 0, 0.2);
+}
+
+body.pwa-standalone .pwa-bottom-nav {
+  display: flex !important;
+}
+
+.pwa-nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  background: none;
+  border: none;
+  color: var(--color-text-muted);
+  font-size: 0.72rem;
+  font-weight: 500;
+  padding: 6px 0;
+  cursor: pointer;
+  transition: color 0.15s ease, transform 0.15s ease;
+}
+
+.pwa-nav-item svg {
+  width: 22px;
+  height: 22px;
+  stroke: currentColor;
+  transition: stroke 0.15s ease, transform 0.15s ease;
+}
+
+.pwa-nav-item.active {
+  color: var(--color-primary) !important;
+  font-weight: 700;
+}
+
+.pwa-nav-item.active svg {
+  stroke: var(--color-primary);
+  transform: scale(1.1);
+}
+
+/* PWA Innstillinger Listestil */
+.pwa-settings-group {
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 1.25rem;
+}
+
+.pwa-settings-item {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.95rem 1.15rem;
+  border-bottom: 1px solid var(--color-border);
+  cursor: pointer;
+  color: var(--color-text-main);
+  text-decoration: none;
+  font-size: 0.92rem;
+  transition: background 0.12s ease;
+}
+
+.pwa-settings-item:last-child {
+  border-bottom: none;
+}
+
+.pwa-settings-item:active {
+  background: var(--color-bg-subtle);
+}
+
+/* PWA Toggle Switch (iOS-aktig ren bryter) */
+.pwa-switch {
+  position: relative;
+  display: inline-block;
+  width: 46px;
+  height: 26px;
+}
+
+.pwa-switch input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+}
+
+.pwa-slider {
+  position: absolute;
+  cursor: pointer;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: var(--color-border);
+  transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 34px;
+}
+
+.pwa-slider:before {
+  position: absolute;
+  content: "";
+  height: 20px;
+  width: 20px;
+  left: 3px;
+  bottom: 3px;
+  background-color: white;
+  transition: .25s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 50%;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+}
+
+.pwa-switch input:checked + .pwa-slider {
+  background-color: var(--color-primary);
+}
+
+.pwa-switch input:checked + .pwa-slider:before {
+  transform: translateX(20px);
+}
+
+

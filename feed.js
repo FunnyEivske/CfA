@@ -129,11 +129,18 @@ export async function loadPosts() {
         }
 
         const isAdmin = currentUser && currentUser.role === 'admin';
+        const isStandalone = document.body.classList.contains('pwa-standalone') || window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
-        data.posts.forEach(post => {
+        data.posts.forEach((post, index) => {
             const article = document.createElement('article');
             article.className = 'feed-item';
             article.dataset.id = post.id;
+
+            // I PWA Standalone-modus: Skjul alle innlegg bortsett fra det aller nyeste (index 0)
+            if (isStandalone && index > 0) {
+                article.classList.add('pwa-post-hidden');
+                article.style.display = 'none';
+            }
 
             const isLikedClass = post.is_liked ? 'liked' : '';
 
@@ -179,6 +186,34 @@ export async function loadPosts() {
 
             feedContainer.appendChild(article);
         });
+
+        // Hvis PWA og det finnes mer enn 1 innlegg, legg til "Tidligere innlegg"-knapp
+        if (isStandalone && data.posts.length > 1) {
+            const showMoreWrap = document.createElement('div');
+            showMoreWrap.className = 'pwa-show-more-container';
+            const remainingCount = data.posts.length - 1;
+            showMoreWrap.innerHTML = `
+                <button type="button" class="pwa-show-more-btn" id="pwa-expand-posts-btn">
+                    <span>Tidligere innlegg (${remainingCount} til)</span>
+                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <polyline points="6 9 12 15 18 9"></polyline>
+                    </svg>
+                </button>
+            `;
+            feedContainer.appendChild(showMoreWrap);
+
+            const expandBtn = showMoreWrap.querySelector('#pwa-expand-posts-btn');
+            if (expandBtn) {
+                expandBtn.onclick = () => {
+                    const hiddenPosts = feedContainer.querySelectorAll('.pwa-post-hidden');
+                    hiddenPosts.forEach(el => {
+                        el.style.display = '';
+                        el.style.animation = 'pwaViewFadeIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards';
+                    });
+                    showMoreWrap.remove();
+                };
+            }
+        }
 
         setupFeedEvents();
 
