@@ -1387,18 +1387,27 @@ async function setupPushNotificationUI() {
 
     function syncPushUI(isSubscribed) {
         if (isSubscribed) {
-            toggleBtn.textContent = 'Slå av';
-            toggleBtn.classList.remove('btn-primary');
-            toggleBtn.classList.add('btn-secondary');
-            statusText.textContent = 'Varsler er aktivert';
+            localStorage.setItem('cfa_push_subscribed', 'true');
+            if (toggleBtn) {
+                toggleBtn.textContent = 'Slå av';
+                toggleBtn.classList.remove('btn-primary');
+                toggleBtn.classList.add('btn-secondary');
+            }
+            if (statusText) statusText.textContent = 'Varsler er aktivert';
             if (pwaPushToggle) pwaPushToggle.checked = true;
             if (pwaPushDesc) pwaPushDesc.textContent = 'Påslått (du mottar varsler om innlegg og conventions)';
-            if (pwaOnboardingBanner) pwaOnboardingBanner.classList.add('hidden');
+            if (pwaOnboardingBanner) {
+                pwaOnboardingBanner.classList.add('hidden');
+                pwaOnboardingBanner.style.display = 'none';
+            }
         } else {
-            toggleBtn.textContent = 'Aktiver';
-            toggleBtn.classList.remove('btn-secondary');
-            toggleBtn.classList.add('btn-primary');
-            statusText.textContent = 'Varsel ved nye innlegg';
+            localStorage.removeItem('cfa_push_subscribed');
+            if (toggleBtn) {
+                toggleBtn.textContent = 'Aktiver';
+                toggleBtn.classList.remove('btn-secondary');
+                toggleBtn.classList.add('btn-primary');
+            }
+            if (statusText) statusText.textContent = 'Varsel ved nye innlegg';
             if (pwaPushToggle) pwaPushToggle.checked = false;
             if (pwaPushDesc) pwaPushDesc.textContent = 'Avslått (trykk for å motta varsler)';
         }
@@ -1409,20 +1418,33 @@ async function setupPushNotificationUI() {
         const reg = await registerServiceWorker();
         if (reg) {
             currentSubscription = await reg.pushManager.getSubscription();
-            if (currentSubscription) {
+            if (currentSubscription || Notification.permission === 'granted' || localStorage.getItem('cfa_push_subscribed') === 'true') {
                 syncPushUI(true);
+                if (pwaOnboardingBanner) {
+                    pwaOnboardingBanner.classList.add('hidden');
+                    pwaOnboardingBanner.style.display = 'none';
+                }
             } else if (Notification.permission === 'denied') {
-                toggleBtn.disabled = true;
-                toggleBtn.textContent = 'Blokkert';
-                statusText.textContent = 'Varsler er blokkert i nettleseren';
+                if (toggleBtn) {
+                    toggleBtn.disabled = true;
+                    toggleBtn.textContent = 'Blokkert';
+                }
+                if (statusText) statusText.textContent = 'Varsler er blokkert i nettleseren';
                 if (pwaPushToggle) pwaPushToggle.disabled = true;
                 if (pwaPushDesc) pwaPushDesc.textContent = 'Blokkert i telefonens innstillinger';
-                if (pwaOnboardingBanner) pwaOnboardingBanner.classList.add('hidden');
+                if (pwaOnboardingBanner) {
+                    pwaOnboardingBanner.classList.add('hidden');
+                    pwaOnboardingBanner.style.display = 'none';
+                }
             } else {
                 syncPushUI(false);
-                // Vis PWA Onboarding hvis i standalone-modus og ikke avvist denne økten
-                if (isStandaloneMode && pwaOnboardingBanner && sessionStorage.getItem('pwa_push_onboarding_dismissed') !== 'true') {
+                // Vis PWA Onboarding kun hvis i standalone-modus og ikke allerede avvist eller godtatt
+                if (isStandaloneMode && pwaOnboardingBanner && sessionStorage.getItem('pwa_push_onboarding_dismissed') !== 'true' && localStorage.getItem('cfa_push_subscribed') !== 'true') {
                     pwaOnboardingBanner.classList.remove('hidden');
+                    pwaOnboardingBanner.style.display = '';
+                } else if (pwaOnboardingBanner) {
+                    pwaOnboardingBanner.classList.add('hidden');
+                    pwaOnboardingBanner.style.display = 'none';
                 }
             }
         }
@@ -1439,7 +1461,13 @@ async function setupPushNotificationUI() {
                 onbEnableBtn.textContent = 'Aktiverer...';
                 try {
                     currentSubscription = await subscribeUserToPush();
+                    localStorage.setItem('cfa_push_subscribed', 'true');
+                    sessionStorage.setItem('pwa_push_onboarding_dismissed', 'true');
                     syncPushUI(true);
+                    if (pwaOnboardingBanner) {
+                        pwaOnboardingBanner.classList.add('hidden');
+                        pwaOnboardingBanner.style.display = 'none';
+                    }
                     alert('Push-varsler er nå aktivert på telefonen din!');
                 } catch (e) {
                     alert('Kunne ikke aktivere varsler: ' + e.message);
@@ -1453,7 +1481,10 @@ async function setupPushNotificationUI() {
         const onbDismissBtn = document.getElementById('pwa-onboarding-dismiss-btn');
         if (onbDismissBtn) {
             onbDismissBtn.onclick = () => {
-                pwaOnboardingBanner.classList.add('hidden');
+                if (pwaOnboardingBanner) {
+                    pwaOnboardingBanner.classList.add('hidden');
+                    pwaOnboardingBanner.style.display = 'none';
+                }
                 sessionStorage.setItem('pwa_push_onboarding_dismissed', 'true');
             };
         }
@@ -1658,7 +1689,6 @@ async function loadPwaMembers() {
                         <span style="font-size: 0.75rem; color: var(--color-text-muted);">${m.role === 'admin' ? 'Styre / Admin' : 'Medlem'}</span>
                     </div>
                 </div>
-                ${m.role === 'admin' ? '<span class="badge text-xs" style="background: var(--color-primary); color: white;">Admin</span>' : ''}
             `;
             container.appendChild(row);
         });

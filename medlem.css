@@ -2458,7 +2458,8 @@ body.pwa-standalone .pwa-logout-btn {
 }
 
 /* Skjul PWA-spesifikke views og bunnmeny i vanlig nettleser */
-.pwa-only {
+.pwa-only,
+body:not(.pwa-standalone) .pwa-view:not(#pwa-view-home) {
   display: none !important;
 }
 
@@ -2495,12 +2496,21 @@ body.pwa-standalone .pwa-only {
   display: block !important;
 }
 
+/* Sørg for at .hidden ALLTID skjuler elementer, selv i PWA */
+.hidden,
+body.pwa-standalone .hidden,
+body.pwa-standalone .pwa-only.hidden,
+body.pwa-standalone .pwa-push-banner.hidden {
+  display: none !important;
+}
+
+/* PWA Sidevisninger: kun det aktive viewet vises */
 body.pwa-standalone .pwa-view {
-  display: none;
+  display: none !important;
 }
 
 body.pwa-standalone .pwa-view.active {
-  display: block;
+  display: block !important;
   animation: pwaViewFadeIn 0.22s cubic-bezier(0.16, 1, 0.3, 1) forwards;
 }
 
