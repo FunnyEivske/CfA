@@ -152,6 +152,11 @@ function setupModals() {
                 }
             }
         }
+        const modalThemeLabel = document.getElementById('modal-theme-status-label');
+        if (modalThemeLabel) {
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            modalThemeLabel.textContent = isDark ? 'På' : 'Av';
+        }
         openModal('profile-modal');
     };
     bindClick('open-profile-modal', openProfileHandler);
@@ -163,6 +168,26 @@ function setupModals() {
         closeModal('profile-modal');
         document.getElementById('logout-button')?.click();
     });
+
+    const modalThemeRow = document.getElementById('modal-theme-toggle-row');
+    if (modalThemeRow && !modalThemeRow.dataset.initialized) {
+        modalThemeRow.dataset.initialized = 'true';
+        modalThemeRow.onclick = () => {
+            if (typeof window.toggleTheme === 'function') {
+                window.toggleTheme();
+            } else {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            }
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            const modalThemeLabel = document.getElementById('modal-theme-status-label');
+            if (modalThemeLabel) modalThemeLabel.textContent = isDark ? 'På' : 'Av';
+            const pwaThemeLabel = document.getElementById('pwa-current-theme-label');
+            if (pwaThemeLabel) pwaThemeLabel.textContent = isDark ? 'Mørkt tema' : 'Lyst tema';
+        };
+    }
 
     // 6. Innlegg & Convention knapper
     bindClick('new-post-btn', () => openModal('post-modal'));
@@ -1853,11 +1878,18 @@ function loadPwaSettings() {
     if (themeRow && !themeRow.dataset.initialized) {
         themeRow.dataset.initialized = 'true';
         themeRow.onclick = () => {
-            const currentTheme = document.documentElement.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            document.documentElement.setAttribute('data-theme', newTheme);
-            localStorage.setItem('cfa-theme', newTheme);
-            if (themeLabel) themeLabel.textContent = newTheme === 'dark' ? 'Mørkt tema' : 'Lyst tema';
+            if (typeof window.toggleTheme === 'function') {
+                window.toggleTheme();
+            } else {
+                const currentTheme = document.documentElement.getAttribute('data-theme');
+                const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                localStorage.setItem('theme', newTheme);
+            }
+            const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
+            if (themeLabel) themeLabel.textContent = isDark ? 'Mørkt tema' : 'Lyst tema';
+            const modalThemeLabel = document.getElementById('modal-theme-status-label');
+            if (modalThemeLabel) modalThemeLabel.textContent = isDark ? 'På' : 'Av';
         };
     }
 }
