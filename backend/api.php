@@ -960,29 +960,38 @@ switch ($action) {
         // 2. Send e-post til Google Workspace (kontakt@cosplayforalle.no)
         $cleanName = preg_replace('/[\r\n]/', '', $name);
         $cleanEmail = filter_var($email, FILTER_SANITIZE_EMAIL);
-        $encodedName = '=?UTF-8?B?' . base64_encode($cleanName) . '?=';
+        $safeName = trim(preg_replace('/[\r\n",<>]/', '', $cleanName));
 
         $to = 'kontakt@cosplayforalle.no';
         $subject = '=?UTF-8?B?' . base64_encode('Ny henvendelse fra nettsiden: ' . $cleanName) . '?=';
 
+        // Sett opp e-postheadere i henhold til Google Workspace / SPF / DMARC krav:
+        // - From / Avsender MÅ være kontakt@cosplayforalle.no for å bestå SPF/DKIM og unngå søppelpost-filtrering
+        // - Reply-To / Svar til MÅ hente e-postadressen brukeren fylte inn i skjemaet
         $headers = [];
         $headers[] = 'MIME-Version: 1.0';
         $headers[] = 'Content-Type: text/plain; charset=UTF-8; format=flowed';
         $headers[] = 'Content-Transfer-Encoding: 8bit';
-        $headers[] = 'From: "Cosplay for Alle Kontaktskjema" <kontakt@cosplayforalle.no>';
-        $headers[] = "Reply-To: $encodedName <$cleanEmail>";
+        $headers[] = 'From: "Cosplay for Alle" <kontakt@cosplayforalle.no>';
+        $headers[] = 'Reply-To: ' . $cleanEmail;
+        $headers[] = 'Return-Path: <kontakt@cosplayforalle.no>';
         $headers[] = 'X-Mailer: PHP/' . phpversion();
 
         $body = "Du har mottatt en ny henvendelse fra kontaktskjemaet på cosplayforalle.no:\n\n";
-        $body .= "Navn: " . $cleanName . "\n";
-        $body .= "E-post: " . $cleanEmail . "\n";
+        $body .= "Fra: " . $cleanName . " <" . $cleanEmail . ">\n";
+        $body .= "Svar-til: " . $cleanEmail . "\n";
         $body .= "Dato: " . date('d.m.Y H:i') . "\n";
         $body .= "--------------------------------------------------\n\n";
         $body .= $message . "\n\n";
         $body .= "--------------------------------------------------\n";
-        $body .= "Trykk 'Svar' (Reply) i e-posten for å svare direkte til " . $cleanName . " (" . $cleanEmail . ").\n";
+        $body .= "Trykk 'Svar' (Reply) i e-posten for å svare direkte til " . $cleanEmail . ".\n";
 
-        $mailSent = @mail($to, $subject, $body, implode("\r\n", $headers), '-fkontakt@cosplayforalle.no');
+        // Bruk array-støtte i PHP 7.2+ for å garantere riktige linjeskift for webserverens MTA
+        if (defined('PHP_VERSION_ID') && PHP_VERSION_ID >= 70200) {
+            $mailSent = @mail($to, $subject, $body, $headers, '-fkontakt@cosplayforalle.no');
+        } else {
+            $mailSent = @mail($to, $subject, $body, implode("\r\n", $headers), '-fkontakt@cosplayforalle.no');
+        }
 
         jsonResponse([
             'success' => true,
