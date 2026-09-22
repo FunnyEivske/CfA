@@ -2641,6 +2641,21 @@ body.pwa-standalone .pwa-bottom-nav {
   display: flex !important;
 }
 
+/* Løft dark mode-knappen over mobilappens bunnmeny */
+body.pwa-standalone .theme-toggle {
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+  right: 1.25rem !important;
+  z-index: 3000 !important;
+}
+
+@media (display-mode: standalone) {
+  .theme-toggle {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    right: 1.25rem !important;
+    z-index: 3000 !important;
+  }
+}
+
 .pwa-nav-item {
   flex: 1;
   display: flex;

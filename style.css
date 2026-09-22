@@ -1251,6 +1251,21 @@ body.pwa-standalone .pwa-header-profile-btn:active img {
   transform: scale(0.92);
 }
 
+/* Løft dark mode-knappen over mobilappens bunnmeny */
+body.pwa-standalone .theme-toggle {
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+  right: 1.25rem !important;
+  z-index: 3000 !important;
+}
+
+@media (display-mode: standalone) {
+  .theme-toggle {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    right: 1.25rem !important;
+    z-index: 3000 !important;
+  }
+}
+
 /* PWA Mobile Install Banner */
 .pwa-install-banner {
   position: fixed;
