@@ -760,10 +760,21 @@ p {
   /* 24px */
 }
 
+.main-footer p {
+  color: var(--palette-pure-white, #FFFFFF);
+}
+
+.footer-tagline {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #FFF1E1; /* High contrast warm ivory (> 10:1 ratio) */
+  line-height: 1.6;
+}
+
 .footer-copyright {
   font-size: 0.875rem;
   /* 14px */
-  color: var(--color-text-footer-muted);
+  color: #E2E2E6; /* High contrast light grey (> 8.5:1 ratio) */
 }
 
 /*

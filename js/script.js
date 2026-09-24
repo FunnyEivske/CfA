@@ -31,14 +31,18 @@ export async function initApp() {
 }
 
 function deferAuthUI() {
-    // Only query backend auth state during idle or delayed, to avoid blocking critical render
     const isLoginPage = window.location.pathname.includes('login') || window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('/login');
     if (isLoginPage) {
         setupAuthUI();
-    } else if ('requestIdleCallback' in window) {
-        requestIdleCallback(setupAuthUI, { timeout: 2500 });
+        return;
+    }
+    // Only query backend auth state after the page has completely finished loading
+    if (document.readyState === 'complete') {
+        setTimeout(setupAuthUI, 2000);
     } else {
-        setTimeout(setupAuthUI, 1000);
+        window.addEventListener('load', () => {
+            setTimeout(setupAuthUI, 2000);
+        }, { once: true });
     }
 }
 

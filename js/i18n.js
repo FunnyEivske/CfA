@@ -60,7 +60,11 @@ export function toggleLanguage() {
 }
 
 export function initI18n() {
-    loadTranslations(currentLang);
+    if (currentLang !== 'no') {
+        loadTranslations(currentLang);
+    } else {
+        updateLangBadges('no');
+    }
     
     const langBtns = document.querySelectorAll('.lang-toggle-btn, #lang-toggle-btn');
     langBtns.forEach(btn => {
