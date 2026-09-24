@@ -69,6 +69,7 @@ function updateHeaderUI(user) {
     const logoutBtns = document.querySelectorAll('#logout-button, #dropdown-logout-button');
     const memberLink = document.getElementById('member-link');
     const profileLink = document.getElementById('profile-link');
+    const joinLinks = document.querySelectorAll('#join-link, #mobile-join-link, .nav-link-cta, .mobile-cta-join');
 
     const mobileLoginLink = document.getElementById('mobile-login-link');
     const mobileLogoutBtns = document.querySelectorAll('#mobile-logout-button');
@@ -78,6 +79,10 @@ function updateHeaderUI(user) {
 
     if (user) {
         if (loginLink) loginLink.classList.add('hidden');
+        joinLinks.forEach(link => {
+            link.classList.add('hidden');
+            link.style.display = 'none';
+        });
         logoutBtns.forEach(btn => {
             btn.classList.remove('hidden');
             btn.onclick = async () => {
@@ -105,6 +110,10 @@ function updateHeaderUI(user) {
         }
     } else {
         if (loginLink) loginLink.classList.remove('hidden');
+        joinLinks.forEach(link => {
+            link.classList.remove('hidden');
+            link.style.display = '';
+        });
         logoutBtns.forEach(btn => btn.classList.add('hidden'));
         if (memberLink) memberLink.classList.add('hidden');
         if (profileLink) profileLink.classList.add('hidden');
