@@ -8,9 +8,9 @@ This rule applies to all interactions with the Cosplay for alle (CfA) codebase.
 
 ## 2. Mandatory Synchronization Protocol
 Whenever making changes to CSS, JS, HTML, or media:
-1. Always update the website and PWA files.
+1. Always update the website and PWA files directly on the `main` branch.
 2. Run `npm run sync:app` to automatically mirror shared assets and member pages into `member-app/www/`.
-3. Commit and push to Git.
+3. Commit and push directly to `main` (`git push origin main`).
 4. Deploy to Webhuset via `npm run deploy:webhuset`.
 
 ## 3. Native App Structure (`member-app/`)

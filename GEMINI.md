@@ -61,7 +61,7 @@ Whenever you perform work or update code in this codebase:
    ```bash
    git add -A
    git commit -m "..."
-   git push origin <branch>
+   git push origin main
    ```
 4. **Deploy to Webhuset**:
    ```bash
@@ -71,11 +71,10 @@ Whenever you perform work or update code in this codebase:
 
 ---
 
-## 4. Git Branching Strategy
+## 4. Unified Branch (`main`)
 
-- **`main`**: The primary production branch deployed to Webhuset.
-- **`member-app`**: The dedicated branch for the standalone member app configuration and native platform builds.
-- Always ensure changes that benefit both website/PWA and native app are committed and synced across branches as needed.
+- Everything (the Website, PWA, and standalone Member App in `member-app/`) lives and is developed directly on the **`main`** branch.
+- No separate branches needed for normal operations; all multi-platform syncs and deployments happen directly from `main`.
 
 ---
 
