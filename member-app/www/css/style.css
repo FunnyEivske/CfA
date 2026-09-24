@@ -1,0 +1,1487 @@
+/* --- Fonter lastes asynkront via HTML for maksimal ytelse --- */
+
+/*
+==========================================
+  CSS Variabler (Roter)
+==========================================
+*/
+:root {
+  /* Fonter */
+  --font-body: 'Inter', sans-serif;
+  --font-display: 'Playfair Display', serif;
+
+  /* --- Ny Fargepalett --- */
+  --palette-deep-maroon: #7E1C38;
+  --palette-pastel-pink: #FFCDD2;
+  --palette-charcoal-grey: #3C3C40;
+  --palette-cream-ivory: #FFF1E1;
+  --palette-pure-white: #FFFFFF;
+  --palette-white: #FFFFFF;
+
+  /* --- Funksjonelle Variabler --- */
+  --color-primary: var(--palette-deep-maroon);
+  --color-primary-dark: #5c1429;
+  --color-primary-hover: var(--palette-pastel-pink);
+
+  --color-bg-page: var(--palette-cream-ivory);
+  --color-bg-card: var(--palette-pure-white);
+  --color-bg-section: #FFF9F2;
+  /* Light ivory */
+  --color-bg-white: var(--palette-pure-white);
+  --color-bg-header: #FFFFFF;
+  --color-bg-footer: var(--palette-charcoal-grey);
+
+  --color-text-main: var(--palette-charcoal-grey);
+  --color-text-muted: #5A5A5E;
+  /* Lighter charcoal */
+  --color-text-inverse: var(--palette-pure-white);
+  --color-text-base: var(--palette-charcoal-grey);
+  --color-text-footer: var(--palette-cream-ivory);
+
+  --color-border: #E8D9CC;
+  --color-error: #dc2626;
+
+  /* Annet */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --border-radius-sm: 0.375rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-full: 9999px;
+
+  --transition-all: all 0.2s ease-in-out;
+}
+
+/* --- Dark Mode Overrides --- */
+[data-theme="dark"] {
+  --color-primary: #B72B50; /* Brighter, vibrant maroon in dark mode */
+  --color-primary-dark: #8C1C3A;
+  --color-primary-hover: #FFCDD2;
+
+  --color-bg-page: var(--palette-charcoal-grey);
+  --color-bg-card: #2B2B2E; /* Darker charcoal for cards */
+  --color-bg-section: #323236; /* Medium charcoal */
+  --color-bg-header: #18181B;
+
+  --color-text-main: var(--palette-cream-ivory);
+  --color-text-muted: #D1D1D6; /* Clear readable silver-grey for muted text */
+  --color-text-inverse: #FFFFFF; /* Pure white text on colored buttons */
+
+  --color-border: #4D4D52;
+  --color-bg-white: var(--palette-charcoal-grey);
+
+  --color-bg-input: #1F1F22;
+  --color-bg-footer: #1F1F22;
+}
+
+/* Ensure broad readability in dark mode for dynamic content */
+[data-theme="dark"] p,
+[data-theme="dark"] .feed-item-content,
+[data-theme="dark"] .feed-item-content *,
+[data-theme="dark"] #documents-list-container,
+[data-theme="dark"] #documents-list-container * {
+  color: var(--color-text-main);
+}
+
+
+/* --- Theme Helpers --- */
+[data-theme="dark"] .logo-light-only {
+  display: none !important;
+}
+
+[data-theme="light"] .logo-dark-only {
+  display: none !important;
+}
+
+[data-theme="dark"] .logo-dark-only {
+  display: block !important;
+}
+
+.hidden {
+  display: none !important;
+}
+
+/*
+==========================================
+  Nullstilling (Reset) og Basis
+==========================================
+*/
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  font-size: 16px;
+  overflow-x: hidden;
+}
+
+body {
+  font-family: var(--font-body);
+  color: var(--color-text-main);
+  background-color: var(--color-bg-page);
+  line-height: 1.6;
+  overflow-x: hidden;
+  /* Prevent horizontal scroll from fixed menu */
+}
+
+body.modal-open {
+  overflow: hidden;
+  height: 100vh;
+  touch-action: none;
+  -webkit-overflow-scrolling: none;
+}
+
+img {
+  max-width: 100%;
+  height: auto;
+  display: block;
+}
+
+a {
+  color: var(--color-primary);
+  text-decoration: none;
+  transition: var(--transition-all);
+}
+
+a:hover {
+  color: var(--color-primary-hover);
+}
+
+ul,
+ol {
+  list-style-position: inside;
+}
+
+/*
+==========================================
+  Hjelpeklasser (Utility Classes)
+==========================================
+*/
+.container {
+  width: 100%;
+  /* max-width: 1100px;  <-- FJERNET DENNE */
+  margin-left: auto;
+  margin-right: auto;
+  padding-left: 1.5rem;
+  /* 24px */
+  padding-right: 1.5rem;
+  /* 24px */
+}
+
+.section {
+  padding-top: 5rem;
+  /* 80px */
+  padding-bottom: 5rem;
+  /* 80px */
+}
+
+.section-bg-medium {
+  background-color: var(--color-bg-section);
+}
+
+.section-bg-white {
+  background-color: var(--color-bg-white);
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+/* Skjuler elementer */
+.hidden {
+  display: none !important;
+}
+
+/*
+==========================================
+  Typografi
+==========================================
+*/
+h1,
+h2,
+h3,
+h4 {
+  font-family: var(--font-display);
+  color: var(--color-text-main);
+  font-weight: 700;
+  margin-bottom: 1rem;
+}
+
+h1 {
+  font-size: 3rem;
+  /* 48px */
+  margin-bottom: 1rem;
+}
+
+h2 {
+  font-size: 2.25rem;
+  /* 36px */
+  margin-bottom: 1.5rem;
+}
+
+h3 {
+  font-size: 1.5rem;
+  /* 24px */
+}
+
+p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+  color: var(--color-text-muted);
+}
+
+/* Større avsnitt-tekst */
+.text-lg {
+  font-size: 1.125rem;
+  /* 18px */
+  line-height: 1.7;
+}
+
+/*
+==========================================
+  Knapper
+==========================================
+*/
+.button {
+  display: inline-block;
+  font-family: var(--font-body);
+  font-weight: 700;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: var(--border-radius-full);
+  cursor: pointer;
+  transition: var(--transition-all);
+  text-align: center;
+  font-size: 0.875rem;
+  /* 14px */
+}
+
+.button:hover {
+  transform: scale(1.05);
+  background-color: var(--color-primary-hover);
+}
+
+/* Primær knapp */
+.button-primary {
+  background-color: var(--color-primary);
+  color: #FFFFFF !important;
+}
+
+.button-primary:hover {
+  background-color: var(--color-primary-hover);
+  color: #5C1429 !important;
+}
+
+/* Sekundær knapp */
+.button-secondary {
+  background-color: var(--color-bg-card);
+  color: var(--color-text-main) !important;
+  border: 1px solid var(--color-border);
+}
+
+.button-secondary:hover {
+  background-color: var(--color-bg-section);
+  border-color: var(--color-primary);
+  color: var(--color-text-main) !important;
+}
+
+
+/* Større knapp */
+.button-lg {
+  padding: 0.75rem 2rem;
+  font-size: 1.125rem;
+  /* 18px */
+}
+
+/* Logg ut-knapp (spesial) */
+#logout-button,
+#mobile-logout-button {
+  background-color: var(--color-text-muted);
+  color: white;
+}
+
+#logout-button:hover,
+#mobile-logout-button:hover {
+  background-color: var(--palette-shadow-grey);
+}
+
+/* 
+==========================================
+  Dark Mode Toggle Button
+==========================================
+*/
+.theme-toggle {
+  position: fixed;
+  bottom: 2rem;
+  right: 2rem;
+  z-index: 1000;
+  width: 50px;
+  height: 50px;
+  border-radius: 50%;
+  background: var(--color-primary);
+  color: white;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  border: none;
+  box-shadow: var(--shadow-lg);
+  cursor: pointer;
+  transition: var(--transition-all);
+}
+
+.theme-toggle:hover {
+  transform: scale(1.1) rotate(15deg);
+  background: var(--color-primary-hover);
+  box-shadow: var(--shadow-xl);
+}
+
+/* Skjul "Bytt tema" tekst på floating knapp */
+.theme-toggle span {
+  display: none;
+}
+
+@media (max-width: 768px) {
+  .theme-toggle {
+    bottom: 1.5rem;
+    right: 1.5rem;
+    width: 45px;
+    height: 45px;
+  }
+}
+
+/*
+==========================================
+  Skjema (Forms)
+==========================================
+*/
+.form-group {
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  display: block;
+  font-weight: 500;
+  color: var(--color-secondary);
+  margin-bottom: 0.5rem;
+}
+
+.form-input,
+.form-textarea {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-md);
+  font-family: var(--font-body);
+  font-size: 1rem;
+  transition: var(--transition-colors);
+}
+
+.form-input:focus,
+.form-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary);
+  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.2);
+  /* Ring-effekt */
+}
+
+.form-input,
+.form-textarea {
+  background-color: var(--color-bg-input, var(--color-bg-card));
+  color: var(--color-text-main);
+}
+
+.form-input::placeholder,
+.form-textarea::placeholder {
+  color: var(--color-text-muted);
+  opacity: 1;
+  /* For Firefox */
+}
+
+.form-textarea {
+  resize: vertical;
+  min-height: 120px;
+}
+
+.form-error {
+  color: #ef4444;
+  background: rgba(239, 68, 68, 0.1);
+  border: 1px solid rgba(239, 68, 68, 0.25);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+.form-success {
+  color: #10b981;
+  background: rgba(16, 185, 129, 0.1);
+  border: 1px solid rgba(16, 185, 129, 0.25);
+  border-radius: var(--border-radius-md, 8px);
+  padding: 0.85rem 1.25rem;
+  font-size: 0.95rem;
+  text-align: center;
+  margin-top: 1rem;
+}
+
+/*
+==========================================
+  Header & Navigasjon
+==========================================
+*/
+.main-header {
+  background-color: var(--color-bg-header);
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  transition: background-color 0.3s ease;
+}
+
+.main-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.75rem;
+  padding-bottom: 0.75rem;
+}
+
+.nav-brand-group {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.logo-link {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  text-decoration: none;
+}
+
+.logo-img {
+  height: 3rem;
+  width: 3rem;
+  border-radius: var(--border-radius-full);
+  object-fit: cover;
+}
+
+.logo-text {
+  font-size: 1.25rem;
+  font-weight: 700;
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .logo-text {
+  color: var(--palette-cream-ivory);
+}
+
+/* Globe Language Toggle Button beside Logo */
+.lang-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.35rem;
+  padding: 0.3rem 0.65rem;
+  border-radius: 9999px;
+  background: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  color: var(--color-text-main);
+  font-size: 0.75rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: var(--transition-all);
+  box-shadow: var(--shadow-sm);
+  user-select: none;
+  text-decoration: none;
+}
+
+.lang-toggle-btn:hover {
+  transform: translateY(-1px) scale(1.04);
+  background: var(--color-primary);
+  color: #ffffff;
+  border-color: var(--color-primary);
+  box-shadow: var(--shadow-md);
+}
+
+.lang-toggle-btn .globe-icon {
+  width: 15px;
+  height: 15px;
+  stroke: currentColor;
+}
+
+[data-theme="dark"] .lang-toggle-btn {
+  background: var(--color-bg-card);
+  border-color: var(--color-border);
+  color: var(--color-text-main);
+}
+
+
+/* Desktop-meny */
+.nav-menu-desktop {
+  display: none;
+  /* Skjult på mobil */
+  align-items: center;
+  gap: 1.5rem;
+  /* 24px */
+}
+
+.nav-link {
+  color: var(--color-text-main);
+  transition: var(--transition-all);
+  font-weight: 500;
+}
+
+.nav-link:hover {
+  color: var(--color-primary);
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--palette-pastel-pink);
+}
+
+/* Aktiv lenke (og medlemslenke) */
+.nav-link-active {
+  color: var(--color-primary);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .nav-link-active {
+  color: var(--palette-pastel-pink);
+}
+
+/* Ghost Knapp (F.eks. Språkvelger) */
+.button-ghost {
+  background: transparent;
+  color: var(--color-text-main);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-full);
+}
+
+.button-ghost:hover {
+  background: rgba(126, 28, 56, 0.1);
+  color: var(--color-primary);
+  border-color: var(--color-primary);
+}
+
+[data-theme="dark"] .button-ghost:hover {
+  background: rgba(255, 205, 210, 0.15);
+  color: var(--palette-pastel-pink);
+  border-color: var(--palette-pastel-pink);
+}
+
+/* Mobilmeny-knapp */
+.mobile-menu-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--color-text-main);
+  z-index: 1600;
+  padding: 0.5rem;
+  transition: var(--transition-all);
+}
+
+.mobile-menu-button:hover {
+  color: var(--color-primary);
+  transform: scale(1.08);
+}
+
+.mobile-menu-button svg {
+  width: 1.75rem;
+  height: 1.75rem;
+  display: block;
+}
+
+/* Mobilmeny (Premium Overlay) */
+.nav-menu-mobile {
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  height: 100vh;
+  height: 100dvh;
+  background-color: rgba(255, 255, 255, 0.98);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  z-index: 1500;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 1.5rem;
+  padding: 2rem;
+  transform: translateY(-100%);
+  transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.3s ease;
+  opacity: 0;
+  pointer-events: none;
+}
+
+[data-theme="dark"] .nav-menu-mobile {
+  background-color: rgba(28, 25, 23, 0.98);
+}
+
+.nav-menu-mobile.show {
+  transform: translateY(0);
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.nav-menu-mobile .nav-link,
+.nav-menu-mobile .nav-link-active {
+  font-size: 1.4rem;
+  font-weight: 700;
+  font-family: var(--font-display);
+  color: var(--color-text-main);
+  text-align: center;
+  text-decoration: none;
+  transition: var(--transition-all);
+  padding: 0.5rem 1rem;
+}
+
+.nav-menu-mobile .nav-link:hover,
+.nav-menu-mobile .nav-link-active:hover {
+  color: var(--color-primary);
+  transform: scale(1.05);
+}
+
+.nav-menu-mobile .button {
+  margin-top: 0.5rem;
+  width: auto;
+  min-width: 220px;
+  font-size: 1rem;
+  text-align: center;
+}
+
+.mobile-cta-join {
+  background-color: var(--color-primary);
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(126, 28, 56, 0.35);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mobile-cta-join:hover {
+  background-color: var(--color-primary-hover);
+  color: #5C1429 !important;
+  transform: scale(1.05);
+}
+
+.nav-link-cta {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.nav-link-cta:hover {
+  color: var(--color-primary-hover);
+}
+
+[data-theme="dark"] .nav-link-cta {
+  color: var(--palette-pastel-pink);
+}
+
+/*
+==========================================
+  Footer
+==========================================
+*/
+.main-footer {
+  background-color: var(--color-bg-footer);
+  color: var(--color-text-footer);
+  padding-top: 2.5rem;
+  padding-bottom: 2.5rem;
+  text-align: center;
+}
+
+.footer-logo {
+  height: 4rem;
+  /* 64px */
+  width: 4rem;
+  /* 64px */
+  margin-left: auto;
+  margin-right: auto;
+  margin-bottom: 1rem;
+  border-radius: var(--border-radius-full);
+  object-fit: cover;
+}
+
+.footer-title {
+  font-size: 1.125rem;
+  /* 18px */
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--palette-white);
+}
+
+.footer-address {
+  margin-bottom: 1rem;
+  color: var(--palette-white);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  word-break: break-word;
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
+}
+
+.social-links {
+  display: flex;
+  justify-content: center;
+  gap: 1.5rem;
+  /* 24px */
+  margin-bottom: 1rem;
+}
+
+.social-link {
+  color: var(--color-text-footer);
+}
+
+.social-link:hover {
+  color: var(--color-text-light);
+}
+
+.social-icon {
+  width: 1.5rem;
+  /* 24px */
+  height: 1.5rem;
+  /* 24px */
+}
+
+.main-footer p {
+  color: var(--palette-pure-white, #FFFFFF);
+}
+
+.footer-tagline {
+  font-size: 1rem;
+  margin-bottom: 0.75rem;
+  color: #FFF1E1; /* High contrast warm ivory (> 10:1 ratio) */
+  line-height: 1.6;
+}
+
+.footer-copyright {
+  font-size: 0.875rem;
+  /* 14px */
+  color: #E2E2E6; /* High contrast light grey (> 8.5:1 ratio) */
+}
+
+/*
+==========================================
+  Spesifikke Sider/Seksjoner
+==========================================
+*/
+
+/* --- Hero (index.html) --- */
+.hero-section {
+  position: relative;
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  text-align: center;
+  color: var(--palette-white);
+  padding: 2rem;
+}
+
+.hero-bg-picture {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
+}
+
+.hero-bg-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center;
+}
+
+.hero-overlay {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to bottom, rgba(0, 0, 0, 0.4), rgba(0, 0, 0, 0.65));
+  z-index: 2;
+}
+
+.hero-content {
+  position: relative;
+  max-width: 800px;
+  margin-left: auto;
+  margin-right: auto;
+  z-index: 10;
+  background: rgba(0, 0, 0, 0.45);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  padding: 3rem 2rem;
+  border-radius: var(--border-radius-lg);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+}
+
+.hero-content h1,
+.hero-content h1 *,
+.hero-content p,
+.hero-content p * {
+  color: #FFFFFF !important;
+  text-shadow: 0 2px 10px rgba(0, 0, 0, 0.9);
+}
+
+
+/* --- Om Oss Teaser (index.html) & Om Oss (om-oss.html) --- */
+.about-section .grid-container,
+.om-oss-page .grid-container {
+  display: grid;
+  gap: 3rem;
+  align-items: center;
+}
+
+.about-section .grid-image,
+.om-oss-page .grid-image {
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  width: 100%;
+}
+
+.about-section .grid-text,
+.om-oss-page .grid-text {
+  text-align: left;
+}
+
+.about-section .grid-text h2,
+.om-oss-page .grid-text h2 {
+  margin-bottom: 1.5rem;
+}
+
+/* --- Kurs Teaser (index.html) --- */
+.kurs-grid {
+  display: grid;
+  gap: 2rem;
+}
+
+.kurs-card {
+  display: block;
+  text-decoration: none;
+  background-color: var(--color-bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-lg);
+  overflow: hidden;
+  transition: transform 0.2s ease;
+}
+
+.kurs-card:hover {
+  transform: translateY(-8px);
+}
+
+.kurs-card-image {
+  width: 100%;
+  height: 12rem;
+  /* 192px */
+  object-fit: cover;
+}
+
+.kurs-card-content {
+  padding: 1.5rem;
+}
+
+.kurs-card-content h3 {
+  color: var(--color-primary);
+}
+
+/* --- Galleri Teaser (index.html) & Galleri (galleri.html) --- */
+.gallery-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.gallery-item {
+  position: relative;
+  overflow: hidden;
+  border-radius: var(--border-radius-lg);
+}
+
+.gallery-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+
+.gallery-item:hover .gallery-image {
+  transform: scale(1.05);
+}
+
+/* --- Dynamisk Masonry Galleri (galleri.html) --- */
+.gallery-masonry {
+  column-count: 1;
+  column-gap: 1.5rem;
+  width: 100%;
+}
+
+@media (min-width: 576px) {
+  .gallery-masonry {
+    column-count: 2;
+  }
+}
+
+@media (min-width: 992px) {
+  .gallery-masonry {
+    column-count: 3;
+  }
+}
+
+@media (min-width: 1200px) {
+  .gallery-masonry {
+    column-count: 4;
+  }
+}
+
+.gallery-masonry-item {
+  break-inside: avoid;
+  margin-bottom: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  overflow: hidden;
+  background: var(--color-bg-card);
+  box-shadow: var(--shadow-sm);
+  border: 1px solid var(--color-border);
+  transition: transform 0.25s ease, box-shadow 0.25s ease;
+  cursor: pointer;
+}
+
+.gallery-masonry-item:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lg);
+}
+
+.gallery-masonry-item img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: contain;
+  transition: transform 0.3s ease;
+}
+
+.gallery-masonry-item:hover img {
+  transform: scale(1.02);
+}
+
+/* --- Modal System & Overlays --- */
+body.modal-open {
+  overflow: hidden !important;
+}
+
+.modal-container {
+  position: fixed;
+  inset: 0;
+  z-index: 3000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem;
+}
+
+.modal-overlay {
+  position: absolute;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.65);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  z-index: 1;
+}
+
+.modal-content {
+  position: relative;
+  z-index: 10;
+  width: 100%;
+  max-width: 600px;
+  background-color: var(--color-bg-card);
+  border: 1px solid var(--color-border);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  max-height: calc(100dvh - 2rem);
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.maxWidth-600 {
+  max-width: 600px;
+}
+
+.maxWidth-800 {
+  max-width: 800px;
+}
+
+/* --- Kontakt (kontakt.html) --- */
+.form-container {
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+  background-color: var(--color-bg-card);
+  padding: 2rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+}
+
+/* --- Logg inn (login.html) --- */
+.login-page-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 80vh;
+  /* Mindre enn 100vh for å se header */
+  padding: 4rem 0;
+}
+
+.login-form-container {
+  background-color: var(--color-bg-card);
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-xl);
+  padding: 2.5rem;
+  width: 100%;
+  max-width: 400px;
+}
+
+.login-form-container .button {
+  width: 100%;
+}
+
+/* --- Medlemsside (medlem.html) --- */
+.medlem-container {
+  max-width: 700px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#new-post-container {
+  background-color: var(--color-bg-card);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+}
+
+#new-post-container h2 {
+  color: var(--color-primary-darker);
+}
+
+#new-post-container .button {
+  width: 100%;
+}
+
+.feed-item {
+  background-color: var(--color-bg-card);
+  padding: 1.5rem;
+  border-radius: var(--border-radius-lg);
+  box-shadow: var(--shadow-md);
+  margin-bottom: 1.5rem;
+}
+
+.feed-item h3 {
+  color: var(--color-primary-darker);
+  margin-bottom: 0.5rem;
+}
+
+.feed-item-meta {
+  font-size: 0.875rem;
+  color: var(--color-text-muted);
+  margin-bottom: 1rem;
+}
+
+.feed-item-content {
+  color: var(--color-secondary);
+}
+
+.feed-item-content p {
+  color: var(--color-secondary);
+}
+
+/*
+==========================================
+  Responsive Design (Media Queries)
+==========================================
+*/
+
+/* --- Tablet (og større) --- */
+@media (min-width: 768px) {
+
+  /* Skjul mobilmeny, vis desktop-meny */
+  .mobile-menu-button {
+    display: none;
+  }
+
+  .nav-menu-desktop {
+    display: flex;
+  }
+
+  .nav-menu-mobile {
+    display: none !important;
+    /* Alltid skjult på desktop */
+  }
+
+  /* Grid-systemer */
+  .about-section .grid-container,
+  .om-oss-page .grid-container {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .kurs-grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .gallery-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .form-container {
+    padding: 2.5rem;
+  }
+}
+
+/* --- Lightbox --- */
+.lightbox {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background-color: rgba(0, 0, 0, 0.9);
+  z-index: 2000;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem;
+  cursor: pointer;
+}
+
+.lightbox.active {
+  display: flex;
+}
+
+.lightbox-content {
+  position: relative;
+  max-width: 100%;
+  max-height: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.lightbox-image {
+  max-width: 90vw;
+  max-height: 90vh;
+  object-fit: contain;
+  border-radius: var(--border-radius-md);
+  box-shadow: var(--shadow-xl);
+  cursor: default;
+}
+
+.lightbox-close {
+  position: absolute;
+  top: 1.5rem;
+  right: 1.5rem;
+  background: rgba(0, 0, 0, 0.6);
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: white;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2rem;
+  line-height: 1;
+  cursor: pointer;
+  transition: var(--transition-all);
+  z-index: 2100;
+}
+
+.lightbox-close:hover {
+  transform: scale(1.1);
+  background: rgba(180, 83, 9, 0.9);
+  color: #fff;
+}
+
+@media (max-width: 768px) {
+  .lightbox {
+    padding: 1rem;
+  }
+  .lightbox-close {
+    top: 1rem;
+    right: 1rem;
+    width: 38px;
+    height: 38px;
+    font-size: 1.6rem;
+  }
+}
+
+/* ==========================================
+   PWA / Standalone-modus (åpnet fra hjemskjerm)
+   ========================================== */
+@media (display-mode: standalone) {
+  /* Skjul ordinære navigasjonslenker i standalone for ren app-opplevelse */
+  .nav-desktop .nav-link,
+  .nav-menu-desktop .nav-link,
+  .mobile-menu-button,
+  .mobile-toggle,
+  .mobile-menu,
+  .nav-menu-mobile,
+  .lang-toggle-btn {
+    display: none !important;
+  }
+
+  /* Vis toppmeny med kun logo og ren Logg ut-knapp */
+  .nav-desktop,
+  .nav-menu-desktop {
+    display: flex !important;
+    align-items: center !important;
+    gap: 0.5rem !important;
+  }
+
+  #logout-button,
+  .pwa-logout-btn {
+    display: inline-flex !important;
+    padding: 0.4rem 0.85rem !important;
+    font-size: 0.875rem !important;
+  }
+
+  /* Tilpass iOS Safe Area insets */
+  body {
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+}
+
+body.pwa-standalone .nav-desktop .nav-link,
+body.pwa-standalone .nav-menu-desktop .nav-link,
+body.pwa-standalone .mobile-menu-button,
+body.pwa-standalone .mobile-toggle,
+body.pwa-standalone .mobile-menu,
+body.pwa-standalone .nav-menu-mobile,
+body.pwa-standalone .lang-toggle-btn {
+  display: none !important;
+}
+
+body.pwa-standalone .nav-desktop,
+body.pwa-standalone .nav-menu-desktop,
+body.pwa-standalone #logout-button,
+body.pwa-standalone .pwa-logout-btn {
+  display: none !important;
+}
+
+.pwa-header-profile-btn {
+  display: none;
+}
+
+body.pwa-standalone .pwa-header-profile-btn {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border: none;
+  padding: 0;
+  cursor: pointer;
+  margin-left: auto;
+  outline: none;
+}
+
+body.pwa-standalone .pwa-header-profile-btn img {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--color-primary);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+  transition: transform 0.15s ease;
+}
+
+body.pwa-standalone .pwa-header-profile-btn:active img {
+  transform: scale(0.92);
+}
+
+/* Løft dark mode-knappen over mobilappens bunnmeny */
+body.pwa-standalone .theme-toggle {
+  bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+  right: 1.25rem !important;
+  z-index: 3000 !important;
+}
+
+@media (display-mode: standalone) {
+  .theme-toggle {
+    bottom: calc(58px + env(safe-area-inset-bottom, 0px) + 1rem) !important;
+    right: 1.25rem !important;
+    z-index: 3000 !important;
+  }
+}
+
+/* PWA Mobile Install Banner */
+.pwa-install-banner {
+  position: fixed;
+  bottom: 1.25rem;
+  left: 1rem;
+  right: 1rem;
+  max-width: 440px;
+  margin: 0 auto;
+  background: var(--color-bg-surface);
+  border: 1.5px solid var(--color-primary);
+  border-radius: 16px;
+  padding: 1rem 1.25rem;
+  box-shadow: 0 12px 35px rgba(0, 0, 0, 0.35);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  gap: 0.85rem;
+  animation: slideUpPwa 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes slideUpPwa {
+  from {
+    transform: translateY(100%);
+    opacity: 0;
+  }
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
+}
+
+.pwa-banner-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+}
+
+.pwa-banner-info {
+  display: flex;
+  align-items: center;
+  gap: 0.85rem;
+}
+
+.pwa-banner-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  object-fit: cover;
+  flex-shrink: 0;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.15);
+}
+
+.pwa-banner-actions {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  justify-content: flex-end;
+}
+
+.pwa-banner-btn-install {
+  background: var(--color-primary);
+  color: #FFFFFF !important;
+  font-weight: 600;
+  font-size: 0.85rem;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  border: none;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  transition: opacity 0.15s ease;
+}
+
+.pwa-banner-btn-install:hover {
+  opacity: 0.9;
+}
+
+.pwa-banner-btn-close {
+  background: transparent;
+  color: var(--color-text-muted);
+  font-size: 0.85rem;
+  padding: 0.5rem 0.75rem;
+  border-radius: 9999px;
+  border: 1px solid var(--color-border);
+  cursor: pointer;
+}
+
+/* iOS PWA Guide Modal */
+.pwa-ios-modal {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(4px);
+  z-index: 10000;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 1rem;
+  animation: fadeInPwa 0.25s ease forwards;
+}
+
+@keyframes fadeInPwa {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+.pwa-ios-card {
+  width: 100%;
+  max-width: 400px;
+  background: var(--color-bg-surface);
+  border: 1px solid var(--color-border);
+  border-radius: 20px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow-xl);
+  text-align: left;
+  margin-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Like-knapp for innlegg */
+.like-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.45rem !important;
+  padding: 0.45rem 0.95rem !important;
+  border-radius: 9999px !important;
+  border: 1.5px solid var(--color-border) !important;
+  background: var(--color-bg-subtle) !important;
+  color: var(--color-text-main) !important;
+  font-size: 0.88rem !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.like-btn:hover {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.08) !important;
+}
+
+.like-btn.liked {
+  border-color: #ef4444 !important;
+  background: rgba(239, 68, 68, 0.14) !important;
+  color: #ef4444 !important;
+  box-shadow: 0 2px 10px rgba(239, 68, 68, 0.25) !important;
+}
+
+.like-btn.liked .like-count {
+  color: #ef4444 !important;
+  font-weight: 700 !important;
+}
+
+.like-btn:active {
+  transform: scale(0.93) !important;
+}
+
+

@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">CfA Medlem</string>
+    <string name="title_activity_main">CfA Medlem</string>
+    <string name="package_name">no.cosplayforalle.medlem</string>
+    <string name="custom_url_scheme">no.cosplayforalle.medlem</string>
+</resources>

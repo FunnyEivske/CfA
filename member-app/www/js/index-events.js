@@ -1,0 +1,211 @@
+export async function loadPublicEvents() {
+    const eventsContainer = document.getElementById('public-events-container');
+    if (!eventsContainer) return;
+
+    try {
+        const { EventAPI } = await import('./api-client.js');
+        const data = await EventAPI.getEvents();
+        const rawEvents = (data.events || []).filter(e => e.visibility !== 'internal');
+        eventsContainer.innerHTML = '';
+
+        if (rawEvents.length === 0) {
+            eventsContainer.innerHTML = '<p class="text-center text-muted py-6" style="grid-column: 1/-1;" data-i18n="no_events">Ingen kommende arrangementer for øyeblikket.</p>';
+            return;
+        }
+
+        const now = new Date();
+        now.setHours(0, 0, 0, 0);
+
+        // Finn fremtidige arrangementer først
+        const upcomingEvents = rawEvents.filter(e => {
+            if (!e.date) return true;
+            const d = new Date(e.date);
+            const endD = e.end_date ? new Date(e.end_date) : d;
+            return endD >= now;
+        });
+
+        // Bruk fremtidige hvis de finnes, ellers listen som den er
+        const listToSort = upcomingEvents.length > 0 ? upcomingEvents : rawEvents;
+
+        // Sorter kronologisk etter dato (nærmest i tid først)
+        listToSort.sort((a, b) => {
+            const da = a.date ? new Date(a.date).getTime() : Infinity;
+            const db = b.date ? new Date(b.date).getTime() : Infinity;
+            return da - db;
+        });
+
+        // Vis kun de 4 første / nærmeste arrangementene på forsiden
+        const events = listToSort.slice(0, 4);
+
+        events.forEach(event => {
+            const card = document.createElement('a');
+            card.href = 'hva-skjer';
+            card.className = 'kurs-card';
+            card.style.textDecoration = 'none';
+            card.style.color = 'inherit';
+
+            const imageUrl = event.image_url || '';
+            const webpUrl = imageUrl ? imageUrl.replace(/\.(jpe?g|png)$/i, '.webp') : '';
+            const dateStr = event.date ? new Date(event.date).toLocaleDateString('nb-NO', { 
+                day: 'numeric', 
+                month: 'long', 
+                year: 'numeric'
+            }) : '';
+
+            // Clean description snippet from HTML tags
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = event.description || '';
+            const plainDesc = tempDiv.textContent || tempDiv.innerText || '';
+
+            card.innerHTML = `
+                ${imageUrl 
+                    ? `<picture>
+                         ${webpUrl ? `<source srcset="${webpUrl}" type="image/webp">` : ''}
+                         <img src="${imageUrl}" alt="${event.title}" class="kurs-card-image" width="400" height="200" loading="lazy" decoding="async" style="width: 100%; height: 200px; object-fit: cover;">
+                       </picture>`
+                    : `<div class="kurs-card-image" style="background:var(--color-bg-alt);height:200px;display:flex;align-items:center;justify-content:center;"><span style="color:var(--color-text-muted);">Bilde mangler</span></div>`
+                }
+                <div class="kurs-card-content" style="padding: 1.25rem;">
+                    <h3 style="margin-top: 0; color: var(--color-text-main); font-size: 1.2rem;">${event.title}</h3>
+                    <p style="font-size: 0.9rem; color: var(--color-primary); font-weight: 600; margin-bottom: 0.5rem;">
+                        📅 ${dateStr} ${event.location ? ' • 📍 ' + event.location : ''}
+                    </p>
+                    <p style="display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; margin-bottom: 0; color: var(--color-text-muted); font-size: 0.95rem; line-height: 1.5;">
+                        ${plainDesc}
+                    </p>
+                </div>
+            `;
+            eventsContainer.appendChild(card);
+        });
+    } catch (err) {
+        console.error("Feil ved henting av arrangementer:", err);
+        eventsContainer.innerHTML = '<p class="text-center text-error py-6" style="grid-column: 1/-1;">Kunne ikke laste arrangementer.</p>';
+    }
+}
+
+export async function loadHomepageGalleryTeaser() {
+    const teaserContainer = document.getElementById('homepage-gallery-teaser');
+    if (!teaserContainer) return;
+
+    try {
+        const { GalleryAPI } = await import('./api-client.js');
+        const data = await GalleryAPI.getGallery('public');
+        const items = data.gallery || [];
+        teaserContainer.innerHTML = '';
+
+        if (items.length === 0) {
+            teaserContainer.innerHTML = '<p class="text-center text-muted py-6" style="grid-column: 1/-1;">Ingen bilder i galleriet ennå.</p>';
+            return;
+        }
+
+        // Shuffle array and select 4 pictures so it is always 1 single clean line that scales smoothly
+        const shuffled = [...items].sort(() => 0.5 - Math.random());
+        const count = Math.min(shuffled.length, 4);
+        const selected = shuffled.slice(0, count);
+
+        teaserContainer.style.display = 'grid';
+        teaserContainer.style.gridTemplateColumns = `repeat(${count}, minmax(0, 1fr))`;
+        teaserContainer.style.gap = 'clamp(0.5rem, 1.75vw, 1.25rem)';
+
+        selected.forEach(img => {
+            const itemDiv = document.createElement('div');
+            itemDiv.className = 'gallery-item';
+            itemDiv.style.cssText = 'position: relative; overflow: hidden; border-radius: var(--radius-md); aspect-ratio: 1/1; cursor: pointer; background: var(--color-bg-subtle); box-shadow: var(--shadow-sm); transition: transform 0.2s ease;';
+            
+            const webpUrl = img.image_url ? img.image_url.replace(/\.(jpe?g|png)$/i, '.webp') : '';
+
+            itemDiv.innerHTML = `
+                <picture>
+                    ${webpUrl ? `<source srcset="${webpUrl}" type="image/webp">` : ''}
+                    <img src="${img.image_url}" alt="${img.title || 'Cosplay bilde'}" width="250" height="250" style="width: 100%; height: 100%; object-fit: cover; display: block;" loading="lazy" decoding="async">
+                </picture>
+            `;
+
+            itemDiv.addEventListener('mouseenter', () => {
+                itemDiv.style.transform = 'scale(1.02)';
+            });
+            itemDiv.addEventListener('mouseleave', () => {
+                itemDiv.style.transform = 'scale(1)';
+            });
+
+            itemDiv.onclick = () => {
+                openHomepageLightbox(img.image_url);
+            };
+
+            teaserContainer.appendChild(itemDiv);
+        });
+    } catch (err) {
+        console.error("Feil ved lasting av gallerismakebit:", err);
+        teaserContainer.innerHTML = '<p class="text-center text-error py-6" style="grid-column: 1/-1;">Kunne ikke hente bilder.</p>';
+    }
+}
+
+function openHomepageLightbox(src) {
+    let lightbox = document.getElementById('lightbox');
+    let lightboxImg = document.getElementById('lightbox-image');
+
+    if (!lightbox) {
+        lightbox = document.createElement('div');
+        lightbox.id = 'lightbox';
+        lightbox.className = 'lightbox';
+        lightbox.innerHTML = `
+            <div class="lightbox-content">
+                <button id="lightbox-close" class="lightbox-close" aria-label="Lukk">&times;</button>
+                <img id="lightbox-image" class="lightbox-image" src="" alt="Større visning">
+            </div>
+        `;
+        document.body.appendChild(lightbox);
+        lightboxImg = lightbox.querySelector('#lightbox-image');
+
+        lightbox.onclick = (e) => {
+            if (e.target === lightbox || e.target.id === 'lightbox-close') {
+                lightbox.classList.remove('active');
+                document.body.style.overflow = '';
+            }
+        };
+    }
+
+    if (lightboxImg) lightboxImg.src = src;
+    lightbox.classList.add('active');
+    document.body.style.overflow = 'hidden';
+}
+
+function initLazySections() {
+    const eventsContainer = document.getElementById('public-events-container');
+    const teaserContainer = document.getElementById('homepage-gallery-teaser');
+
+    if ('IntersectionObserver' in window) {
+        if (eventsContainer) {
+            const evObserver = new IntersectionObserver((entries, obs) => {
+                if (entries[0].isIntersecting) {
+                    obs.disconnect();
+                    loadPublicEvents();
+                }
+            }, { rootMargin: '300px 0px' });
+            evObserver.observe(eventsContainer);
+        } else {
+            loadPublicEvents();
+        }
+
+        if (teaserContainer) {
+            const galObserver = new IntersectionObserver((entries, obs) => {
+                if (entries[0].isIntersecting) {
+                    obs.disconnect();
+                    loadHomepageGalleryTeaser();
+                }
+            }, { rootMargin: '300px 0px' });
+            galObserver.observe(teaserContainer);
+        } else {
+            loadHomepageGalleryTeaser();
+        }
+    } else {
+        loadPublicEvents();
+        loadHomepageGalleryTeaser();
+    }
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initLazySections);
+} else {
+    initLazySections();
+}

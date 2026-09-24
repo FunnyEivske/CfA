@@ -1,0 +1,19 @@
+{
+  "name": "cfa-member-app",
+  "version": "1.0.0",
+  "description": "Cosplay for alle (CfA) - Standalone Native Member App for iOS & Android",
+  "private": true,
+  "scripts": {
+    "sync": "node ../scripts/sync-app.js",
+    "cap:sync": "cap sync",
+    "cap:copy": "cap copy",
+    "cap:open:android": "cap open android",
+    "cap:open:ios": "cap open ios"
+  },
+  "dependencies": {
+    "@capacitor/android": "^7.0.1",
+    "@capacitor/cli": "^7.0.1",
+    "@capacitor/core": "^7.0.1",
+    "@capacitor/ios": "^7.0.1"
+  }
+}
