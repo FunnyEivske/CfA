@@ -400,10 +400,37 @@ export async function optimizeImageForUpload(file, maxWidth = 1024, initialQuali
 }
 
 export const AuthAPI = {
-    login: (email, password) => request('login', 'POST', { email, password }),
-    register: (email, password, name) => request('register', 'POST', { email, password, name }),
-    logout: () => request('logout', 'POST'),
-    getAuthState: () => request('auth_state'),
+    login: async (email, password) => {
+        const res = await request('login', 'POST', { email, password });
+        if (res && res.success) {
+            try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
+        }
+        return res;
+    },
+    register: async (email, password, name) => {
+        const res = await request('register', 'POST', { email, password, name });
+        if (res && res.success) {
+            try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
+        }
+        return res;
+    },
+    logout: async () => {
+        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+        return request('logout', 'POST');
+    },
+    getAuthState: async () => {
+        try {
+            const res = await request('auth_state');
+            if (res && res.authenticated) {
+                try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
+            } else {
+                try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+            }
+            return res;
+        } catch (err) {
+            return { authenticated: false };
+        }
+    },
     updateProfile: (displayName) => request('update_profile', 'POST', { display_name: displayName }),
     uploadAvatar: async (formDataOrFile) => {
         let fd = formDataOrFile;
@@ -538,12 +565,19 @@ export function urlBase64ToUint8Array(base64String) {
  */
 export async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        try {
-            const reg = await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
-            return reg;
-        } catch (err) {
-            console.warn('Service Worker registrering feilet:', err);
-            return null;
+        const doRegister = async () => {
+            try {
+                return await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+            } catch (err) {
+                console.warn('Service Worker registrering feilet:', err);
+                return null;
+            }
+        };
+
+        if (document.readyState === 'complete') {
+            return doRegister();
+        } else {
+            window.addEventListener('load', doRegister, { once: true });
         }
     }
     return null;

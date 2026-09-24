@@ -1,10 +1,9 @@
-import { EventAPI, GalleryAPI } from './api-client.js';
-
 export async function loadPublicEvents() {
     const eventsContainer = document.getElementById('public-events-container');
     if (!eventsContainer) return;
 
     try {
+        const { EventAPI } = await import('./api-client.js');
         const data = await EventAPI.getEvents();
         const rawEvents = (data.events || []).filter(e => e.visibility !== 'internal');
         eventsContainer.innerHTML = '';
@@ -89,6 +88,7 @@ export async function loadHomepageGalleryTeaser() {
     if (!teaserContainer) return;
 
     try {
+        const { GalleryAPI } = await import('./api-client.js');
         const data = await GalleryAPI.getGallery('public');
         const items = data.gallery || [];
         teaserContainer.innerHTML = '';

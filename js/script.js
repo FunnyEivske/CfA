@@ -32,17 +32,37 @@ export async function initApp() {
 
 function deferAuthUI() {
     const isLoginPage = window.location.pathname.includes('login') || window.location.pathname.endsWith('/login.html') || window.location.pathname.endsWith('/login');
-    if (isLoginPage) {
+    const isMemberPage = window.location.pathname.includes('medlem') || window.location.pathname.includes('profil') || window.location.pathname.includes('app');
+    
+    if (isLoginPage || isMemberPage) {
         setupAuthUI();
         return;
     }
-    // Only query backend auth state after the page has completely finished loading
+
+    // For public visitors: do not make a blocking network request if no session exists
+    let hasSession = false;
+    try {
+        hasSession = localStorage.getItem('cfa_has_session') === '1';
+    } catch (e) {}
+
+    if (!hasSession) {
+        updateHeaderUI(null);
+        return;
+    }
+
+    // For logged-in users returning to the site: check session when browser is idle
+    const runCheck = () => {
+        if ('requestIdleCallback' in window) {
+            window.requestIdleCallback(() => setupAuthUI(), { timeout: 4000 });
+        } else {
+            setTimeout(setupAuthUI, 3000);
+        }
+    };
+
     if (document.readyState === 'complete') {
-        setTimeout(setupAuthUI, 2000);
+        runCheck();
     } else {
-        window.addEventListener('load', () => {
-            setTimeout(setupAuthUI, 2000);
-        }, { once: true });
+        window.addEventListener('load', runCheck, { once: true });
     }
 }
 

@@ -3,23 +3,6 @@
 require_once 'config.php';
 require_once 'webpush.php';
 
-// Sikre at tabell for Web Push-abonnementer eksisterer
-try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        user_id VARCHAR(128) NOT NULL,
-        endpoint TEXT NOT NULL,
-        p256dh VARCHAR(255) NOT NULL,
-        auth VARCHAR(255) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-        INDEX idx_user (user_id),
-        UNIQUE KEY uniq_endpoint (endpoint(191))
-    )");
-} catch (Exception $e) {
-    // Ignorer hvis tabellen allerede eksisterer
-}
-
 header("Access-Control-Allow-Origin: *");
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
@@ -1061,6 +1044,17 @@ switch ($action) {
 
         try {
             $userId = $_SESSION['user_id'];
+            $pdo->exec("CREATE TABLE IF NOT EXISTS push_subscriptions (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                user_id VARCHAR(128) NOT NULL,
+                endpoint TEXT NOT NULL,
+                p256dh VARCHAR(255) NOT NULL,
+                auth VARCHAR(255) NOT NULL,
+                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+                INDEX idx_user (user_id),
+                UNIQUE KEY uniq_endpoint (endpoint(191))
+            )");
             $stmt = $pdo->prepare("INSERT INTO push_subscriptions (user_id, endpoint, p256dh, auth) 
                                    VALUES (?, ?, ?, ?) 
                                    ON DUPLICATE KEY UPDATE user_id = VALUES(user_id), p256dh = VALUES(p256dh), auth = VALUES(auth), updated_at = CURRENT_TIMESTAMP");
