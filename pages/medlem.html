@@ -61,6 +61,7 @@
                 <a href="hva-skjer" class="nav-link">Hva skjer</a>
                 <a href="galleri" class="nav-link">Galleri</a>
                 <a href="kontakt" class="nav-link">Kontakt</a>
+                <a href="bli-medlem" class="nav-link nav-link-cta" data-i18n="nav_member">Bli medlem</a>
                 <a href="medlem" class="nav-link active">Min side</a>
                 
                 <!-- Desktop Notifications moved to sidebar -->
@@ -83,6 +84,7 @@
             <a href="hva-skjer" class="nav-link">Conventions</a>
             <a href="galleri" class="nav-link">Galleri</a>
             <a href="kontakt" class="nav-link">Kontakt</a>
+            <a href="bli-medlem" class="button button-primary mobile-cta-join" data-i18n="nav_member">Bli medlem</a>
             <a href="medlem" class="nav-link-active" style="color: var(--color-primary); font-weight: bold;">Min side</a>
             <button id="mobile-logout-button" class="button button-secondary" style="width: 100%; margin-top: 1rem;">Logg ut</button>
         </div>
@@ -592,7 +594,7 @@
                             
                             <!-- Profile Image Live Preview -->
                             <div id="profile-preview-container" class="hidden" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border);">
-                                <img id="profile-image-preview" src="" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
+                                <img id="profile-image-preview" src="" alt="Forhåndsvisning av profilbilde" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
                                 <div style="flex: 1;">
                                     <p id="profile-image-name" class="text-xs font-medium" style="margin: 0; color: var(--color-text-main);"></p>
                                     <button type="button" id="remove-profile-image-btn" class="btn btn-ghost btn-xs text-error" style="padding: 0; font-size: 0.75rem;">Fjern valgt bilde</button>
@@ -801,7 +803,7 @@
                             <input type="file" id="post-image-input" name="image" accept="image/png, image/jpeg, image/webp" style="display: none;">
                         </div>
                         <div id="post-image-preview-container" class="hidden" style="margin-top: 0.75rem; position: relative;">
-                            <img id="post-image-preview" src="" style="max-height: 220px; width: 100%; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--color-border);">
+                            <img id="post-image-preview" src="" alt="Forhåndsvisning av innleggsbilde" style="max-height: 220px; width: 100%; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--color-border);">
                             <button type="button" id="remove-post-image" style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;">&times;</button>
                         </div>
                     </div>
@@ -953,7 +955,7 @@
 
                         <!-- Live Preview (No Cropping!) -->
                         <div id="event-image-preview-wrapper" class="hidden" style="position: relative; margin-top: 1rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-bg-surface);">
-                            <img id="event-image-preview" src="" style="width: 100%; max-height: 280px; object-fit: cover; display: block;">
+                            <img id="event-image-preview" src="" alt="Forhåndsvisning av arrangementsbilde" style="width: 100%; max-height: 280px; object-fit: cover; display: block;">
                             <button type="button" id="remove-event-image"
                                 style="position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; box-shadow: var(--shadow-md);" title="Fjern bilde">&times;</button>
                         </div>
@@ -1374,7 +1376,7 @@
 
                 <div id="modal-crop-preview-wrapper" class="crop-preview-wrapper">
             <div class="crop-area">
-                <img id="modal-crop-image" src="" class="crop-image">
+                <img id="modal-crop-image" src="" alt="Bilde som skal beskjæres" class="crop-image">
                 <div class="crop-overlay"></div>
                 <div id="modal-crop-viewport" class="crop-viewport">
                     <div class="crop-grid">

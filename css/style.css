@@ -665,6 +665,33 @@ p {
   text-align: center;
 }
 
+.mobile-cta-join {
+  background-color: var(--color-primary);
+  color: #FFFFFF !important;
+  box-shadow: 0 4px 14px rgba(126, 28, 56, 0.35);
+  font-weight: 700;
+  letter-spacing: 0.02em;
+}
+
+.mobile-cta-join:hover {
+  background-color: var(--color-primary-hover);
+  color: #5C1429 !important;
+  transform: scale(1.05);
+}
+
+.nav-link-cta {
+  font-weight: 600;
+  color: var(--color-primary);
+}
+
+.nav-link-cta:hover {
+  color: var(--color-primary-hover);
+}
+
+[data-theme="dark"] .nav-link-cta {
+  color: var(--palette-pastel-pink);
+}
+
 /*
 ==========================================
   Footer
@@ -701,6 +728,13 @@ p {
 .footer-address {
   margin-bottom: 1rem;
   color: var(--palette-white);
+  line-height: 1.6;
+  font-size: 0.95rem;
+  word-break: break-word;
+  max-width: 780px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 0 1rem;
 }
 
 .social-links {
