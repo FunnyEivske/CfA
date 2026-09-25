@@ -25,6 +25,7 @@
 
   --color-bg-page: var(--palette-cream-ivory);
   --color-bg-card: var(--palette-pure-white);
+  --color-bg-surface: var(--palette-pure-white);
   --color-bg-section: #FFF9F2;
   /* Light ivory */
   --color-bg-white: var(--palette-pure-white);
@@ -62,6 +63,7 @@
 
   --color-bg-page: var(--palette-charcoal-grey);
   --color-bg-card: #2B2B2E; /* Darker charcoal for cards */
+  --color-bg-surface: #2B2B2E;
   --color-bg-section: #323236; /* Medium charcoal */
   --color-bg-header: #18181B;
 
@@ -1333,7 +1335,8 @@ body.pwa-standalone .theme-toggle {
   right: 1rem;
   max-width: 440px;
   margin: 0 auto;
-  background: var(--color-bg-surface);
+  background-color: var(--color-bg-card, #FFFFFF);
+  background: var(--color-bg-card, #FFFFFF);
   border: 1.5px solid var(--color-primary);
   border-radius: 16px;
   padding: 1rem 1.25rem;
@@ -1405,13 +1408,19 @@ body.pwa-standalone .theme-toggle {
 }
 
 .pwa-banner-btn-close {
-  background: transparent;
-  color: var(--color-text-muted);
+  background: var(--color-bg-section, #FFF9F2);
+  color: var(--color-text-main, #3C3C40);
   font-size: 0.85rem;
-  padding: 0.5rem 0.75rem;
+  font-weight: 500;
+  padding: 0.5rem 0.85rem;
   border-radius: 9999px;
-  border: 1px solid var(--color-border);
+  border: 1px solid var(--color-border, #E8D9CC);
   cursor: pointer;
+  transition: all 0.15s ease;
+}
+
+.pwa-banner-btn-close:hover {
+  background: var(--color-border, #E8D9CC);
 }
 
 /* iOS PWA Guide Modal */
@@ -1436,13 +1445,32 @@ body.pwa-standalone .theme-toggle {
 .pwa-ios-card {
   width: 100%;
   max-width: 400px;
-  background: var(--color-bg-surface);
+  background-color: var(--color-bg-card, #FFFFFF);
+  background: var(--color-bg-card, #FFFFFF);
   border: 1px solid var(--color-border);
   border-radius: 20px;
   padding: 1.5rem;
   box-shadow: var(--shadow-xl);
   text-align: left;
   margin-bottom: env(safe-area-inset-bottom, 1rem);
+}
+
+/* Mørk modus tilpasninger for PWA-bannere */
+[data-theme="dark"] .pwa-install-banner,
+[data-theme="dark"] .pwa-ios-card {
+  background-color: #242428 !important;
+  background: #242428 !important;
+  border-color: rgba(255, 255, 255, 0.16) !important;
+}
+
+[data-theme="dark"] .pwa-banner-btn-close {
+  background: #323236;
+  color: var(--color-text-main);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+[data-theme="dark"] .pwa-banner-btn-close:hover {
+  background: #3f3f45;
 }
 
 /* Like-knapp for innlegg */
