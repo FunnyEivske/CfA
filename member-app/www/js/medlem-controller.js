@@ -503,7 +503,7 @@ window.openMemberDetailModal = openMemberDetailModal;
 
 let cachedMembersList = [];
 
-// Sidepanel: Høyre medlemsliste (Viser styret & ledelsen primært)
+// Sidepanel: Høyre medlemsliste (Viser alle medlemmer med styret øverst)
 async function loadSidebarMembers() {
     const listContainer = document.getElementById('sidebar-members-list');
     const countEl = document.getElementById('board-members-count');
@@ -512,25 +512,27 @@ async function loadSidebarMembers() {
     try {
         const res = await MemberAPI.getMembers();
         cachedMembersList = res.members || [];
-        const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
 
-        if (countEl) countEl.textContent = boardMembers.length;
-        const totalCountEl = document.getElementById('sidebar-total-members-count');
-        if (totalCountEl) totalCountEl.textContent = cachedMembersList.length;
+        // Sorter: Styret / ledelsen først, deretter vanlige medlemmer
+        const sortedMembers = [...cachedMembersList].sort((a, b) => {
+            const aAdmin = a.role === 'admin' ? 1 : 0;
+            const bAdmin = b.role === 'admin' ? 1 : 0;
+            if (bAdmin !== aAdmin) return bAdmin - aAdmin;
+            return (a.display_name || '').localeCompare(b.display_name || '', 'nb');
+        });
 
-        const pwaBoardEl = document.getElementById('pwa-board-count');
-        if (pwaBoardEl) pwaBoardEl.textContent = boardMembers.length;
-        const pwaTotalEl = document.getElementById('pwa-total-count');
-        if (pwaTotalEl) pwaTotalEl.textContent = cachedMembersList.length;
+        if (countEl) countEl.textContent = sortedMembers.length;
+        const pwaCountEl = document.getElementById('pwa-member-count');
+        if (pwaCountEl) pwaCountEl.textContent = sortedMembers.length;
 
         listContainer.innerHTML = '';
 
-        if (boardMembers.length === 0) {
-            listContainer.innerHTML = '<p class="text-muted text-sm py-2">Ingen i styret/ledelsen registrert ennå.</p>';
+        if (sortedMembers.length === 0) {
+            listContainer.innerHTML = '<p class="text-muted text-sm py-2">Ingen medlemmer funnet.</p>';
             return;
         }
 
-        boardMembers.forEach(m => {
+        sortedMembers.forEach(m => {
             const row = document.createElement('div');
             row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
             row.setAttribute('role', 'button');
@@ -540,14 +542,19 @@ async function loadSidebarMembers() {
             row.onmouseleave = () => row.style.background = 'transparent';
 
             const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
-            const roleText = 'Styre / Ledelsen';
+            const isAdmin = m.role === 'admin';
+            const roleBadge = isAdmin
+                ? '<span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 700; background: rgba(139, 29, 59, 0.1); padding: 1px 6px; border-radius: 4px;">Styre / Leder</span>'
+                : '<span style="font-size: 0.72rem; color: var(--color-text-muted);">Medlem</span>';
 
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.75rem; pointer-events: none; min-width: 0;">
-                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
+                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid ${isAdmin ? 'var(--color-primary)' : 'var(--color-border)'}; flex-shrink: 0;">
                     <div style="min-width: 0;">
                         <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
-                        <span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 600;">${roleText}</span>
+                        <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 1px;">
+                            ${roleBadge}
+                        </div>
                     </div>
                 </div>
                 <span style="color: var(--color-text-muted); font-size: 0.9rem; pointer-events: none;">›</span>
@@ -564,7 +571,7 @@ async function loadSidebarMembers() {
             listContainer.appendChild(row);
         });
     } catch (e) {
-        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste styremedlemmer.</p>';
+        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste medlemmer.</p>';
     }
 }
 
@@ -1657,66 +1664,86 @@ async function setupPushNotificationUI() {
     const pwaPushDesc = document.getElementById('pwa-settings-push-desc');
     const pwaOnboardingBanner = document.getElementById('pwa-push-onboarding');
 
-    function syncPushUI(isSubscribed) {
+    function syncPushUI(isSubscribed, isBlocked = false) {
+        if (isBlocked) {
+            if (toggleBtn) {
+                toggleBtn.disabled = true;
+                toggleBtn.textContent = 'Blokkert';
+            }
+            if (statusText) statusText.textContent = 'Varsler er blokkert i nettleseren';
+            if (pwaPushToggle) {
+                pwaPushToggle.checked = false;
+                pwaPushToggle.disabled = true;
+            }
+            if (pwaPushDesc) pwaPushDesc.textContent = 'Blokkert i telefonens innstillinger';
+            if (pwaOnboardingBanner) {
+                pwaOnboardingBanner.classList.add('hidden');
+                pwaOnboardingBanner.style.display = 'none';
+            }
+            return;
+        }
+
         if (isSubscribed) {
             localStorage.setItem('cfa_push_subscribed', 'true');
             if (toggleBtn) {
+                toggleBtn.disabled = false;
                 toggleBtn.textContent = 'Slå av';
                 toggleBtn.classList.remove('btn-primary');
                 toggleBtn.classList.add('btn-secondary');
             }
             if (statusText) statusText.textContent = 'Varsler er aktivert';
-            if (pwaPushToggle) pwaPushToggle.checked = true;
+            if (pwaPushToggle) {
+                pwaPushToggle.disabled = false;
+                pwaPushToggle.checked = true;
+            }
             if (pwaPushDesc) pwaPushDesc.textContent = 'Påslått (du mottar varsler om innlegg og conventions)';
             if (pwaOnboardingBanner) {
                 pwaOnboardingBanner.classList.add('hidden');
                 pwaOnboardingBanner.style.display = 'none';
             }
         } else {
-            localStorage.removeItem('cfa_push_subscribed');
             if (toggleBtn) {
+                toggleBtn.disabled = false;
                 toggleBtn.textContent = 'Aktiver';
                 toggleBtn.classList.remove('btn-secondary');
                 toggleBtn.classList.add('btn-primary');
             }
             if (statusText) statusText.textContent = 'Varsel ved nye innlegg';
-            if (pwaPushToggle) pwaPushToggle.checked = false;
+            if (pwaPushToggle) {
+                pwaPushToggle.disabled = false;
+                pwaPushToggle.checked = false;
+            }
             if (pwaPushDesc) pwaPushDesc.textContent = 'Avslått (trykk for å motta varsler)';
         }
     }
 
-    // Sjekk nåværende abonnement
+    // 1. Sett UI umiddelbart fra localStorage/tillatelse slik at refresh aldri hopper til "Avslått"
+    const previouslySubscribed = localStorage.getItem('cfa_push_subscribed') === 'true';
+    const isGranted = typeof Notification !== 'undefined' && Notification.permission === 'granted';
+    const isDenied = typeof Notification !== 'undefined' && Notification.permission === 'denied';
+
+    if (isDenied) {
+        syncPushUI(false, true);
+    } else if (previouslySubscribed || isGranted) {
+        syncPushUI(true);
+    } else {
+        syncPushUI(false);
+    }
+
+    // 2. Asynkron verifikasjon mot Service Worker og PushManager
     try {
         const reg = await registerServiceWorker();
-        if (reg) {
+        if (reg && reg.pushManager) {
             currentSubscription = await reg.pushManager.getSubscription();
-            if (currentSubscription || Notification.permission === 'granted' || localStorage.getItem('cfa_push_subscribed') === 'true') {
+            if (currentSubscription || isGranted || previouslySubscribed) {
                 syncPushUI(true);
-                if (pwaOnboardingBanner) {
-                    pwaOnboardingBanner.classList.add('hidden');
-                    pwaOnboardingBanner.style.display = 'none';
-                }
-            } else if (Notification.permission === 'denied') {
-                if (toggleBtn) {
-                    toggleBtn.disabled = true;
-                    toggleBtn.textContent = 'Blokkert';
-                }
-                if (statusText) statusText.textContent = 'Varsler er blokkert i nettleseren';
-                if (pwaPushToggle) pwaPushToggle.disabled = true;
-                if (pwaPushDesc) pwaPushDesc.textContent = 'Blokkert i telefonens innstillinger';
-                if (pwaOnboardingBanner) {
-                    pwaOnboardingBanner.classList.add('hidden');
-                    pwaOnboardingBanner.style.display = 'none';
-                }
+            } else if (isDenied) {
+                syncPushUI(false, true);
             } else {
                 syncPushUI(false);
-                // Vis PWA Onboarding kun hvis i standalone-modus og ikke allerede avvist eller godtatt
                 if (isStandaloneMode && pwaOnboardingBanner && sessionStorage.getItem('pwa_push_onboarding_dismissed') !== 'true' && localStorage.getItem('cfa_push_subscribed') !== 'true') {
                     pwaOnboardingBanner.classList.remove('hidden');
                     pwaOnboardingBanner.style.display = '';
-                } else if (pwaOnboardingBanner) {
-                    pwaOnboardingBanner.classList.add('hidden');
-                    pwaOnboardingBanner.style.display = 'none';
                 }
             }
         }
@@ -1776,10 +1803,13 @@ async function setupPushNotificationUI() {
             } else {
                 if (currentSubscription) {
                     try {
-                        const ep = currentSubscription.endpoint;
-                        await currentSubscription.unsubscribe();
-                        await PushAPI.unsubscribe(ep);
-                        currentSubscription = null;
+                        if (currentSubscription) {
+                            const ep = currentSubscription.endpoint;
+                            await currentSubscription.unsubscribe();
+                            await PushAPI.unsubscribe(ep);
+                            currentSubscription = null;
+                        }
+                        localStorage.removeItem('cfa_push_subscribed');
                         syncPushUI(false);
                     } catch (err) {
                         pwaPushToggle.checked = true;
@@ -1797,10 +1827,13 @@ async function setupPushNotificationUI() {
         if (currentSubscription) {
             toggleBtn.textContent = 'Slår av...';
             try {
-                const endpoint = currentSubscription.endpoint;
-                await currentSubscription.unsubscribe();
-                await PushAPI.unsubscribe(endpoint);
-                currentSubscription = null;
+                if (currentSubscription) {
+                    const endpoint = currentSubscription.endpoint;
+                    await currentSubscription.unsubscribe();
+                    await PushAPI.unsubscribe(endpoint);
+                    currentSubscription = null;
+                }
+                localStorage.removeItem('cfa_push_subscribed');
                 syncPushUI(false);
             } catch (err) {
                 console.error('Avmelding feilet:', err);
@@ -2077,34 +2110,34 @@ async function loadPwaMembers() {
     if (!container) return;
 
     if (!cachedMembersList || cachedMembersList.length === 0) {
-        container.innerHTML = '<p class="text-center text-muted py-4">Laster ledelsen...</p>';
+        container.innerHTML = '<p class="text-center text-muted py-4">Laster medlemmer...</p>';
         try {
             const res = await MemberAPI.getMembers();
             cachedMembersList = res.members || [];
         } catch (e) {
-            container.innerHTML = '<p class="text-center text-error py-4">Kunne ikke laste styret/ledelsen.</p>';
+            container.innerHTML = '<p class="text-center text-error py-4">Kunne ikke laste medlemslisten.</p>';
             return;
         }
     }
 
-    const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
+    // Sorter: Styret / ledelsen først, deretter vanlige medlemmer
+    const sortedMembers = [...cachedMembersList].sort((a, b) => {
+        const aAdmin = a.role === 'admin' ? 1 : 0;
+        const bAdmin = b.role === 'admin' ? 1 : 0;
+        if (bAdmin !== aAdmin) return bAdmin - aAdmin;
+        return (a.display_name || '').localeCompare(b.display_name || '', 'nb');
+    });
 
-    const pwaBoardEl = document.getElementById('pwa-board-count');
-    if (pwaBoardEl) pwaBoardEl.textContent = boardMembers.length;
-    const pwaTotalEl = document.getElementById('pwa-total-count');
-    if (pwaTotalEl) pwaTotalEl.textContent = cachedMembersList.length;
-
-    const sidebarBoardEl = document.getElementById('board-members-count');
-    if (sidebarBoardEl) sidebarBoardEl.textContent = boardMembers.length;
-    const sidebarTotalEl = document.getElementById('sidebar-total-members-count');
-    if (sidebarTotalEl) sidebarTotalEl.textContent = cachedMembersList.length;
+    if (countEl) countEl.textContent = sortedMembers.length;
+    const sidebarCountEl = document.getElementById('board-members-count');
+    if (sidebarCountEl) sidebarCountEl.textContent = sortedMembers.length;
 
     function renderList(list) {
         container.innerHTML = '';
-        if (countEl) countEl.textContent = boardMembers.length;
+        if (countEl) countEl.textContent = list.length;
 
         if (list.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted py-4">Ingen i ledelsen matcher søket.</p>';
+            container.innerHTML = '<p class="text-center text-muted py-4">Ingen medlemmer matcher søket.</p>';
             return;
         }
 
@@ -2116,20 +2149,23 @@ async function loadPwaMembers() {
             row.setAttribute('aria-label', `Se profilen til ${m.display_name}`);
 
             const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
-            const roleText = 'Styre / Ledelsen';
+            const isAdmin = m.role === 'admin';
+            const roleBadge = isAdmin
+                ? '<span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 700; background: rgba(139, 29, 59, 0.1); padding: 2px 7px; border-radius: 9999px;">Styre / Leder</span>'
+                : '<span style="font-size: 0.72rem; color: var(--color-text-muted);">Medlem</span>';
 
             let contactBadge = '';
             if (m.phone || m.contact_email) {
-                contactBadge = '<span style="display: inline-block; font-size: 0.7rem; background: rgba(139, 29, 59, 0.15); color: var(--color-primary); padding: 1px 6px; border-radius: 4px;">Kontaktinfo tilgjengelig</span>';
+                contactBadge = '<span style="display: inline-block; font-size: 0.7rem; background: rgba(139, 29, 59, 0.12); color: var(--color-primary); padding: 1px 6px; border-radius: 4px;">Har kontaktinfo</span>';
             }
 
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.85rem; pointer-events: none; min-width: 0;">
-                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0;">
+                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid ${isAdmin ? 'var(--color-primary)' : 'var(--color-border)'}; flex-shrink: 0;">
                     <div style="min-width: 0;">
                         <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
                         <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 2px;">
-                            <span style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">${roleText}</span>
+                            ${roleBadge}
                             ${contactBadge}
                         </div>
                     </div>
@@ -2154,13 +2190,13 @@ async function loadPwaMembers() {
         });
     }
 
-    renderList(boardMembers);
+    renderList(sortedMembers);
 
     if (searchInput && !searchInput.dataset.initialized) {
         searchInput.dataset.initialized = 'true';
         searchInput.oninput = () => {
             const q = searchInput.value.toLowerCase().trim();
-            const filtered = boardMembers.filter(m => (m.display_name && m.display_name.toLowerCase().includes(q)) || (m.email && m.email.toLowerCase().includes(q)));
+            const filtered = sortedMembers.filter(m => (m.display_name && m.display_name.toLowerCase().includes(q)) || (m.role && m.role.toLowerCase().includes(q)));
             renderList(filtered);
         };
     }

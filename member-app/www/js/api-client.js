@@ -580,19 +580,11 @@ export function urlBase64ToUint8Array(base64String) {
  */
 export async function registerServiceWorker() {
     if ('serviceWorker' in navigator) {
-        const doRegister = async () => {
-            try {
-                return await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
-            } catch (err) {
-                console.warn('Service Worker registrering feilet:', err);
-                return null;
-            }
-        };
-
-        if (document.readyState === 'complete') {
-            return doRegister();
-        } else {
-            window.addEventListener('load', doRegister, { once: true });
+        try {
+            return await navigator.serviceWorker.register('/service-worker.js', { scope: '/' });
+        } catch (err) {
+            console.warn('Service Worker registrering feilet:', err);
+            return null;
         }
     }
     return null;
