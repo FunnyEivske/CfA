@@ -4,6 +4,30 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
+    <!-- Google Consent Mode v2: Standardstatus (Må ligge øverst i head før sporingsskript) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      (function() {
+        var consent = null;
+        try { consent = JSON.parse(localStorage.getItem('cookie_consent')); } catch (e) {}
+        gtag('consent', 'default', {
+          'ad_storage': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_user_data': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_personalization': (consent && consent.marketing) ? 'granted' : 'denied',
+          'analytics_storage': (consent && consent.analytics) ? 'granted' : 'denied',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+          'wait_for_update': 500
+        });
+      })();
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18472435099"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'AW-18472435099');
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
     <title>Last ned Cosplay for alle Appen</title>
     <meta name="description" content="Last ned og installer Cosplay for alle-appen på mobilen eller datamaskinen din for rask og enkel tilgang.">
@@ -16,6 +40,7 @@
     <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.webp">
     <link rel="stylesheet" href="css/style.css">
     <script src="js/theme-switcher.js"></script>
+        <script defer src="js/cookie-consent.js"></script>
     <style>
         .app-landing-wrapper {
             min-height: 100vh;

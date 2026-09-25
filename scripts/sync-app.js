@@ -63,7 +63,8 @@ const jsFiles = [
   'profil.js',
   'i18n.js',
   'theme-switcher.js',
-  'index-events.js'
+  'index-events.js',
+  'cookie-consent.js'
 ];
 for (const file of jsFiles) {
   copyFile(path.join(rootDir, 'js', file), path.join(appWwwDir, 'js', file));
