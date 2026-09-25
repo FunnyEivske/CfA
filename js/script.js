@@ -523,11 +523,23 @@ function setupMobileMenu() {
     const btn = document.getElementById('mobile-menu-button');
     const menu = document.getElementById('mobile-menu');
     if (btn && menu) {
-        btn.onclick = (e) => {
-            e.stopPropagation();
+        const toggleMenu = (e) => {
+            if (e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
             menu.classList.toggle('show');
             document.body.classList.toggle('modal-open', menu.classList.contains('show'));
         };
+
+        btn.onclick = toggleMenu;
+
+        menu.addEventListener('click', (e) => {
+            if (e.target === menu) {
+                menu.classList.remove('show');
+                document.body.classList.remove('modal-open');
+            }
+        });
 
         menu.querySelectorAll('a, button').forEach(el => {
             el.addEventListener('click', () => {

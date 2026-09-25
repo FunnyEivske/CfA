@@ -636,9 +636,10 @@ p {
 }
 
 .nav-menu-mobile.show {
-  transform: translateY(0);
-  opacity: 1;
-  pointer-events: auto;
+  display: flex !important;
+  transform: translateY(0) !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
 }
 
 .nav-menu-mobile .nav-link,
