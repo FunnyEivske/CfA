@@ -61,7 +61,7 @@ if (fs.existsSync(path.join(rootDir, 'css/medlem.css'))) {
 }
 
 // 2. Upload JS files
-const jsFiles = ['script.js', 'api-client.js', 'index-events.js', 'i18n.js', 'theme-switcher.js', 'medlem-controller.js', 'feed.js', 'arrangement.js', 'profil.js'];
+const jsFiles = ['script.js', 'api-client.js', 'index-events.js', 'i18n.js', 'theme-switcher.js', 'medlem-controller.js', 'feed.js', 'arrangement.js', 'profil.js', 'cookie-consent.js'];
 for (const file of jsFiles) {
   uploadFile(`js/${file}`, `js/${file}`);
   uploadFile(`js/${file}`, file);
