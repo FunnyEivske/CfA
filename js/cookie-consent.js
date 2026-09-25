@@ -256,7 +256,50 @@
     showBanner();
   };
 
+  // --- Google Ads Konverteringssporing (Kun ved klikk på Kontakt eller Bli medlem) ---
+  function trackConversion() {
+    if (typeof window.gtag === 'function') {
+      window.gtag('event', 'conversion', {
+        'send_to': 'AW-18472435099/ryVtCKTB0YQdEJv7q-hE',
+        'value': 1.0,
+        'currency': 'USD'
+      });
+    }
+  }
+
+  window.trackAdsConversion = trackConversion;
+  window.gtag_report_conversion = trackConversion;
+
+  function setupConversionClickTracking() {
+    document.addEventListener('click', function (e) {
+      var target = e.target.closest('a, button');
+      if (!target) return;
+
+      var href = (target.getAttribute('href') || '').toLowerCase();
+      var id = (target.id || '').toLowerCase();
+      var text = (target.textContent || '').trim().toLowerCase();
+
+      var isBliMedlem = href.includes('bli-medlem') ||
+                        id.includes('join') ||
+                        text.includes('bli medlem');
+
+      var isKontakt = href === 'kontakt' ||
+                      href.endsWith('/kontakt') ||
+                      href.includes('kontakt.html') ||
+                      id.includes('contact') ||
+                      text === 'kontakt' ||
+                      text === 'kontakt oss' ||
+                      text.startsWith('kontakt');
+
+      if (isBliMedlem || isKontakt) {
+        trackConversion();
+      }
+    }, true);
+  }
+
   function init() {
+    setupConversionClickTracking();
+
     if (isNativeApp) {
       // Ingen behov for informasjonskapselbanner i en ren Capacitor native mobil-app
       return;
@@ -275,3 +318,4 @@
     init();
   }
 })();
+
