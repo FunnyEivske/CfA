@@ -503,7 +503,7 @@ window.openMemberDetailModal = openMemberDetailModal;
 
 let cachedMembersList = [];
 
-// Sidepanel: Høyre medlemsliste (Viser alle medlemmer med styret øverst)
+// Sidepanel på nettsiden (desktop): Viser kun styret / ledelsen, med knapp for å se alle medlemmer
 async function loadSidebarMembers() {
     const listContainer = document.getElementById('sidebar-members-list');
     const countEl = document.getElementById('board-members-count');
@@ -513,26 +513,21 @@ async function loadSidebarMembers() {
         const res = await MemberAPI.getMembers();
         cachedMembersList = res.members || [];
 
-        // Sorter: Styret / ledelsen først, deretter vanlige medlemmer
-        const sortedMembers = [...cachedMembersList].sort((a, b) => {
-            const aAdmin = a.role === 'admin' ? 1 : 0;
-            const bAdmin = b.role === 'admin' ? 1 : 0;
-            if (bAdmin !== aAdmin) return bAdmin - aAdmin;
-            return (a.display_name || '').localeCompare(b.display_name || '', 'nb');
-        });
+        // På nettsiden (ikke PWA) vises kun styret/ledelsen
+        const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
 
-        if (countEl) countEl.textContent = sortedMembers.length;
+        if (countEl) countEl.textContent = boardMembers.length;
         const pwaCountEl = document.getElementById('pwa-member-count');
-        if (pwaCountEl) pwaCountEl.textContent = sortedMembers.length;
+        if (pwaCountEl) pwaCountEl.textContent = cachedMembersList.length;
 
         listContainer.innerHTML = '';
 
-        if (sortedMembers.length === 0) {
-            listContainer.innerHTML = '<p class="text-muted text-sm py-2">Ingen medlemmer funnet.</p>';
+        if (boardMembers.length === 0) {
+            listContainer.innerHTML = '<p class="text-muted text-sm py-2">Ingen i styret registrert ennå.</p>';
             return;
         }
 
-        sortedMembers.forEach(m => {
+        boardMembers.forEach(m => {
             const row = document.createElement('div');
             row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
             row.setAttribute('role', 'button');
@@ -542,14 +537,11 @@ async function loadSidebarMembers() {
             row.onmouseleave = () => row.style.background = 'transparent';
 
             const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
-            const isAdmin = m.role === 'admin';
-            const roleBadge = isAdmin
-                ? '<span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 700; background: rgba(139, 29, 59, 0.1); padding: 1px 6px; border-radius: 4px;">Styre / Leder</span>'
-                : '<span style="font-size: 0.72rem; color: var(--color-text-muted);">Medlem</span>';
+            const roleBadge = '<span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 700; background: rgba(139, 29, 59, 0.1); padding: 1px 6px; border-radius: 4px;">Styre / Leder</span>';
 
             row.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.75rem; pointer-events: none; min-width: 0;">
-                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid ${isAdmin ? 'var(--color-primary)' : 'var(--color-border)'}; flex-shrink: 0;">
+                    <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--color-primary); flex-shrink: 0;">
                     <div style="min-width: 0;">
                         <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
                         <div style="display: flex; align-items: center; gap: 0.35rem; margin-top: 1px;">
@@ -571,7 +563,7 @@ async function loadSidebarMembers() {
             listContainer.appendChild(row);
         });
     } catch (e) {
-        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste medlemmer.</p>';
+        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste styret.</p>';
     }
 }
 
