@@ -441,7 +441,12 @@ export const AuthAPI = {
             return { authenticated: false };
         }
     },
-    updateProfile: (displayName) => request('update_profile', 'POST', { display_name: displayName }),
+    updateProfile: (displayName, phone, contactEmail) => {
+        const payload = typeof displayName === 'object' && displayName !== null
+            ? displayName
+            : { display_name: displayName, phone: phone || null, contact_email: contactEmail || null };
+        return request('update_profile', 'POST', payload);
+    },
     uploadAvatar: async (formDataOrFile) => {
         let fd = formDataOrFile;
         if (formDataOrFile instanceof File || formDataOrFile instanceof Blob) {

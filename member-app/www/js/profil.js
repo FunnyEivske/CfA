@@ -31,6 +31,8 @@ export async function initProfilePage() {
 
 function setupProfileForm(user) {
     const nameInput = document.getElementById('display-name') || document.getElementById('display-name-input');
+    const contactEmailInput = document.getElementById('contact-email');
+    const phoneInput = document.getElementById('phone');
     const profileForm = document.getElementById('profile-form');
     const avatarInput = document.getElementById('profile-image-upload') || document.getElementById('profile-image-file-input');
     const uploadBtn = document.getElementById('profile-image-upload-button');
@@ -38,6 +40,8 @@ function setupProfileForm(user) {
     const saveBtn = document.getElementById('profile-save-button');
 
     if (nameInput) nameInput.value = user.display_name || '';
+    if (contactEmailInput) contactEmailInput.value = user.contact_email || '';
+    if (phoneInput) phoneInput.value = user.phone || '';
 
     if (uploadBtn && avatarInput) {
         uploadBtn.onclick = (e) => {
@@ -58,6 +62,8 @@ function setupProfileForm(user) {
         profileForm.onsubmit = async (e) => {
             e.preventDefault();
             const newName = nameInput ? nameInput.value.trim() : '';
+            const newContactEmail = contactEmailInput ? contactEmailInput.value.trim() : '';
+            const newPhone = phoneInput ? phoneInput.value.trim() : '';
 
             if (saveBtn) {
                 saveBtn.disabled = true;
@@ -66,7 +72,7 @@ function setupProfileForm(user) {
 
             try {
                 if (newName) {
-                    await AuthAPI.updateProfile(newName);
+                    await AuthAPI.updateProfile(newName, newPhone, newContactEmail);
                 }
 
                 if (avatarInput && avatarInput.files && avatarInput.files[0]) {

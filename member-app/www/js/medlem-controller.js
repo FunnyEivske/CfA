@@ -123,6 +123,12 @@ function setupModals() {
             const nameInput = document.getElementById('display-name-input');
             if (nameInput) nameInput.value = currentUser.display_name || '';
 
+            const contactEmailInput = document.getElementById('profile-contact-email-input');
+            if (contactEmailInput) contactEmailInput.value = currentUser.contact_email || '';
+
+            const phoneInput = document.getElementById('profile-phone-input');
+            if (phoneInput) phoneInput.value = currentUser.phone || '';
+
             const modalAvatar = document.getElementById('profile-modal-avatar');
             if (modalAvatar) {
                 modalAvatar.src = currentUser.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.display_name || currentUser.email)}&background=random`;
@@ -162,6 +168,10 @@ function setupModals() {
 
     bindClick('close-member-detail-modal-x', () => closeModal('member-detail-modal'));
     bindClick('close-member-detail-modal-btn', () => closeModal('member-detail-modal'));
+    bindClick('sidebar-show-all-members-btn', openAllMembersModal);
+    bindClick('pwa-show-all-members-btn', openAllMembersModal);
+    bindClick('close-all-members-modal-x', () => closeModal('all-members-modal'));
+    bindClick('close-all-members-modal-btn', () => closeModal('all-members-modal'));
 
     // 6. Innlegg & Convention knapper
     bindClick('new-post-btn', () => openModal('post-modal'));
@@ -255,14 +265,23 @@ function setupProfileForm() {
                 return;
             }
 
+            const contactEmailInput = document.getElementById('profile-contact-email-input');
+            const phoneInput = document.getElementById('profile-phone-input');
+            const newContactEmail = contactEmailInput ? contactEmailInput.value.trim() : '';
+            const newPhone = phoneInput ? phoneInput.value.trim() : '';
+
             if (submitBtn) {
                 submitBtn.disabled = true;
                 submitBtn.textContent = 'Lagrer...';
             }
 
             try {
-                await AuthAPI.updateProfile(newName);
-                if (currentUser) currentUser.display_name = newName;
+                await AuthAPI.updateProfile(newName, newPhone, newContactEmail);
+                if (currentUser) {
+                    currentUser.display_name = newName;
+                    currentUser.phone = newPhone;
+                    currentUser.contact_email = newContactEmail;
+                }
 
                 const profileNameEl = document.getElementById('profile-name');
                 if (profileNameEl) profileNameEl.textContent = newName;
@@ -364,6 +383,44 @@ function openMemberDetailModal(m) {
     const nameEl = document.getElementById('detail-member-name');
     if (nameEl) nameEl.textContent = m.display_name || 'Ukjent medlem';
 
+    // Kontaktinfo (E-post & Telefon) hvis oppgitt
+    const contactSection = document.getElementById('detail-member-contact-section');
+    const emailLink = document.getElementById('detail-member-contact-email-link');
+    const emailVal = document.getElementById('detail-member-contact-email-val');
+    const phoneLink = document.getElementById('detail-member-contact-phone-link');
+    const phoneVal = document.getElementById('detail-member-contact-phone-val');
+
+    let hasContact = false;
+    if (emailLink && emailVal) {
+        if (m.contact_email && m.contact_email.trim()) {
+            const cleanEmail = m.contact_email.trim();
+            emailLink.href = 'mailto:' + encodeURIComponent(cleanEmail);
+            emailVal.textContent = cleanEmail;
+            emailLink.classList.remove('hidden');
+            hasContact = true;
+        } else {
+            emailLink.classList.add('hidden');
+        }
+    }
+    if (phoneLink && phoneVal) {
+        if (m.phone && m.phone.trim()) {
+            const cleanPhone = m.phone.trim();
+            phoneLink.href = 'tel:' + cleanPhone.replace(/\s+/g, '');
+            phoneVal.textContent = cleanPhone;
+            phoneLink.classList.remove('hidden');
+            hasContact = true;
+        } else {
+            phoneLink.classList.add('hidden');
+        }
+    }
+    if (contactSection) {
+        if (hasContact) {
+            contactSection.classList.remove('hidden');
+        } else {
+            contactSection.classList.add('hidden');
+        }
+    }
+
     const emailEl = document.getElementById('detail-member-email');
     if (emailEl) {
         if (m.email) {
@@ -448,24 +505,30 @@ function openMemberDetailModal(m) {
 }
 window.openMemberDetailModal = openMemberDetailModal;
 
-// Sidepanel: Høyre medlemsliste
+let cachedMembersList = [];
+
+// Sidepanel: Høyre medlemsliste (Viser styret & ledelsen primært)
 async function loadSidebarMembers() {
     const listContainer = document.getElementById('sidebar-members-list');
+    const countEl = document.getElementById('board-members-count');
     if (!listContainer) return;
 
     try {
         const res = await MemberAPI.getMembers();
-        const members = res.members || [];
+        cachedMembersList = res.members || [];
+        const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
+
+        if (countEl) countEl.textContent = boardMembers.length;
         listContainer.innerHTML = '';
 
-        if (members.length === 0) {
-            listContainer.innerHTML = '<p class="text-muted text-sm">Ingen medlemmer funnet.</p>';
+        if (boardMembers.length === 0) {
+            listContainer.innerHTML = '<p class="text-muted text-sm py-2">Ingen i styret/ledelsen registrert ennå.</p>';
             return;
         }
 
-        members.forEach(m => {
+        boardMembers.forEach(m => {
             const row = document.createElement('div');
-            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.4rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
+            row.style.cssText = 'display: flex; align-items: center; justify-content: space-between; gap: 0.75rem; padding: 0.45rem 0.5rem; border-radius: 8px; cursor: pointer; transition: background 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
             row.setAttribute('role', 'button');
             row.setAttribute('tabindex', '0');
             row.setAttribute('title', `Trykk for å se profilen til ${m.display_name}`);
@@ -473,21 +536,20 @@ async function loadSidebarMembers() {
             row.onmouseleave = () => row.style.background = 'transparent';
 
             const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
-            const roleText = m.role === 'admin' ? 'Administrator' : 'Medlem';
+            const roleText = 'Styre / Ledelsen';
 
             row.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.75rem; pointer-events: none;">
+                <div style="display: flex; align-items: center; gap: 0.75rem; pointer-events: none; min-width: 0;">
                     <img src="${avatarUrl}" alt="${m.display_name}" style="width: 34px; height: 34px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
-                    <div>
-                        <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
+                    <div style="min-width: 0;">
+                        <strong style="font-size: 0.85rem; color: var(--color-text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
+                        <span style="font-size: 0.72rem; color: var(--color-primary); font-weight: 600;">${roleText}</span>
                     </div>
                 </div>
                 <span style="color: var(--color-text-muted); font-size: 0.9rem; pointer-events: none;">›</span>
             `;
 
             row.onclick = () => openMemberDetailModal(m);
-            row.addEventListener('click', () => openMemberDetailModal(m));
             row.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -498,7 +560,7 @@ async function loadSidebarMembers() {
             listContainer.appendChild(row);
         });
     } catch (e) {
-        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste medlemmer.</p>';
+        listContainer.innerHTML = '<p class="text-muted text-sm">Kunne ikke laste styremedlemmer.</p>';
     }
 }
 
@@ -1860,7 +1922,149 @@ function setupPwaNavigation() {
     });
 }
 
-let pwaAllMembers = [];
+let allMembersFilter = 'all';
+
+function setupAllMembersModal() {
+    const searchInput = document.getElementById('all-members-modal-search');
+    if (searchInput && !searchInput.dataset.initialized) {
+        searchInput.dataset.initialized = 'true';
+        searchInput.addEventListener('input', () => {
+            renderAllMembersModal();
+        });
+    }
+
+    const filterBtns = document.querySelectorAll('.all-members-filter-btn');
+    filterBtns.forEach(btn => {
+        btn.addEventListener('click', () => {
+            allMembersFilter = btn.dataset.filter || 'all';
+            filterBtns.forEach(b => {
+                if (b === btn) {
+                    b.style.background = 'var(--color-primary)';
+                    b.style.color = '#fff';
+                    b.style.border = '1px solid var(--color-primary)';
+                } else {
+                    b.style.background = 'var(--color-bg-surface)';
+                    b.style.color = 'var(--color-text-main)';
+                    b.style.border = '1px solid var(--color-border)';
+                }
+            });
+            renderAllMembersModal();
+        });
+    });
+}
+
+async function openAllMembersModal() {
+    openModal('all-members-modal');
+    setupAllMembersModal();
+    const searchInput = document.getElementById('all-members-modal-search');
+    if (searchInput) searchInput.value = '';
+
+    allMembersFilter = 'all';
+    document.querySelectorAll('.all-members-filter-btn').forEach(b => {
+        if (b.dataset.filter === 'all') {
+            b.style.background = 'var(--color-primary)';
+            b.style.color = '#fff';
+            b.style.border = '1px solid var(--color-primary)';
+        } else {
+            b.style.background = 'var(--color-bg-surface)';
+            b.style.color = 'var(--color-text-main)';
+            b.style.border = '1px solid var(--color-border)';
+        }
+    });
+
+    const listContainer = document.getElementById('all-members-modal-list');
+    if (!cachedMembersList || cachedMembersList.length === 0) {
+        if (listContainer) listContainer.innerHTML = '<p class="text-center text-muted py-6">Henter alle medlemmer...</p>';
+        try {
+            const res = await MemberAPI.getMembers();
+            cachedMembersList = res.members || [];
+        } catch (e) {
+            if (listContainer) listContainer.innerHTML = '<p class="text-center text-error py-6">Kunne ikke laste medlemslisten.</p>';
+            return;
+        }
+    }
+    renderAllMembersModal();
+}
+window.openAllMembersModal = openAllMembersModal;
+
+function renderAllMembersModal() {
+    const listContainer = document.getElementById('all-members-modal-list');
+    const subtitleEl = document.getElementById('all-members-modal-subtitle');
+    const searchInput = document.getElementById('all-members-modal-search');
+    if (!listContainer) return;
+
+    const query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+    let filtered = (cachedMembersList || []).filter(m => {
+        if (allMembersFilter === 'admin' && m.role !== 'admin') return false;
+        if (allMembersFilter === 'member' && m.role === 'admin') return false;
+        if (query) {
+            const matchName = m.display_name && m.display_name.toLowerCase().includes(query);
+            const matchEmail = m.email && m.email.toLowerCase().includes(query);
+            const matchContact = m.contact_email && m.contact_email.toLowerCase().includes(query);
+            const matchPhone = m.phone && m.phone.toLowerCase().includes(query);
+            return matchName || matchEmail || matchContact || matchPhone;
+        }
+        return true;
+    });
+
+    if (subtitleEl) {
+        subtitleEl.textContent = `Viser ${filtered.length} av ${cachedMembersList.length} medlemmer`;
+    }
+
+    listContainer.innerHTML = '';
+
+    if (filtered.length === 0) {
+        listContainer.innerHTML = '<p class="text-center text-muted py-8">Ingen medlemmer funnet med dette søket/filteret.</p>';
+        return;
+    }
+
+    filtered.forEach(m => {
+        const item = document.createElement('div');
+        item.style.cssText = 'display: flex; align-items: center; justify-content: space-between; padding: 0.75rem 1rem; background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: 12px; gap: 0.75rem; cursor: pointer; transition: transform 0.1s ease, border-color 0.15s ease; -webkit-tap-highlight-color: rgba(139, 29, 59, 0.2); touch-action: manipulation;';
+        item.onmouseenter = () => { item.style.borderColor = 'var(--color-primary)'; };
+        item.onmouseleave = () => { item.style.borderColor = 'var(--color-border)'; };
+
+        const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
+        const isAdmin = m.role === 'admin';
+        const roleBadge = isAdmin
+            ? '<span style="font-size: 0.7rem; background: var(--color-primary); color: #fff; padding: 2px 7px; border-radius: 9999px; font-weight: 600;">Styre / Admin</span>'
+            : '<span style="font-size: 0.7rem; background: var(--color-bg-surface); color: var(--color-text-muted); border: 1px solid var(--color-border); padding: 2px 7px; border-radius: 9999px;">Medlem</span>';
+
+        let contactBadges = '';
+        if (m.contact_email) {
+            contactBadges += `<span title="${m.contact_email}" style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.72rem; color: var(--color-primary); background: rgba(139, 29, 59, 0.08); padding: 2px 6px; border-radius: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                ${m.contact_email}
+            </span>`;
+        }
+        if (m.phone) {
+            contactBadges += `<span title="${m.phone}" style="display: inline-flex; align-items: center; gap: 3px; font-size: 0.72rem; color: var(--color-primary); background: rgba(139, 29, 59, 0.08); padding: 2px 6px; border-radius: 4px;">
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                ${m.phone}
+            </span>`;
+        }
+
+        item.innerHTML = `
+            <div style="display: flex; align-items: center; gap: 0.85rem; min-width: 0; pointer-events: none;">
+                <img src="${avatarUrl}" alt="${m.display_name}" style="width: 42px; height: 42px; border-radius: 50%; object-fit: cover; border: 1px solid var(--color-border); flex-shrink: 0;">
+                <div style="min-width: 0;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2px;">
+                        <strong style="font-size: 0.92rem; color: var(--color-text-main); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
+                        ${roleBadge}
+                    </div>
+                    ${contactBadges ? `<div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 3px;">${contactBadges}</div>` : ''}
+                </div>
+            </div>
+            <div style="display: flex; align-items: center; gap: 0.4rem; pointer-events: none; flex-shrink: 0;">
+                <span style="color: var(--color-text-muted); font-size: 1.1rem;">›</span>
+            </div>
+        `;
+
+        item.onclick = () => openMemberDetailModal(m);
+        listContainer.appendChild(item);
+    });
+}
 
 async function loadPwaMembers() {
     const container = document.getElementById('pwa-members-list-container');
@@ -1868,23 +2072,25 @@ async function loadPwaMembers() {
     const searchInput = document.getElementById('pwa-member-search');
     if (!container) return;
 
-    if (pwaAllMembers.length === 0) {
-        container.innerHTML = '<p class="text-center text-muted py-4">Laster medlemmer...</p>';
+    if (!cachedMembersList || cachedMembersList.length === 0) {
+        container.innerHTML = '<p class="text-center text-muted py-4">Laster ledelsen...</p>';
         try {
             const res = await MemberAPI.getMembers();
-            pwaAllMembers = res.members || [];
+            cachedMembersList = res.members || [];
         } catch (e) {
-            container.innerHTML = '<p class="text-center text-error py-4">Kunne ikke laste medlemmer.</p>';
+            container.innerHTML = '<p class="text-center text-error py-4">Kunne ikke laste styret/ledelsen.</p>';
             return;
         }
     }
 
+    const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
+
     function renderList(list) {
         container.innerHTML = '';
-        if (countEl) countEl.textContent = `${list.length} medlemmer`;
+        if (countEl) countEl.textContent = `${list.length} i ledelsen`;
 
         if (list.length === 0) {
-            container.innerHTML = '<p class="text-center text-muted py-4">Ingen medlemmer matcher søket.</p>';
+            container.innerHTML = '<p class="text-center text-muted py-4">Ingen i ledelsen matcher søket.</p>';
             return;
         }
 
@@ -1896,14 +2102,22 @@ async function loadPwaMembers() {
             row.setAttribute('aria-label', `Se profilen til ${m.display_name}`);
 
             const avatarUrl = m.photo_url || ('https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name) + '&background=random');
-            const roleText = m.role === 'admin' ? 'Styre / Admin' : 'Medlem';
+            const roleText = 'Styre / Ledelsen';
+
+            let contactBadge = '';
+            if (m.phone || m.contact_email) {
+                contactBadge = '<span style="display: inline-block; font-size: 0.7rem; background: rgba(139, 29, 59, 0.15); color: var(--color-primary); padding: 1px 6px; border-radius: 4px;">Kontaktinfo tilgjengelig</span>';
+            }
 
             row.innerHTML = `
-                <div style="display: flex; align-items: center; gap: 0.85rem; pointer-events: none;">
+                <div style="display: flex; align-items: center; gap: 0.85rem; pointer-events: none; min-width: 0;">
                     <img src="${avatarUrl}" alt="${m.display_name}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border); flex-shrink: 0;">
-                    <div>
-                        <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block;">${m.display_name}</strong>
-                        <span style="font-size: 0.75rem; color: var(--color-text-muted);">${roleText}</span>
+                    <div style="min-width: 0;">
+                        <strong style="font-size: 0.95rem; color: var(--color-text-main); display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${m.display_name}</strong>
+                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap; margin-top: 2px;">
+                            <span style="font-size: 0.75rem; color: var(--color-primary); font-weight: 600;">${roleText}</span>
+                            ${contactBadge}
+                        </div>
                     </div>
                 </div>
                 <div style="display: flex; align-items: center; gap: 0.5rem; pointer-events: none;">
@@ -1915,7 +2129,6 @@ async function loadPwaMembers() {
                 e.preventDefault();
                 openMemberDetailModal(m);
             };
-            row.addEventListener('click', () => openMemberDetailModal(m));
             row.addEventListener('keydown', (e) => {
                 if (e.key === 'Enter' || e.key === ' ') {
                     e.preventDefault();
@@ -1927,13 +2140,13 @@ async function loadPwaMembers() {
         });
     }
 
-    renderList(pwaAllMembers);
+    renderList(boardMembers);
 
     if (searchInput && !searchInput.dataset.initialized) {
         searchInput.dataset.initialized = 'true';
         searchInput.oninput = () => {
             const q = searchInput.value.toLowerCase().trim();
-            const filtered = pwaAllMembers.filter(m => (m.display_name && m.display_name.toLowerCase().includes(q)) || (m.email && m.email.toLowerCase().includes(q)));
+            const filtered = boardMembers.filter(m => (m.display_name && m.display_name.toLowerCase().includes(q)) || (m.email && m.email.toLowerCase().includes(q)));
             renderList(filtered);
         };
     }

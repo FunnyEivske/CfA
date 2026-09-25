@@ -192,9 +192,15 @@ switch ($action) {
         
     case 'auth_state':
         if (isset($_SESSION['user_id'])) {
-            $stmt = $pdo->prepare('SELECT id, email, display_name, photo_url, role, member_since, tos_accepted, must_change_password FROM users WHERE id = ?');
-            $stmt->execute([$_SESSION['user_id']]);
-            $user = $stmt->fetch();
+            try {
+                $stmt = $pdo->prepare('SELECT id, email, display_name, photo_url, role, member_since, tos_accepted, must_change_password, phone, contact_email FROM users WHERE id = ?');
+                $stmt->execute([$_SESSION['user_id']]);
+                $user = $stmt->fetch();
+            } catch (Exception $e) {
+                $stmt = $pdo->prepare('SELECT id, email, display_name, photo_url, role, member_since, tos_accepted, must_change_password FROM users WHERE id = ?');
+                $stmt->execute([$_SESSION['user_id']]);
+                $user = $stmt->fetch();
+            }
             if ($user) {
                 $mustChange = (int)($user['must_change_password'] ?? 0) === 1;
                 $mustAcceptTos = (int)($user['tos_accepted'] ?? 0) === 0;
@@ -219,11 +225,25 @@ switch ($action) {
         requireAuth();
         $data = json_decode(file_get_contents('php://input'), true);
         $name = trim($data['display_name'] ?? '');
+        $phone = isset($data['phone']) ? trim($data['phone']) : null;
+        $contactEmail = isset($data['contact_email']) ? trim($data['contact_email']) : null;
         
         if (!$name) jsonResponse(['error' => 'Display name cannot be empty'], 400);
+
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT NULL");
+        } catch (Exception $e) {}
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN contact_email VARCHAR(255) DEFAULT NULL");
+        } catch (Exception $e) {}
         
-        $stmt = $pdo->prepare('UPDATE users SET display_name = ? WHERE id = ?');
-        $stmt->execute([$name, $_SESSION['user_id']]);
+        try {
+            $stmt = $pdo->prepare('UPDATE users SET display_name = ?, phone = ?, contact_email = ? WHERE id = ?');
+            $stmt->execute([$name, $phone, $contactEmail, $_SESSION['user_id']]);
+        } catch (Exception $e) {
+            $stmt = $pdo->prepare('UPDATE users SET display_name = ? WHERE id = ?');
+            $stmt->execute([$name, $_SESSION['user_id']]);
+        }
         jsonResponse(['success' => true]);
         break;
 
@@ -301,8 +321,20 @@ switch ($action) {
         break;
 
     case 'get_members':
-        $stmt = $pdo->query('SELECT id, email, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted FROM users ORDER BY display_name ASC');
-        jsonResponse(['members' => $stmt->fetchAll()]);
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN phone VARCHAR(50) DEFAULT NULL");
+        } catch (Exception $e) {}
+        try {
+            $pdo->exec("ALTER TABLE users ADD COLUMN contact_email VARCHAR(255) DEFAULT NULL");
+        } catch (Exception $e) {}
+
+        try {
+            $stmt = $pdo->query('SELECT id, email, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted, phone, contact_email FROM users ORDER BY display_name ASC');
+            jsonResponse(['members' => $stmt->fetchAll()]);
+        } catch (Exception $e) {
+            $stmt = $pdo->query('SELECT id, email, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted FROM users ORDER BY display_name ASC');
+            jsonResponse(['members' => $stmt->fetchAll()]);
+        }
         break;
 
     case 'get_posts':
