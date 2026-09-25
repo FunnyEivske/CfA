@@ -328,11 +328,16 @@ switch ($action) {
             $pdo->exec("ALTER TABLE users ADD COLUMN contact_email VARCHAR(255) DEFAULT NULL");
         } catch (Exception $e) {}
 
+        // Sikkerhet: Ikke vis privat innloggings-e-post offentlig til andre medlemmer.
+        // Kun administratorer kan se innloggings-e-post ved medlemsadministrasjon.
+        $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+        $emailField = $isAdmin ? 'email' : 'NULL as email';
+
         try {
-            $stmt = $pdo->query('SELECT id, email, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted, phone, contact_email FROM users ORDER BY display_name ASC');
+            $stmt = $pdo->query("SELECT id, {$emailField}, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted, phone, contact_email FROM users ORDER BY display_name ASC");
             jsonResponse(['members' => $stmt->fetchAll()]);
         } catch (Exception $e) {
-            $stmt = $pdo->query('SELECT id, email, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted FROM users ORDER BY display_name ASC');
+            $stmt = $pdo->query("SELECT id, {$emailField}, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted FROM users ORDER BY display_name ASC");
             jsonResponse(['members' => $stmt->fetchAll()]);
         }
         break;

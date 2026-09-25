@@ -423,12 +423,8 @@ function openMemberDetailModal(m) {
 
     const emailEl = document.getElementById('detail-member-email');
     if (emailEl) {
-        if (m.email) {
-            emailEl.textContent = m.email;
-            emailEl.style.display = 'block';
-        } else {
-            emailEl.style.display = 'none';
-        }
+        emailEl.textContent = '';
+        emailEl.style.display = 'none';
     }
 
     const roleBadge = document.getElementById('detail-member-role-badge');
@@ -519,6 +515,14 @@ async function loadSidebarMembers() {
         const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
 
         if (countEl) countEl.textContent = boardMembers.length;
+        const totalCountEl = document.getElementById('sidebar-total-members-count');
+        if (totalCountEl) totalCountEl.textContent = cachedMembersList.length;
+
+        const pwaBoardEl = document.getElementById('pwa-board-count');
+        if (pwaBoardEl) pwaBoardEl.textContent = boardMembers.length;
+        const pwaTotalEl = document.getElementById('pwa-total-count');
+        if (pwaTotalEl) pwaTotalEl.textContent = cachedMembersList.length;
+
         listContainer.innerHTML = '';
 
         if (boardMembers.length === 0) {
@@ -2085,9 +2089,19 @@ async function loadPwaMembers() {
 
     const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
 
+    const pwaBoardEl = document.getElementById('pwa-board-count');
+    if (pwaBoardEl) pwaBoardEl.textContent = boardMembers.length;
+    const pwaTotalEl = document.getElementById('pwa-total-count');
+    if (pwaTotalEl) pwaTotalEl.textContent = cachedMembersList.length;
+
+    const sidebarBoardEl = document.getElementById('board-members-count');
+    if (sidebarBoardEl) sidebarBoardEl.textContent = boardMembers.length;
+    const sidebarTotalEl = document.getElementById('sidebar-total-members-count');
+    if (sidebarTotalEl) sidebarTotalEl.textContent = cachedMembersList.length;
+
     function renderList(list) {
         container.innerHTML = '';
-        if (countEl) countEl.textContent = `${list.length} i ledelsen`;
+        if (countEl) countEl.textContent = boardMembers.length;
 
         if (list.length === 0) {
             container.innerHTML = '<p class="text-center text-muted py-4">Ingen i ledelsen matcher søket.</p>';

@@ -343,9 +343,24 @@
                 <!-- PWA-Visning 2: Medlemmer -->
                 <div id="pwa-view-members" class="pwa-view">
                     <div class="card mb-4">
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3 class="text-lg" style="margin: 0;">Styret & Administratorer</h3>
-                            <span id="pwa-member-count" class="badge text-xs" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border);">0 ledere</span>
+                        <div class="card-header" style="display: flex; flex-direction: column; gap: 0.65rem; padding: 1.15rem 1.25rem 0.95rem; border-bottom: 1px solid var(--color-border);">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.5rem;">
+                                <div>
+                                    <h3 class="text-lg" style="margin: 0; font-weight: 700; color: var(--color-text-main);">Styret & Administratorer</h3>
+                                    <p class="text-xs text-muted" style="margin: 2px 0 0;">Ledelsen i Cosplay for alle</p>
+                                </div>
+                                <div class="cfa-members-pill-badge" style="display: inline-flex; align-items: center; gap: 0.38rem; padding: 0.3rem 0.75rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(139, 29, 59, 0.14), rgba(139, 29, 59, 0.05)); border: 1px solid rgba(139, 29, 59, 0.3); font-size: 0.78rem; font-weight: 700; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                                    <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--color-primary); display: inline-block; box-shadow: 0 0 6px var(--color-primary);"></span>
+                                    <span><strong id="pwa-board-count">0</strong> i styret</span>
+                                </div>
+                            </div>
+                            <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.78rem; color: var(--color-text-muted); background: var(--color-bg-subtle); padding: 0.4rem 0.85rem; border-radius: 10px; border: 1px solid var(--color-border);">
+                                <span style="display: flex; align-items: center; gap: 0.45rem;">
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary); flex-shrink: 0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Totalt registrerte medlemmer:
+                                </span>
+                                <strong id="pwa-total-count" style="color: var(--color-text-main); font-weight: 700; font-size: 0.86rem;">0</strong>
+                            </div>
                         </div>
                         <div class="card-body">
                             <p class="text-xs text-muted mb-3">Her er styret og administratorene i CfA. Trykk på en person for å se profil og kontaktinformasjon.</p>
@@ -537,9 +552,21 @@
             </div>
             <aside class="dashboard-sidebar-right">
                 <div class="card mb-6">
-                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                        <h4 class="text-lg" style="margin: 0;">Styret & Ledelsen</h4>
-                        <span id="board-members-count" class="badge text-xs" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border);">0</span>
+                    <div class="card-header" style="display: flex; flex-direction: column; gap: 0.6rem; padding: 1.1rem 1.25rem 0.9rem; border-bottom: 1px solid var(--color-border);">
+                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%; flex-wrap: wrap; gap: 0.4rem;">
+                            <h4 class="text-lg" style="margin: 0; font-weight: 700; color: var(--color-text-main);">Styret & Ledelsen</h4>
+                            <div class="cfa-members-pill-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(139, 29, 59, 0.14), rgba(139, 29, 59, 0.05)); border: 1px solid rgba(139, 29, 59, 0.3); font-size: 0.75rem; font-weight: 700; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--color-primary); display: inline-block; box-shadow: 0 0 6px var(--color-primary);"></span>
+                                <span><strong id="board-members-count">0</strong> i styret</span>
+                            </div>
+                        </div>
+                        <div style="display: flex; align-items: center; justify-content: space-between; font-size: 0.76rem; color: var(--color-text-muted); background: var(--color-bg-subtle); padding: 0.35rem 0.75rem; border-radius: 8px; border: 1px solid var(--color-border);">
+                            <span style="display: flex; align-items: center; gap: 0.4rem;">
+                                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="color: var(--color-primary); flex-shrink: 0;"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                Totalt antall medlemmer:
+                            </span>
+                            <strong id="sidebar-total-members-count" style="color: var(--color-text-main); font-weight: 700; font-size: 0.84rem;">0</strong>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="sidebar-members-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
@@ -678,8 +705,8 @@
                         <img id="detail-member-avatar" src="" alt="Profilbilde" style="width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-primary); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transition: transform 0.2s ease;">
                     </a>
                 </div>
-                <h3 id="detail-member-name" style="margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">...</h3>
-                <p id="detail-member-email" style="margin: 3px 0 0.75rem; font-size: 0.85rem; color: var(--color-text-muted);">...</p>
+                <h3 id="detail-member-name" style="margin: 0 0 0.75rem; font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">...</h3>
+                <p id="detail-member-email" class="hidden" style="display: none;"></p>
                 
                 <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
                     <span id="detail-member-role-badge" class="badge text-xs" style="background: var(--color-primary); color: white; padding: 0.35rem 0.85rem; border-radius: 999px; font-weight: 600;">Medlem</span>
