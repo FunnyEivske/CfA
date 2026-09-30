@@ -50,7 +50,8 @@ const targetPages = [
   'login.html',
   'medlem.html',
   'profil.html',
-  'app.html'
+  'app.html',
+  'app-start.html'
 ];
 
 targetPages.forEach(file => {
