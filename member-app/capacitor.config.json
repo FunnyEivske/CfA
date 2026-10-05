@@ -1,0 +1,16 @@
+{
+  "appId": "no.cosplayforalle.medlem",
+  "appName": "CfA Medlem",
+  "webDir": "www",
+  "bundledWebRuntime": false,
+  "server": {
+    "androidScheme": "https",
+    "cleartext": false
+  },
+  "plugins": {
+    "SplashScreen": {
+      "launchShowDuration": 1500,
+      "backgroundColor": "#7E1C38"
+    }
+  }
+}

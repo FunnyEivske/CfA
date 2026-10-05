@@ -6,6 +6,8 @@ CREATE TABLE IF NOT EXISTS users (
     password_hash VARCHAR(255) NOT NULL,
     display_name VARCHAR(100) NOT NULL,
     photo_url VARCHAR(255) DEFAULT NULL,
+    phone VARCHAR(50) DEFAULT NULL,
+    contact_email VARCHAR(255) DEFAULT NULL,
     role VARCHAR(50) DEFAULT 'medlem', -- 'admin', 'medlem'
     member_since DATE DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP

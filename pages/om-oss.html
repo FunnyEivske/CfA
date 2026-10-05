@@ -4,8 +4,34 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
+
+    <!-- Google Consent Mode v2: Standardstatus (Må ligge øverst i head før sporingsskript) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      (function() {
+        var consent = null;
+        try { consent = JSON.parse(localStorage.getItem('cookie_consent')); } catch (e) {}
+        gtag('consent', 'default', {
+          'ad_storage': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_user_data': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_personalization': (consent && consent.marketing) ? 'granted' : 'denied',
+          'analytics_storage': (consent && consent.analytics) ? 'granted' : 'denied',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+          'wait_for_update': 500
+        });
+      })();
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18472435099"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'AW-18472435099');
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Om oss - Cosplay for alle</title>
+    <meta name="description" content="Om Cosplay for alle (CfA) – vår visjon for et inkluderende cosplay-fellesskap i Norge, vårt styre og våre verdier for skaperglede.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -54,8 +80,8 @@
                 <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
                 <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
                 <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
-                <a id="member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min
-                    side</a>
+                <a id="join-link" href="bli-medlem" class="nav-link nav-link-cta" data-i18n="nav_member">Bli medlem</a>
+                <a id="member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
                 <a id="login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg
                     ut</button>
@@ -76,8 +102,8 @@
                 <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
                 <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
                 <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
-                <a id="mobile-member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min
-                    side</a>
+                <a id="mobile-join-link" href="bli-medlem" class="button button-primary mobile-cta-join" data-i18n="nav_member">Bli medlem</a>
+                <a id="mobile-member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
                 <a id="mobile-login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
                 <button id="mobile-logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg
                     ut</button>
@@ -96,23 +122,17 @@
                 </div>
                 <div class="grid-container">
                     <div class="grid-text">
-                        <h2 data-i18n="vision_title">Vår Visjon</h2>
+                        <h2 data-i18n="vision_title">Vår visjon</h2>
                         <div class="text-lg">
-                            <p data-i18n="vision_p1"> I Cosplay for Alle ønker vi å hjelpe med og gjøre drømmecosplay
-                                til en realitet. vi har en visjon om og gjøre cosplay mulig for den som ønsker til tross
-                                for funksjon erfaring og kunskaps nivå.
-                                vi deler kunskap, verktøy og bygger fantastiske kreasjoner samt og hjelpe værandre med
-                                prosjekter.
-                                med fokus på håndtverk, cosplay og samhold ønsker vi og gjøre cosplay gøy for deg.</p>
-                            <p data-i18n="vision_p2">Vi arrangerer treff, workshops og fellesturer til conventions over
-                                hele landet!
-                                BLI MED DA VELL!!!</p>
+                            <p data-i18n="vision_p1">Cosplay for Alle (CfA) er en registrert frivillig organisasjon (non-profit) som arbeider for å gjøre cosplay og skaperglede tilgjengelig for alle, uavhengig av forkunnskaper, funksjonsevne eller erfaringsnivå. Vi deler kunnskap, verktøy og utstyr, og støtter hverandre gjennom hele den kreative prosessen fra idé til ferdig kreasjon.</p>
+                            <p data-i18n="vision_p2">Vårt mål er å fremme håndverk, fellesskap og et trygt, inkluderende miljø for kreative sjeler. Vi arrangerer faste treff, workshops og fellesturer til conventions over hele landet.</p>
                         </div>
                     </div>
                     <picture>
-                    <source srcset="Media/Bilder/cosplay-gruppe.webp" type="image/webp">
-                    <img src="Media/Bilder/cosplay-gruppe.jpg" alt="Cosplayere sammen" class="grid-image" width="1024" height="576" loading="lazy" decoding="async">
-                </picture>
+                        <source media="(max-width: 640px)" srcset="Media/Bilder/cosplay-gruppe-mobile.webp" type="image/webp" width="364" height="205">
+                        <source srcset="Media/Bilder/cosplay-gruppe.webp" type="image/webp" width="1024" height="576">
+                        <img src="Media/Bilder/cosplay-gruppe.webp" alt="Cosplayere i fellesskap på samling" class="grid-image" width="1024" height="576" loading="lazy" decoding="async">
+                    </picture>
                 </div>
             </div>
         </section>
@@ -195,8 +215,7 @@
         <div class="container">
             <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" class="footer-logo" width="48" height="48">
             <p class="footer-title">Cosplay for alle (CfA)</p>
-            <p class="footer-address" data-i18n="footer_address">Norge • Org.nr: 938 323 143 • kontakt@cosplayforalle.no
-            </p>
+            <p class="footer-address" data-i18n="footer_address">Kirkegaten 2B, 4836 Arendal, Norge • Org.nr: 938 323 143 • kontakt@cosplayforalle.no</p>
             <div class="social-links">
                 <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link">
                     <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
@@ -215,7 +234,10 @@
                     </svg>
                 </a>
             </div>
-            <p class="footer-copyright">&copy; 2026 Cosplay for alle (CfA). Alle rettigheter reservert.</p>
+            <p class="footer-copyright" data-i18n="footer_copyright">&copy; 2026 Cosplay for alle (CfA). Alle rettigheter reservert.</p>
+            <p style="margin-top: 0.5rem;">
+                <button type="button" onclick="window.openCookieConsent()" class="cookie-manage-link" data-i18n="cookie_manage">Administrer informasjonskapsler</button>
+            </p>
         </div>
     </footer>
 
@@ -233,6 +255,7 @@
     </button>
 
     <script defer src="js/theme-switcher.js"></script>
+    <script defer src="js/cookie-consent.js"></script>
     <script type="module" src="js/i18n.js"></script>
     <script type="module" src="js/script.js"></script>
 </body>

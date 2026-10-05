@@ -48,5 +48,13 @@ cfa_webhuset_klar_til_opplasting*
 deploy.ps1
 *.zip
 scratch/
+
+# Mobile & Capacitor build artifacts
+member-app/android/.gradle/
+member-app/android/build/
+member-app/android/app/build/
+member-app/ios/DerivedData/
+member-app/ios/Pods/
+member-app/ios/App/Pods/
 backend/vapid_keys.php
 

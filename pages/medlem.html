@@ -4,8 +4,42 @@
 <head>
     <base href="/">
     <meta charset="UTF-8">
+    <!-- Google Consent Mode v2: Standardstatus (Må ligge øverst i head før sporingsskript) -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      (function() {
+        var consent = null;
+        try { consent = JSON.parse(localStorage.getItem('cookie_consent')); } catch (e) {}
+        gtag('consent', 'default', {
+          'ad_storage': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_user_data': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_personalization': (consent && consent.marketing) ? 'granted' : 'denied',
+          'analytics_storage': (consent && consent.analytics) ? 'granted' : 'denied',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+          'wait_for_update': 500
+        });
+      })();
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18472435099"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'AW-18472435099');
+    </script>
+
+    <!-- Event snippet for Sidevisning conversion page -->
+    <script>
+      gtag('event', 'conversion', {
+          'send_to': 'AW-18472435099/ryVtCKTB0YQdEJv7q-hE',
+          'value': 1.0,
+          'currency': 'USD'
+      });
+    </script>
+
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Min side - Cosplay for alle</title>
+    <meta name="description" content="Min side for medlemmer i Cosplay for alle (CfA). Se medlemsaktiviteter, arrangementer og oppdateringer.">
 
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -318,14 +352,23 @@
                 <!-- PWA-Visning 2: Medlemmer -->
                 <div id="pwa-view-members" class="pwa-view">
                     <div class="card mb-4">
-                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center;">
-                            <h3 class="text-lg" style="margin: 0;">Medlemmer</h3>
-                            <span id="pwa-member-count" class="badge text-xs" style="background: var(--color-bg-subtle); border: 1px solid var(--color-border);">0 medlemmer</span>
+                        <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--color-border);">
+                            <h3 class="text-lg" style="margin: 0; font-weight: 700; color: var(--color-text-main);">Medlemmer</h3>
+                            <div class="cfa-members-pill-badge" style="display: inline-flex; align-items: center; gap: 0.4rem; padding: 0.3rem 0.75rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(139, 29, 59, 0.14), rgba(139, 29, 59, 0.05)); border: 1px solid rgba(139, 29, 59, 0.3); font-size: 0.8rem; font-weight: 700; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                                <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--color-primary); display: inline-block; box-shadow: 0 0 6px var(--color-primary);"></span>
+                                <span><strong id="pwa-member-count">0</strong> medlemmer</span>
+                            </div>
                         </div>
                         <div class="card-body">
-                            <input type="text" id="pwa-member-search" class="form-input mb-4" placeholder="Søk etter medlem..." style="width: 100%; font-size: 0.9rem;">
+                            <p class="text-xs text-muted mb-3">Her er styret og administratorene i CfA. Trykk på en person for å se profil og kontaktinformasjon.</p>
                             <div id="pwa-members-list-container" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                                <p class="text-center text-muted py-4">Laster medlemmer...</p>
+                                <p class="text-center text-muted py-4">Laster ledelsen...</p>
+                            </div>
+                            <div style="margin-top: 1.25rem; padding-top: 1rem; border-top: 1px solid var(--color-border);">
+                                <button type="button" id="pwa-show-all-members-btn" class="btn btn-primary btn-full" style="font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem; padding: 0.75rem;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                                    Vis alle medlemmer
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -506,13 +549,21 @@
             </div>
             <aside class="dashboard-sidebar-right">
                 <div class="card mb-6">
-                    <div class="card-header">
-                        <h4 class="text-lg">Medlemmer</h4>
+                    <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.1rem 1.25rem; border-bottom: 1px solid var(--color-border);">
+                        <h4 class="text-lg" style="margin: 0; font-weight: 700; color: var(--color-text-main);">Styret & Ledelsen</h4>
+                        <div class="cfa-members-pill-badge" style="display: inline-flex; align-items: center; gap: 0.35rem; padding: 0.28rem 0.65rem; border-radius: 9999px; background: linear-gradient(135deg, rgba(139, 29, 59, 0.14), rgba(139, 29, 59, 0.05)); border: 1px solid rgba(139, 29, 59, 0.3); font-size: 0.76rem; font-weight: 700; color: var(--color-primary); box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);">
+                            <span style="width: 7px; height: 7px; border-radius: 50%; background: var(--color-primary); display: inline-block; box-shadow: 0 0 6px var(--color-primary);"></span>
+                            <span><strong id="board-members-count">0</strong> i styret</span>
+                        </div>
                     </div>
                     <div class="card-body">
                         <div id="sidebar-members-list" style="display: flex; flex-direction: column; gap: 0.75rem;">
-                            <p class="text-muted text-sm">Laster medlemmer...</p>
+                            <p class="text-muted text-sm">Laster styret...</p>
                         </div>
+                        <button type="button" id="sidebar-show-all-members-btn" class="btn btn-secondary btn-full text-sm" style="margin-top: 1rem; font-weight: 600; display: flex; align-items: center; justify-content: center; gap: 0.5rem;">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+                            Vis alle medlemmer
+                        </button>
                     </div>
                 </div>
 
@@ -573,6 +624,18 @@
                     </div>
 
                     <div class="form-group mb-4">
+                        <label for="profile-contact-email-input" class="form-label text-sm font-semibold">Offentlig kontakt-e-post (valgfritt)</label>
+                        <input type="email" id="profile-contact-email-input" class="form-input" placeholder="f.eks. fornavn@eksempel.no" style="font-size: 0.95rem;">
+                        <span class="text-xs text-muted" style="display: block; margin-top: 4px;">Vises for andre medlemmer på profilen din hvis du fyller det ut.</span>
+                    </div>
+
+                    <div class="form-group mb-4">
+                        <label for="profile-phone-input" class="form-label text-sm font-semibold">Telefonnummer (valgfritt)</label>
+                        <input type="tel" id="profile-phone-input" class="form-input" placeholder="f.eks. +47 987 65 432" style="font-size: 0.95rem;">
+                        <span class="text-xs text-muted" style="display: block; margin-top: 4px;">Vises for andre medlemmer på profilen din hvis du fyller det ut.</span>
+                    </div>
+
+                    <div class="form-group mb-4">
                         <label class="form-label text-sm font-semibold">Endre profilbilde</label>
                         <div style="display: flex; flex-direction: column; gap: 0.75rem;">
                             <!-- Drop Zone for Profile -->
@@ -592,7 +655,7 @@
                             
                             <!-- Profile Image Live Preview -->
                             <div id="profile-preview-container" class="hidden" style="display: flex; align-items: center; gap: 1rem; padding: 0.75rem; background: var(--color-bg-subtle); border-radius: 12px; border: 1px solid var(--color-border);">
-                                <img id="profile-image-preview" src="" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
+                                <img id="profile-image-preview" src="" alt="Forhåndsvisning av profilbilde" style="width: 48px; height: 48px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-primary);">
                                 <div style="flex: 1;">
                                     <p id="profile-image-name" class="text-xs font-medium" style="margin: 0; color: var(--color-text-main);"></p>
                                     <button type="button" id="remove-profile-image-btn" class="btn btn-ghost btn-xs text-error" style="padding: 0; font-size: 0.75rem;">Fjern valgt bilde</button>
@@ -630,8 +693,8 @@
                         <img id="detail-member-avatar" src="" alt="Profilbilde" style="width: 104px; height: 104px; border-radius: 50%; object-fit: cover; border: 3px solid var(--color-primary); box-shadow: 0 6px 18px rgba(0, 0, 0, 0.15); transition: transform 0.2s ease;">
                     </a>
                 </div>
-                <h3 id="detail-member-name" style="margin: 0; font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">...</h3>
-                <p id="detail-member-email" style="margin: 3px 0 0.75rem; font-size: 0.85rem; color: var(--color-text-muted);">...</p>
+                <h3 id="detail-member-name" style="margin: 0 0 0.75rem; font-size: 1.35rem; font-weight: 700; color: var(--color-text-main);">...</h3>
+                <p id="detail-member-email" class="hidden" style="display: none;"></p>
                 
                 <div style="display: flex; justify-content: center; gap: 0.5rem; flex-wrap: wrap;">
                     <span id="detail-member-role-badge" class="badge text-xs" style="background: var(--color-primary); color: white; padding: 0.35rem 0.85rem; border-radius: 999px; font-weight: 600;">Medlem</span>
@@ -654,6 +717,21 @@
                         <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600;">Medlemstid</div>
                         <div id="detail-member-duration" style="font-size: 1.05rem; font-weight: 700; color: var(--color-text-main); margin-top: 1px;">-</div>
                         <div id="detail-member-since-date" style="font-size: 0.78rem; color: var(--color-text-muted); margin-top: 2px;">Innmeldt: -</div>
+                    </div>
+                </div>
+
+                <!-- Kontaktinformasjon (E-post & Telefon) hvis oppgitt -->
+                <div id="detail-member-contact-section" class="hidden" style="background: var(--color-bg-subtle); border-radius: 14px; border: 1px solid var(--color-border); padding: 1rem 1.25rem; margin-bottom: 1.25rem;">
+                    <div style="font-size: 0.72rem; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); font-weight: 600; margin-bottom: 0.6rem;">Kontaktinformasjon</div>
+                    <div style="display: flex; flex-direction: column; gap: 0.6rem;">
+                        <a id="detail-member-contact-email-link" href="#" class="hidden" style="display: flex; align-items: center; gap: 0.65rem; color: var(--color-primary); font-size: 0.88rem; font-weight: 500; text-decoration: none; word-break: break-all;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+                            <span id="detail-member-contact-email-val"></span>
+                        </a>
+                        <a id="detail-member-contact-phone-link" href="#" class="hidden" style="display: flex; align-items: center; gap: 0.65rem; color: var(--color-primary); font-size: 0.88rem; font-weight: 500; text-decoration: none;">
+                            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="flex-shrink: 0;"><path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/></svg>
+                            <span id="detail-member-contact-phone-val"></span>
+                        </a>
                     </div>
                 </div>
 
@@ -680,6 +758,40 @@
                 </div>
 
                 <button type="button" id="close-member-detail-modal-btn" class="btn btn-primary btn-full" style="font-weight: 600; padding: 0.75rem;">Lukk</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Alle Medlemmer Modal -->
+    <div id="all-members-modal" class="hidden modal-container" style="z-index: 3050;">
+        <div id="all-members-modal-overlay" class="modal-overlay"></div>
+        <div class="card modal-content maxWidth-600" style="max-height: calc(100dvh - 3rem); display: flex; flex-direction: column; border-radius: 20px; padding: 0; overflow: hidden;">
+            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; padding: 1.15rem 1.25rem; border-bottom: 1px solid var(--color-border); background: var(--color-bg-surface);">
+                <div>
+                    <h3 style="margin: 0; font-size: 1.25rem; font-weight: 700;">Alle medlemmer</h3>
+                    <p id="all-members-modal-subtitle" style="margin: 2px 0 0; font-size: 0.8rem; color: var(--color-text-muted);">Laster...</p>
+                </div>
+                <button type="button" id="close-all-members-modal-x" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M18 6L6 18M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+            <div style="padding: 1rem 1.25rem; border-bottom: 1px solid var(--color-border); background: var(--color-bg-subtle);">
+                <input type="text" id="all-members-modal-search" class="form-input" placeholder="Søk etter navn, rolle eller e-post..." style="width: 100%; font-size: 0.95rem;">
+                <div style="display: flex; gap: 0.5rem; margin-top: 0.75rem; flex-wrap: wrap;">
+                    <button type="button" class="btn btn-xs all-members-filter-btn" data-filter="all" style="padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 600; background: var(--color-primary); color: #fff; border: 1px solid var(--color-primary);">Alle</button>
+                    <button type="button" class="btn btn-xs all-members-filter-btn" data-filter="admin" style="padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 600; background: var(--color-bg-surface); color: var(--color-text-main); border: 1px solid var(--color-border);">Styret & Admin</button>
+                    <button type="button" class="btn btn-xs all-members-filter-btn" data-filter="member" style="padding: 0.35rem 0.85rem; border-radius: 9999px; font-weight: 600; background: var(--color-bg-surface); color: var(--color-text-main); border: 1px solid var(--color-border);">Medlemmer</button>
+                </div>
+            </div>
+            <div class="card-body" style="padding: 1rem 1.25rem; overflow-y: auto; flex: 1; -webkit-overflow-scrolling: touch;">
+                <div id="all-members-modal-list" style="display: flex; flex-direction: column; gap: 0.65rem;">
+                    <p class="text-center text-muted py-6">Laster inn medlemmer...</p>
+                </div>
+            </div>
+            <div class="card-footer" style="padding: 0.85rem 1.25rem; border-top: 1px solid var(--color-border); background: var(--color-bg-surface); display: flex; justify-content: flex-end;">
+                <button type="button" id="close-all-members-modal-btn" class="btn btn-secondary" style="font-weight: 600; padding: 0.5rem 1.25rem;">Lukk</button>
             </div>
         </div>
     </div>
@@ -801,7 +913,7 @@
                             <input type="file" id="post-image-input" name="image" accept="image/png, image/jpeg, image/webp" style="display: none;">
                         </div>
                         <div id="post-image-preview-container" class="hidden" style="margin-top: 0.75rem; position: relative;">
-                            <img id="post-image-preview" src="" style="max-height: 220px; width: 100%; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--color-border);">
+                            <img id="post-image-preview" src="" alt="Forhåndsvisning av innleggsbilde" style="max-height: 220px; width: 100%; border-radius: var(--radius-md); object-fit: cover; border: 1px solid var(--color-border);">
                             <button type="button" id="remove-post-image" style="position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px;">&times;</button>
                         </div>
                     </div>
@@ -953,7 +1065,7 @@
 
                         <!-- Live Preview (No Cropping!) -->
                         <div id="event-image-preview-wrapper" class="hidden" style="position: relative; margin-top: 1rem; border-radius: var(--radius-md); overflow: hidden; border: 1px solid var(--color-border); background: var(--color-bg-surface);">
-                            <img id="event-image-preview" src="" style="width: 100%; max-height: 280px; object-fit: cover; display: block;">
+                            <img id="event-image-preview" src="" alt="Forhåndsvisning av arrangementsbilde" style="width: 100%; max-height: 280px; object-fit: cover; display: block;">
                             <button type="button" id="remove-event-image"
                                 style="position: absolute; top: 8px; right: 8px; background: rgba(220, 38, 38, 0.9); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; font-weight: bold; box-shadow: var(--shadow-md);" title="Fjern bilde">&times;</button>
                         </div>
@@ -1374,7 +1486,7 @@
 
                 <div id="modal-crop-preview-wrapper" class="crop-preview-wrapper">
             <div class="crop-area">
-                <img id="modal-crop-image" src="" class="crop-image">
+                <img id="modal-crop-image" src="" alt="Bilde som skal beskjæres" class="crop-image">
                 <div class="crop-overlay"></div>
                 <div id="modal-crop-viewport" class="crop-viewport">
                     <div class="crop-grid">
@@ -1455,6 +1567,7 @@
 
     <!-- Firebase og hoved-script -->
     <script defer src="js/theme-switcher.js"></script>
+        <script defer src="js/cookie-consent.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="https://cdn.quilljs.com/1.3.6/quill.js"></script>
     <script type="module" src="js/i18n.js"></script>
