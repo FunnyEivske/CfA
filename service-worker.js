@@ -1,7 +1,7 @@
 // service-worker.js - Cosplay for alle (CfA)
 // Minimalistisk, batterivennlig Service Worker for Web Push
 
-const CACHE_NAME = 'cfa-pwa-v2';
+const CACHE_NAME = 'cfa-pwa-v3';
 
 self.addEventListener('install', (event) => {
     // Aktiver ny service worker umiddelbart

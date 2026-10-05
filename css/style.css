@@ -10,36 +10,75 @@
   --font-body: 'Inter', sans-serif;
   --font-display: 'Playfair Display', serif;
 
-  /* --- Ny Fargepalett --- */
-  --palette-deep-maroon: #7E1C38;
-  --palette-pastel-pink: #FFCDD2;
-  --palette-charcoal-grey: #3C3C40;
-  --palette-cream-ivory: #FFF1E1;
+  /* --- Fargepalett fra stilguide --- */
+  /* Primærfarge: Vinrød */
+  --color-vinrod: #6E0A2D;
+  --color-vinrod-rgb: 110, 10, 45;
+  --color-vinrod-dark: #520621;
+  --color-vinrod-darker: #3D0417;
+  --color-vinrod-60: #A86C81;
+  --color-vinrod-30: #D4B5C0;
+  --color-vinrod-10: #F1E7EB;
+
+  /* Sekundærfarge: Stålgrå */
+  --color-stalgra: #909090;
+  --color-stalgra-rgb: 144, 144, 144;
+  --color-stalgra-60: #BCBCBC;
+  --color-stalgra-30: #DDDEDE;
+  --color-stalgra-10: #F4F4F4;
+
+  /* Kontrast- og aksentfarge: Gullbånd */
+  --color-gullband: #F3B716;
+  --color-gullband-rgb: 243, 183, 22;
+  --color-gullband-dark: #D9A00F;
+  --color-gullband-60: #F7D473;
+  --color-gullband-30: #FBE9B9;
+  --color-gullband-10: #FDF7E7;
+
+  /* Mye hvitt */
+  --color-pure-white: #FFFFFF;
+
+  /* Bakoverkompatibilitet */
+  --palette-deep-maroon: var(--color-vinrod);
+  --palette-pastel-pink: var(--color-vinrod-10);
+  --palette-charcoal-grey: #2B2B2E;
+  --palette-cream-ivory: #FFFFFF;
   --palette-pure-white: #FFFFFF;
   --palette-white: #FFFFFF;
+  --palette-shadow-grey: var(--color-stalgra);
 
   /* --- Funksjonelle Variabler --- */
-  --color-primary: var(--palette-deep-maroon);
-  --color-primary-dark: #5c1429;
-  --color-primary-hover: var(--palette-pastel-pink);
+  --color-primary: var(--color-vinrod);
+  --color-primary-dark: var(--color-vinrod-dark);
+  --color-primary-darker: var(--color-vinrod-darker);
+  --color-primary-hover: var(--color-vinrod-dark);
 
-  --color-bg-page: var(--palette-cream-ivory);
-  --color-bg-card: var(--palette-pure-white);
-  --color-bg-section: #FFF9F2;
-  /* Light ivory */
-  --color-bg-white: var(--palette-pure-white);
-  --color-bg-header: #FFFFFF;
-  --color-bg-footer: var(--palette-charcoal-grey);
+  --color-secondary: var(--color-stalgra);
+  --color-accent: var(--color-gullband);
+  --color-accent-hover: var(--color-gullband-dark);
 
-  --color-text-main: var(--palette-charcoal-grey);
-  --color-text-muted: #5A5A5E;
-  /* Lighter charcoal */
-  --color-text-inverse: var(--palette-pure-white);
-  --color-text-base: var(--palette-charcoal-grey);
-  --color-text-footer: var(--palette-cream-ivory);
+  /* Bakgrunner: Mye hvitt og rene, nøytrale flater */
+  --color-bg-page: #FFFFFF;
+  --color-bg-card: #FFFFFF;
+  --color-bg-section: #F8F9FA;
+  --color-bg-subtle: var(--color-stalgra-10);
+  --color-bg-white: #FFFFFF;
+  --color-bg-header: rgba(255, 255, 255, 0.96);
+  --color-bg-footer: #1F1F22; /* Beholder mørk footer */
 
-  --color-border: #E8D9CC;
-  --color-error: #dc2626;
+  /* Tekstfarger */
+  --color-text-main: #212529;
+  --color-text-muted: #646468;
+  --color-text-inverse: #FFFFFF;
+  --color-text-base: #212529;
+  --color-text-footer: #FFFFFF;
+  --color-text-footer-muted: var(--color-stalgra-60);
+
+  /* Kanter og linjer */
+  --color-border: #E5E7EB;
+  --color-border-dark: var(--color-stalgra-60);
+  --color-error: #DC2626;
+  --color-success: #16A34A;
 
   /* Annet */
   --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
@@ -54,26 +93,31 @@
   --transition-all: all 0.2s ease-in-out;
 }
 
-/* --- Dark Mode Overrides --- */
+/* --- Dark Mode Overrides (bevart og raffinert) --- */
 [data-theme="dark"] {
-  --color-primary: #B72B50; /* Brighter, vibrant maroon in dark mode */
-  --color-primary-dark: #8C1C3A;
-  --color-primary-hover: #FFCDD2;
+  --color-primary: #C0325A; /* Lettet og klar vinrød nyanse for optimal kontrast i dark mode */
+  --color-primary-dark: #9E1A42;
+  --color-primary-hover: #D84D74;
 
-  --color-bg-page: var(--palette-charcoal-grey);
-  --color-bg-card: #2B2B2E; /* Darker charcoal for cards */
-  --color-bg-section: #323236; /* Medium charcoal */
+  --color-accent: var(--color-gullband);
+  --color-accent-hover: var(--color-gullband-60);
+
+  --color-bg-page: #18181B;
+  --color-bg-card: #27272A;
+  --color-bg-section: #202023;
   --color-bg-header: #18181B;
+  --color-bg-subtle: #27272A;
 
-  --color-text-main: var(--palette-cream-ivory);
-  --color-text-muted: #D1D1D6; /* Clear readable silver-grey for muted text */
-  --color-text-inverse: #FFFFFF; /* Pure white text on colored buttons */
+  --color-text-main: #F4F4F5;
+  --color-text-muted: #A1A1AA;
+  --color-text-inverse: #FFFFFF;
 
-  --color-border: #4D4D52;
-  --color-bg-white: var(--palette-charcoal-grey);
+  --color-border: #3F3F46;
+  --color-border-dark: #52525B;
+  --color-bg-white: #27272A;
 
-  --color-bg-input: #1F1F22;
-  --color-bg-footer: #1F1F22;
+  --color-bg-input: #1F1F23;
+  --color-bg-footer: #121214;
 }
 
 /* Ensure broad readability in dark mode for dynamic content */
@@ -279,8 +323,8 @@ p {
 }
 
 .button-primary:hover {
-  background-color: var(--color-primary-hover);
-  color: #5C1429 !important;
+  background-color: var(--color-primary-dark);
+  color: #FFFFFF !important;
 }
 
 /* Sekundær knapp */
@@ -291,9 +335,23 @@ p {
 }
 
 .button-secondary:hover {
-  background-color: var(--color-bg-section);
+  background-color: var(--color-vinrod-10);
   border-color: var(--color-primary);
-  color: var(--color-text-main) !important;
+  color: var(--color-primary) !important;
+}
+
+/* Aksentknapp (Gullbånd) */
+.button-accent,
+.btn-accent {
+  background-color: var(--color-accent);
+  color: #1F1F22 !important;
+  font-weight: 700;
+}
+
+.button-accent:hover,
+.btn-accent:hover {
+  background-color: var(--color-accent-hover);
+  color: #1F1F22 !important;
 }
 
 
@@ -391,7 +449,7 @@ p {
 .form-textarea:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 2px rgba(180, 83, 9, 0.2);
+  box-shadow: 0 0 0 2px rgba(110, 10, 45, 0.2);
   /* Ring-effekt */
 }
 
@@ -484,7 +542,7 @@ p {
 }
 
 [data-theme="dark"] .logo-text {
-  color: var(--palette-cream-ivory);
+  color: #FFFFFF;
 }
 
 /* Globe Language Toggle Button beside Logo */
@@ -537,27 +595,126 @@ p {
 }
 
 .nav-link {
+  position: relative;
   color: var(--color-text-main);
-  transition: var(--transition-all);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   font-weight: 500;
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--border-radius-sm);
+  text-decoration: none;
 }
 
+/* Levende og energisk hover med Gullbånd (#F3B716) */
 .nav-link:hover {
+  color: var(--color-accent);
+  transform: translateY(-1px);
+  text-shadow: 0 0 12px rgba(243, 183, 22, 0.4);
+}
+
+.nav-link::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  width: 0;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+  transition: width 0.25s ease, left 0.25s ease;
+}
+
+.nav-link:hover::after {
+  width: 80%;
+  left: 10%;
+}
+
+/* Aktiv lenke i toppmenyen */
+.nav-link-active {
+  position: relative;
   color: var(--color-primary);
+  font-weight: 600;
+  padding: 0.35rem 0.5rem;
+}
+
+.nav-link-active::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 10%;
+  width: 80%;
+  height: 2px;
+  background: var(--color-accent);
+  border-radius: 2px;
+}
+
+.nav-link-active:hover {
+  color: var(--color-accent);
+  transform: translateY(-1px);
+  text-shadow: 0 0 12px rgba(243, 183, 22, 0.4);
+}
+
+[data-theme="dark"] .nav-link {
+  color: #F4F4F5;
 }
 
 [data-theme="dark"] .nav-link:hover {
-  color: var(--palette-pastel-pink);
-}
-
-/* Aktiv lenke (og medlemslenke) */
-.nav-link-active {
-  color: var(--color-primary);
-  font-weight: 600;
+  color: var(--color-accent);
+  text-shadow: 0 0 14px rgba(243, 183, 22, 0.55);
 }
 
 [data-theme="dark"] .nav-link-active {
-  color: var(--palette-pastel-pink);
+  color: #FFFFFF;
+}
+
+[data-theme="dark"] .nav-link-active:hover {
+  color: var(--color-accent);
+}
+
+/* Min side: 100% Vinrød (#6E0A2D) profilknapp */
+#member-link,
+#mobile-member-link {
+  background-color: var(--color-vinrod) !important;
+  color: #FFFFFF !important;
+  font-weight: 700 !important;
+  padding: 0.4rem 1.05rem !important;
+  border-radius: var(--border-radius-full) !important;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 0.35rem;
+  box-shadow: 0 2px 8px rgba(110, 10, 45, 0.3);
+  text-decoration: none !important;
+  border: 1.5px solid var(--color-vinrod) !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+}
+
+#member-link::after,
+#mobile-member-link::after {
+  display: none !important;
+}
+
+#member-link:hover,
+#mobile-member-link:hover {
+  background-color: var(--color-vinrod-dark) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+  transform: translateY(-2px) scale(1.03) !important;
+  box-shadow: 0 4px 14px rgba(110, 10, 45, 0.4), 0 0 10px rgba(243, 183, 22, 0.3) !important;
+}
+
+[data-theme="dark"] #member-link,
+[data-theme="dark"] #mobile-member-link {
+  background-color: var(--color-vinrod) !important;
+  color: #FFFFFF !important;
+  border: 1.5px solid rgba(243, 183, 22, 0.35) !important;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
+}
+
+[data-theme="dark"] #member-link:hover,
+[data-theme="dark"] #mobile-member-link:hover {
+  background-color: var(--color-vinrod-dark) !important;
+  border-color: var(--color-accent) !important;
+  color: var(--color-accent) !important;
+  box-shadow: 0 4px 16px rgba(110, 10, 45, 0.5), 0 0 12px rgba(243, 183, 22, 0.45) !important;
 }
 
 /* Ghost Knapp (F.eks. Språkvelger) */
@@ -569,15 +726,15 @@ p {
 }
 
 .button-ghost:hover {
-  background: rgba(126, 28, 56, 0.1);
+  background: rgba(110, 10, 45, 0.08);
   color: var(--color-primary);
   border-color: var(--color-primary);
 }
 
 [data-theme="dark"] .button-ghost:hover {
-  background: rgba(255, 205, 210, 0.15);
-  color: var(--palette-pastel-pink);
-  border-color: var(--palette-pastel-pink);
+  background: rgba(243, 183, 22, 0.12);
+  color: var(--color-accent);
+  border-color: var(--color-accent);
 }
 
 /* Mobilmeny-knapp */
@@ -1164,7 +1321,7 @@ body.modal-open {
 
 .lightbox-close:hover {
   transform: scale(1.1);
-  background: rgba(180, 83, 9, 0.9);
+  background: var(--color-primary);
   color: #fff;
 }
 

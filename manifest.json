@@ -4,8 +4,8 @@
   "description": "Progressive Web App for Cosplay for alle (CfA) - arrangementer, verksted og medlemsportal.",
   "start_url": "app-start.html",
   "display": "standalone",
-  "background_color": "#1c1917",
-  "theme_color": "#9a3412",
+  "background_color": "#18181B",
+  "theme_color": "#6E0A2D",
   "orientation": "portrait-primary",
   "icons": [
     {
