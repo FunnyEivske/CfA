@@ -10,30 +10,67 @@
   --font-body: 'Inter', sans-serif;
   --font-display: 'Playfair Display', serif;
 
-  /* --- Ny Fargepalett --- */
-  --palette-deep-maroon: #7E1C38;
-  --palette-pastel-pink: #FFCDD2;
-  --palette-charcoal-grey: #3C3C40;
-  --palette-cream-ivory: #FFF1E1;
+  /* --- Fargepalett fra stilguide --- */
+  /* Primærfarge: Vinrød */
+  --color-vinrod: #6E0A2D;
+  --color-vinrod-rgb: 110, 10, 45;
+  --color-vinrod-dark: #520621;
+  --color-vinrod-darker: #3D0417;
+  --color-vinrod-60: #A86C81;
+  --color-vinrod-30: #D4B5C0;
+  --color-vinrod-10: #F1E7EB;
+
+  /* Sekundærfarge: Stålgrå */
+  --color-stalgra: #909090;
+  --color-stalgra-rgb: 144, 144, 144;
+  --color-stalgra-60: #BCBCBC;
+  --color-stalgra-30: #DDDEDE;
+  --color-stalgra-10: #F4F4F4;
+
+  /* Kontrast- og aksentfarge: Gullbånd */
+  --color-gullband: #F3B716;
+  --color-gullband-rgb: 243, 183, 22;
+  --color-gullband-dark: #D9A00F;
+  --color-gullband-60: #F7D473;
+  --color-gullband-30: #FBE9B9;
+  --color-gullband-10: #FDF7E7;
+
+  /* Mye hvitt */
+  --color-pure-white: #FFFFFF;
+
+  /* Bakoverkompatibilitet */
+  --palette-deep-maroon: var(--color-vinrod);
+  --palette-pastel-pink: var(--color-vinrod-10);
+  --palette-charcoal-grey: #2B2B2E;
+  --palette-cream-ivory: #FFFFFF;
   --palette-pure-white: #FFFFFF;
 
   /* --- Funksjonelle Variabler --- */
-  --color-primary: var(--palette-deep-maroon);
-  --color-primary-hover: var(--palette-pastel-pink);
+  --color-primary: var(--color-vinrod);
+  --color-primary-dark: var(--color-vinrod-dark);
+  --color-primary-darker: var(--color-vinrod-darker);
+  --color-primary-hover: var(--color-vinrod-dark);
 
-  --color-bg-body: var(--palette-cream-ivory);
-  --color-bg-surface: var(--palette-pure-white);
-  --color-bg-subtle: #FFF9F2;
-  --color-bg-dark: var(--palette-charcoal-grey);
-  --color-bg-header: #FFFFFF;
+  --color-secondary: var(--color-stalgra);
+  --color-accent: var(--color-gullband);
+  --color-accent-hover: var(--color-gullband-dark);
 
-  --color-text-main: var(--palette-charcoal-grey);
-  --color-text-muted: #5A5A5E;
-  --color-text-light: #FFF9F2;
-  --color-text-inverse: var(--palette-pure-white);
+  /* Bakgrunner: Mye hvitt og rene flater */
+  --color-bg-body: #FFFFFF;
+  --color-bg-surface: #FFFFFF;
+  --color-bg-subtle: var(--color-stalgra-10);
+  --color-bg-dark: #1F1F22;
+  --color-bg-header: rgba(255, 255, 255, 0.96);
 
-  --color-border: #E8D9CC;
-  --color-border-dark: #D4BFA9;
+  /* Tekstfarger */
+  --color-text-main: #212529;
+  --color-text-muted: #646468;
+  --color-text-light: #F4F4F4;
+  --color-text-inverse: #FFFFFF;
+
+  /* Kanter og linjer */
+  --color-border: #E5E7EB;
+  --color-border-dark: var(--color-stalgra-60);
 
   --color-error: #dc2626;
   --color-success: #16a34a;
@@ -53,26 +90,31 @@
   --transition-base: all 0.2s ease-in-out;
 }
 
-/* --- Dark Mode Overrides --- */
+/* --- Dark Mode Overrides (bevart og raffinert) --- */
 [data-theme="dark"] {
-  --color-primary: #B72B50;
-  --color-primary-hover: #FFCDD2;
+  --color-primary: #C0325A;
+  --color-primary-dark: #9E1A42;
+  --color-primary-hover: #D84D74;
 
-  --color-bg-body: var(--palette-charcoal-grey);
-  --color-bg-surface: #2B2B2E;
+  --color-accent: var(--color-gullband);
+  --color-accent-hover: var(--color-gullband-60);
+
+  --color-bg-body: #18181B;
+  --color-bg-surface: #27272A;
   --color-bg-subtle: #323236;
+  --color-bg-dark: #121214;
 
-  --color-text-main: var(--palette-cream-ivory);
-  --color-text-muted: #D1D1D6;
+  --color-text-main: #F4F4F5;
+  --color-text-muted: #A1A1AA;
   --color-text-inverse: #FFFFFF;
 
-  --color-border: #4D4D52;
-  --color-border-dark: #64646A;
+  --color-border: #3F3F46;
+  --color-border-dark: #52525B;
 
-  --color-bg-white: var(--palette-charcoal-grey);
+  --color-bg-white: #27272A;
   --color-bg-header: #18181B;
 
-  --color-bg-input: #1F1F22;
+  --color-bg-input: #1F1F23;
 }
 
 
@@ -530,7 +572,7 @@ p {
 .form-input:focus {
   outline: none;
   border-color: var(--color-primary);
-  box-shadow: 0 0 0 3px rgba(180, 83, 9, 0.1);
+  box-shadow: 0 0 0 3px rgba(110, 10, 45, 0.15);
 }
 
 .form-error {
@@ -663,11 +705,32 @@ p {
   font-weight: 500;
   color: var(--color-text-muted);
   font-size: 0.95rem;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  text-decoration: none;
 }
 
-.nav-link:hover,
+.nav-link:hover {
+  color: var(--color-accent) !important;
+  transform: translateY(-1px);
+  text-shadow: 0 0 12px rgba(243, 183, 22, 0.4);
+}
+
 .nav-link.active {
   color: var(--color-primary);
+  font-weight: 600;
+}
+
+[data-theme="dark"] .nav-link {
+  color: #F4F4F5;
+}
+
+[data-theme="dark"] .nav-link:hover {
+  color: var(--color-accent) !important;
+  text-shadow: 0 0 14px rgba(243, 183, 22, 0.55);
+}
+
+[data-theme="dark"] .nav-link.active {
+  color: #FFFFFF;
 }
 
 /* Mobile Menu (Premium Overlay) */
@@ -1422,7 +1485,7 @@ body.modal-open {
 .upload-drop-zone:hover,
 .upload-drop-zone.dragover {
   border-color: var(--color-primary);
-  background-color: rgba(180, 83, 9, 0.05);
+  background-color: rgba(110, 10, 45, 0.05);
 }
 
 .upload-drop-zone input[type="file"] {
@@ -2364,20 +2427,22 @@ textarea {
 }
 /* Glasur Gruppe Styles */
 .badge-accent {
-  background: var(--color-primary); /* Match site theme */
-  color: white;
+  background: var(--color-accent);
+  color: #1F1F22;
   border-radius: var(--radius-sm);
   font-weight: 700;
   text-transform: uppercase;
 }
 
 .btn-accent {
-  background: var(--color-primary);
-  color: white;
+  background: var(--color-accent);
+  color: #1F1F22;
+  font-weight: 600;
 }
 
 .btn-accent:hover {
-  background: var(--color-primary-hover);
+  background: var(--color-accent-hover);
+  color: #1F1F22;
   transform: translateY(-2px);
   box-shadow: var(--shadow-md);
 }
