@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="no">
+
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <!-- Google Consent Mode v2: Standardstatus -->
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      (function() {
+        var consent = null;
+        try { consent = JSON.parse(localStorage.getItem('cookie_consent')); } catch (e) {}
+        gtag('consent', 'default', {
+          'ad_storage': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_user_data': (consent && consent.marketing) ? 'granted' : 'denied',
+          'ad_personalization': (consent && consent.marketing) ? 'granted' : 'denied',
+          'analytics_storage': (consent && consent.analytics) ? 'granted' : 'denied',
+          'functionality_storage': 'granted',
+          'security_storage': 'granted',
+          'wait_for_update': 500
+        });
+      })();
+    </script>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-18472435099"></script>
+    <script>
+      gtag('js', new Date());
+      gtag('config', 'AW-18472435099');
+    </script>
+
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Personvernerklæring - Cosplay for alle</title>
+    <meta name="description" content="Personvernerklæring for Cosplay for alle (CfA). Les om hvordan vi tar vare på dine personopplysninger og ivaretar ditt personvern.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap">
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap" media="print" onload="this.media='all'">
+    <noscript><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&family=Playfair+Display:wght@700&display=swap"></noscript>
+
+    <link rel="stylesheet" href="css/style.css?v=3.0">
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+
+    <link rel="icon" type="image/jpeg" href="Media/Logo/cfa-logo.webp">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6E0A2D">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="CfA">
+    <link rel="apple-touch-icon" href="Media/Logo/icon-192.png">
+
+    <style>
+        .privacy-container {
+            max-width: 820px;
+            margin: 0 auto;
+            background: var(--color-bg-card);
+            border: 1px solid var(--color-border);
+            border-radius: var(--border-radius-lg);
+            padding: clamp(1.5rem, 4vw, 3rem);
+            box-shadow: var(--shadow-md);
+        }
+
+        .privacy-container h1 {
+            color: var(--color-primary);
+            font-size: clamp(1.8rem, 3.5vw, 2.5rem);
+            margin-bottom: 0.5rem;
+        }
+
+        .privacy-meta {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--color-border);
+        }
+
+        .privacy-section {
+            margin-bottom: 2.25rem;
+        }
+
+        .privacy-section h2 {
+            font-size: 1.35rem;
+            color: var(--color-text-main);
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .privacy-section p {
+            color: var(--color-text-muted);
+            line-height: 1.7;
+            margin-bottom: 0.85rem;
+        }
+
+        .privacy-section ul {
+            list-style: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+            color: var(--color-text-muted);
+            line-height: 1.7;
+        }
+
+        .privacy-highlight-box {
+            background: var(--color-bg-section);
+            border-left: 4px solid var(--color-accent);
+            padding: 1.25rem 1.5rem;
+            border-radius: var(--border-radius-sm);
+            margin: 1.5rem 0;
+        }
+
+        .privacy-highlight-box p {
+            margin-bottom: 0;
+            color: var(--color-text-main);
+            font-weight: 500;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header & Navigasjon -->
+    <header class="main-header">
+        <nav class="container main-nav">
+            <div class="nav-brand-group">
+                <a href="/" class="logo-link">
+                    <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" class="logo-img" width="48" height="48">
+                    <span class="logo-text">CfA</span>
+                </a>
+                <button class="lang-toggle-btn" aria-label="Bytt språk" title="Bytt språk">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="globe-icon">
+                        <circle cx="12" cy="12" r="10"></circle>
+                        <line x1="2" y1="12" x2="22" y2="12"></line>
+                        <path d="M12 2a15.3 15.3 0 0 1 4 10 15.3 15.3 0 0 1-4 10 15.3 15.3 0 0 1-4-10 15.3 15.3 0 0 1 4-10z"></path>
+                    </svg>
+                    <span class="lang-current-label">NO</span>
+                </button>
+            </div>
+
+            <!-- Desktop-meny -->
+            <div class="nav-menu-desktop">
+                <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
+                <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
+                <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
+                <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
+                <a id="member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
+                <a id="login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
+                <button id="logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
+            </div>
+
+            <!-- Mobilmeny-knapp -->
+            <button id="mobile-menu-button" class="mobile-menu-button" aria-label="Åpne meny">
+                <svg class="mobile-menu-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7">
+                    </path>
+                </svg>
+            </button>
+        </nav>
+
+        <!-- Mobilmeny (Overlay) -->
+        <div id="nav-menu-mobile" class="nav-menu-mobile">
+            <a href="om-oss" class="nav-link" data-i18n="nav_about">Om oss</a>
+            <a href="hva-skjer" class="nav-link" data-i18n="nav_events">Conventions</a>
+            <a href="galleri" class="nav-link" data-i18n="nav_gallery">Galleri</a>
+            <a href="kontakt" class="nav-link" data-i18n="nav_contact">Kontakt</a>
+            <a id="mobile-member-link" href="medlem" class="nav-link-active hidden" data-i18n="nav_member_page">Min side</a>
+            <a id="mobile-login-link" href="login" class="button button-primary" data-i18n="nav_login">Logg inn</a>
+            <button id="mobile-logout-button" class="button button-secondary hidden" data-i18n="nav_logout">Logg ut</button>
+        </div>
+    </header>
+
+    <!-- Hovedinnhold -->
+    <main class="section">
+        <div class="container">
+            <article class="privacy-container">
+                <h1>Personvernerklæring</h1>
+                <p class="privacy-meta">Sist oppdatert: Oktober 2026 • Gjeldende for Cosplay for alle (CfA)</p>
+
+                <div class="privacy-highlight-box">
+                    <p>Hos Cosplay for alle (CfA) tar vi personvernet ditt på største alvor. Vi samler kun inn opplysninger som er strengt nødvendige for å administrere medlemskapet ditt, arrangere trygge conventions og workshops, og gi deg tilgang til medlemsportalen vår. Vi selger aldri personopplysninger til tredjeparter.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>1. Behandlingsansvarlig</h2>
+                    <p>Cosplay for alle (CfA) er en ideell og frivillig organisasjon og er behandlingsansvarlig for personopplysninger som samles inn via våre nettsider, medlemsregister og arrangementer:</p>
+                    <ul>
+                        <li><strong>Organisasjon:</strong> Cosplay for alle (CfA)</li>
+                        <li><strong>Organisasjonsnummer:</strong> 938 323 143</li>
+                        <li><strong>Adresse:</strong> Kirkegaten 2B, 4836 Arendal, Norge</li>
+                        <li><strong>E-post for personvernvansvarlig:</strong> <a href="mailto:kontakt@cosplayforalle.no" style="color: var(--color-primary); font-weight: 600;">kontakt@cosplayforalle.no</a></li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>2. Hvilke opplysninger vi behandler</h2>
+                    <p>Vi behandler kun opplysninger du selv oppgir til oss ved registrering, påmelding eller bruk av nettsiden:</p>
+                    <ul>
+                        <li><strong>Medlemskap og profil:</strong> Navn, visningsnavn/brukernavn, e-postadresse, fødselsdato (for å sikre aldersrelevante arrangementer) og eventuelt telefonnummer.</li>
+                        <li><strong>Innloggingsinformasjon:</strong> E-post og passord (passord lagres alltid sikkert med enveis kryptografisk hashing).</li>
+                        <li><strong>Arrangementer og aktiviteter:</strong> Informasjon om påmeldinger til verksteder, kurs og conventions for deltakerlister og sikkerhet.</li>
+                        <li><strong>Bilder og bidrag:</strong> Bilder, kreasjoner eller innlegg du selv frivillig laster opp til medlemsfeeden eller fellesskapsgalleriet.</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>3. Formålet med behandlingen</h2>
+                    <p>Vi bruker opplysningene dine til følgende formål:</p>
+                    <ul>
+                        <li>Å administrere medlemskapet ditt og gi deg tilgang til «Min side», verkstedkalenderen og medlemsfeeden.</li>
+                        <li>Å planlegge og gjennomføre trygge, inkluderende arrangementer og workshops.</li>
+                        <li>Å sende ut viktig organisasjonsinformasjon, som innkalling til årsmøte eller varsler om nye conventions.</li>
+                        <li>Å beskytte fellesskapet mot misbruk, spam og uautorisert tilgang.</li>
+                    </ul>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>4. Informasjonskapsler (Cookies) og analyse</h2>
+                    <p>Vi benytter nødvendige informasjonskapsler for at du skal kunne logge inn og lagre innstillinger (som mørkt tema og språkvalg). Med ditt samtykke benytter vi også anonymisert analyse via Google Consent Mode v2 for å forstå hvordan nettsiden brukes og forbedre brukeropplevelsen for våre medlemmer.</p>
+                    <p>Du kan når som helst endre eller trekke tilbake samtykket ditt ved å klikke på <em>«Administrer informasjonskapsler»</em> nederst på enhver side.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>5. Hvem vi deler opplysninger med</h2>
+                    <p>Dine personopplysninger deles aldri med tredjeparter for markedsføringsformål. Vi benytter kun trygge databehandlere innenfor EØS/Norge som leverer nødvendig infrastruktur (som Webhuset for sikker web- og databasehosting). Alle leverandører er bundet av strenge databehandleravtaler.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>6. Hvor lenge vi lagrer opplysningene</h2>
+                    <p>Vi oppbevarer personopplysningene dine så lenge du har et aktivt medlemskap eller brukerkonto hos oss. Dersom du melder deg ut eller ber om sletting, slettes eller anonymiseres opplysningene dine så snart som mulig, med mindre lovpålagte regnskaps- eller arkivplikter krever oppbevaring.</p>
+                </div>
+
+                <div class="privacy-section">
+                    <h2>7. Dine rettigheter etter GDPR</h2>
+                    <p>Du har fulle rettigheter i henhold til personopplysningsloven og EUs personvernforordning (GDPR):</p>
+                    <ul>
+                        <li><strong>Innsyn:</strong> Du har rett til å få vite hvilke opplysninger vi har lagret om deg.</li>
+                        <li><strong>Retting:</strong> Du kan når som helst endre eller oppdatere opplysningene dine via «Min profil» eller ved å kontakte oss.</li>
+                        <li><strong>Sletting:</strong> Du kan når som helst be om at vi sletter dine personopplysninger og avslutter medlemskapet.</li>
+                        <li><strong>Trekke samtykke:</strong> Du kan når som helst trekke tilbake samtykker du har gitt oss.</li>
+                    </ul>
+                    <p>For å benytte deg av rettighetene dine, send en e-post til <a href="mailto:kontakt@cosplayforalle.no" style="color: var(--color-primary); font-weight: 600;">kontakt@cosplayforalle.no</a>, så hjelper vi deg raskt og kostnadsfritt.</p>
+                    <p>Dersom du mener at vi behandler personopplysninger i strid med loven, har du rett til å klage til <strong>Datatilsynet</strong> (<a href="https://www.datatilsynet.no" target="_blank" rel="noopener noreferrer" style="color: var(--color-primary);">www.datatilsynet.no</a>).</p>
+                </div>
+            </article>
+        </div>
+    </main>
+
+    <!-- Footer -->
+    <footer class="main-footer">
+        <div class="container footer-content">
+            <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" class="footer-logo" width="48" height="48" loading="lazy">
+            <p class="footer-tagline" data-i18n="footer_tagline">Et kreativt fristed for cosplay-entusiaster i hele Norge.</p>
+            <p class="footer-address" data-i18n="footer_address">Kirkegaten 2B, 4836 Arendal, Norge • Org.nr: 938 323 143 • kontakt@cosplayforalle.no</p>
+            <div class="social-links">
+                <a href="#" target="_blank" rel="noopener noreferrer" aria-label="Instagram" class="social-link">
+                    <svg class="social-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <rect x="2" y="2" width="20" height="20" rx="5" ry="5"></rect>
+                        <path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path>
+                        <line x1="17.5" y1="6.5" x2="17.51" y2="6.5"></line>
+                    </svg>
+                </a>
+                <a href="https://www.facebook.com/people/Cosplay-for-alle/61558775345038/" target="_blank" rel="noopener noreferrer" aria-label="Facebook" class="social-link">
+                    <svg class="social-icon" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fill-rule="evenodd" d="M22 12c0-5.523-4.477-10-10-10S2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.878v-6.987h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.988C18.343 21.128 22 16.991 22 12z" clip-rule="evenodd" />
+                    </svg>
+                </a>
+            </div>
+            <p class="footer-copyright" data-i18n="footer_copyright">&copy; 2026 Cosplay for alle (CfA). Alle rettigheter reservert.</p>
+            <p style="margin-top: 0.5rem; display: flex; justify-content: center; gap: 1.25rem; flex-wrap: wrap;">
+                <a href="personvern" class="cookie-manage-link" data-i18n="footer_privacy">Personvernerklæring</a>
+                <button type="button" onclick="window.openCookieConsent()" class="cookie-manage-link" data-i18n="cookie_manage">Administrer informasjonskapsler</button>
+            </p>
+        </div>
+    </footer>
+
+    <!-- Dark Mode Floating Button -->
+    <button class="theme-toggle" aria-label="Bytt tema">
+        <svg class="moon-icon" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+        </svg>
+        <svg class="sun-icon hidden" style="width: 24px; height: 24px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+        </svg>
+    </button>
+
+    <!-- Scripts -->
+    <script defer src="js/theme-switcher.js"></script>
+    <script defer src="js/cookie-consent.js"></script>
+    <script type="module" src="js/i18n.js"></script>
+    <script type="module" src="js/script.js"></script>
+</body>
+
+</html>

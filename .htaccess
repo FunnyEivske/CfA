@@ -102,6 +102,8 @@ DirectoryIndex pages/index.html index.html index.php
 
 # Sikkerhets- og Cache-headere
 <IfModule mod_headers.c>
+    # HSTS (HTTP Strict Transport Security) - Tvinger HTTPS
+    Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
