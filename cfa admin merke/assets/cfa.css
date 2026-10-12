@@ -55,10 +55,11 @@ a { color: var(--rosa-tekst); }
 }
 .merke { display: flex; align-items: center; gap: 12px; text-decoration: none; }
 .merke-rund {
-  width: 44px; height: 44px; border-radius: 50%; background: #fff;
-  display: grid; place-items: center; flex: none;
+  width: 48px; height: 48px; border-radius: 50%; background: #fff;
+  display: flex; align-items: center; justify-content: center; flex: none;
+  padding: 4px;
 }
-.merke-rund img { height: 34px; width: auto; }
+.merke-rund img { width: 38px; height: 38px; object-fit: contain; }
 .merke-navn { font-family: var(--serif); font-weight: 700; font-size: 25px; color: var(--rosa); letter-spacing: -0.01em; }
 .sprak {
   display: inline-flex; align-items: center; gap: 6px;

@@ -383,10 +383,17 @@
         : 'Alt står innenfor den trygge sonen');
     }
     if (t.medBilde && fm.trykk && m.dpi) {
-      if (m.dpi >= 250) p(true, 'Bildet holder ' + m.dpi + ' dpi i ferdig størrelse');
-      else p(false, 'Bildet holder bare ' + m.dpi + ' dpi. Trykkeriet trenger 300 dpi, så bruk et større bilde eller en mindre bildeflate.');
+      if (m.dpi >= 250 || t.erEksempel) {
+        p(true, t.erEksempel ? 'Eksempelbilde (last opp eget bilde for trykk 300 dpi)' : 'Bildet holder ' + m.dpi + ' dpi i ferdig størrelse');
+      } else {
+        p(false, 'Bildet holder bare ' + m.dpi + ' dpi. Trykkeriet trenger 300 dpi, så bruk et større bilde eller en mindre bildeflate.');
+      }
     } else if (t.medBilde && !fm.trykk && m.skjermSkala) {
-      p(m.skjermSkala >= 0.9, m.skjermSkala >= 0.9 ? 'Bildet er stort nok for skjerm' : 'Bildet blir forstørret og kan se uskarpt ut');
+      if (m.skjermSkala >= 0.85 || t.erEksempel) {
+        p(true, t.erEksempel ? 'Eksempelbilde er lastet inn' : 'Bildet er stort nok for skjerm');
+      } else {
+        p(false, 'Bildet blir forstørret og kan se uskarpt ut');
+      }
     }
     if (m.bildeKrympet && !m.overlapp) p(true, 'Bildet er gjort lavere så teksten får plass');
     if (m.tittelLinjer > 3 || t.tittel.length > 60) p(false, 'Tittelen er lang. Korte titler på én til to linjer leses best.');

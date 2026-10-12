@@ -8,7 +8,7 @@
     stalgra: '#909090',
     gull: '#F3B716',
     tekst: '#222222',
-    lysgra: '#F2F2F2',
+    lysgra: '#D6D6DE',
     hvit: '#FFFFFF'
   };
   var FONT = 'Arial, "Helvetica Neue", Helvetica, sans-serif';
@@ -342,11 +342,29 @@
     ['samtykke', 'Samtykkeskjema'],
     ['tekstsjekk', 'Tekstsjekk']
   ];
+  function byggToppbar() {
+    if (document.querySelector('header.topp')) return;
+    var header = document.createElement('header');
+    header.className = 'topp';
+    header.innerHTML = '<div class="topp-inner">' +
+      '<a href="/medlem" class="merke" title="Tilbake til Min side">' +
+        '<div class="merke-rund"><img src="/Media/Logo/cfa-logo.webp" alt="CfA logo" style="height:38px;width:38px;object-fit:contain;"></div>' +
+        '<span class="merke-navn">Cosplay for Alle</span>' +
+      '</a>' +
+      '<nav class="nav">' +
+        '<a href="/medlem" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>' +
+        '<a href="index.html" class="' + (window.location.pathname.endsWith('merkeverktoy/') || window.location.pathname.endsWith('index.html') ? 'sterk' : '') + '">Alle verktøy</a>' +
+      '</nav>' +
+    '</div>';
+    document.body.insertBefore(header, document.body.firstChild);
+  }
+
   function byggMeny() {
+    byggToppbar();
     var nav = document.querySelector('nav.faner[data-aktiv]');
     if (!nav) return;
     var aktiv = nav.getAttribute('data-aktiv');
-    var tilbakeLenke = '<a class="fane fane-tilbake" href="../medlem.html" style="background: rgba(192, 50, 90, 0.2); color: #f472b6; border-color: var(--rosa); display: inline-flex; align-items: center; gap: 6px; font-weight: 700;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>';
+    var tilbakeLenke = '<a class="fane fane-tilbake" href="/medlem" style="background: rgba(192, 50, 90, 0.2); color: #f472b6; border-color: var(--rosa); display: inline-flex; align-items: center; gap: 6px; font-weight: 700;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>';
     nav.innerHTML = tilbakeLenke + VERKTOY.map(function (v) {
       return '<a class="fane" href="' + v[0] + '.html"' + (v[0] === aktiv ? ' aria-current="page"' : '') + '>' + v[1] + '</a>';
     }).join('');

@@ -181,12 +181,12 @@ function setupModals() {
     bindClick('close-admin-control-footer', () => closeModal('admin-control-modal'));
     bindClick('admin-control-modal-overlay', () => closeModal('admin-control-modal'));
 
-    // 1b. Merkeverktøy & Media Panel (Admin)
-    bindClick('open-brand-control-btn', () => openModal('brand-control-modal'));
+    // 1b. Merkeverktøy & Media Panel (Admin) - gå direkte til oversiktssiden
+    bindClick('open-brand-control-btn', () => { window.location.href = 'merkeverktoy/'; });
+    bindClick('pwa-open-brand-modal-btn', () => { window.location.href = 'merkeverktoy/'; });
     bindClick('close-brand-control-modal', () => closeModal('brand-control-modal'));
     bindClick('close-brand-control-footer', () => closeModal('brand-control-modal'));
     bindClick('brand-control-modal-overlay', () => closeModal('brand-control-modal'));
-    setupBrandToolsFilter();
 
     // 2. Medlemsadministrasjon (Admin)
     bindClick('admin-panel-members-btn', () => {

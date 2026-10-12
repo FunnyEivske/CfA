@@ -128,11 +128,8 @@ const appIndexHtml = `<!DOCTYPE html>
         .splash-logo {
             width: 96px;
             height: 96px;
-            border-radius: 50%;
             object-fit: contain;
-            background: #ffffff;
-            padding: 8px;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+            filter: drop-shadow(0 8px 16px rgba(0,0,0,0.25));
             margin-bottom: 1.25rem;
         }
         .splash-title {
@@ -161,7 +158,7 @@ const appIndexHtml = `<!DOCTYPE html>
 </head>
 <body>
     <div class="splash-container">
-        <img src="Media/Logo/logo-farge.svg" alt="Cosplay for alle" class="splash-logo">
+        <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle" class="splash-logo">
         <div class="splash-title">Cosplay for alle</div>
         <div class="splash-spinner"></div>
     </div>

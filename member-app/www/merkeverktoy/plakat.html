@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Plakatgenerator – Cosplay for Alle</title>
 <meta name="theme-color" content="#18181b">
+<link rel="icon" type="image/webp" href="/Media/Logo/cfa-logo.webp"><link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/Media/Logo/icon-192.png">
 <meta name="description" content="Lag plakater og innlegg for Cosplay for Alle som følger merkehåndboken: riktige marger, logo, farger og skrift.">
 <link rel="stylesheet" href="assets/cfa.css">
 </head>
@@ -124,7 +126,7 @@
           <span class="etikett" id="bak-etikett">Bakgrunn</span>
           <div class="valg" role="radiogroup" aria-labelledby="bak-etikett">
             <input type="radio" name="bakgrunn" id="b-hvit" value="hvit" checked><label for="b-hvit">Hvit<small>førstevalget</small></label>
-            <input type="radio" name="bakgrunn" id="b-gra" value="gra"><label for="b-gra">Lys grå<small>#F2F2F2</small></label>
+            <input type="radio" name="bakgrunn" id="b-gra" value="gra"><label for="b-gra">Lys grå<small>#D6D6DE</small></label>
             <input type="radio" name="bakgrunn" id="b-vin" value="vinrod"><label for="b-vin">Vinrød<small>logo på hvit plate</small></label>
           </div>
         </div>
@@ -182,6 +184,7 @@
   var ctx = lerret.getContext('2d');
   var logo = null;
   var bilde = null;
+  var brukerBilde = false;
   var bildeNavn = 'eksempelbilde';
   var sisteMal = null;
 
@@ -244,6 +247,7 @@
       formatKey: verdi('format'),
       bilde: bilde,
       medBilde: $('med-bilde').checked && !!bilde,
+      erEksempel: !brukerBilde,
       bildeHoyde: +$('bilde-hoyde').value / 100,
       fx: +$('fokus-x').value / 100,
       fy: +$('fokus-y').value / 100,
@@ -355,7 +359,7 @@
     if (!/^image\//.test(fil.type)) { status('Velg en bildefil (JPG eller PNG).'); return; }
     var url = URL.createObjectURL(fil);
     CfA.lastBilde(url).then(function (img) {
-      bilde = img; bildeNavn = fil.name;
+      bilde = img; bildeNavn = fil.name; brukerBilde = true;
       $('med-bilde').checked = true;
       status('Bruker ' + fil.name + ' (' + img.naturalWidth + ' × ' + img.naturalHeight + ' px)');
       oppdater();

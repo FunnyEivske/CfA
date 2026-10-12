@@ -100,6 +100,8 @@ const mediaFiles = [
   'Media/Bilder/cosplay-trapp.webp',
   'Media/Bilder/cosplay-trapp.jpg',
   'Media/Logo/cfa-logo.webp',
+  'Media/Logo/cfa-logo.png',
+  'Media/Logo/icon-192.png',
   'Media/Logo/logo-farge.svg',
   'Media/Logo/logo-farge.pdf',
   'Media/Logo/logo-farge.png',
@@ -133,8 +135,11 @@ for (const file of htmlFiles) {
   uploadFile(pagePath, file);
 }
 
-// 7. Upload .htaccess
+// 7. Upload .htaccess and favicon.ico
 uploadFile('.htaccess', '.htaccess');
+if (fs.existsSync(path.join(rootDir, 'favicon.ico'))) {
+  uploadFile('favicon.ico', 'favicon.ico');
+}
 
 // 8. Upload Merkeverktøy
 console.log('🎨 Uploading Merkeverktøy suite...');

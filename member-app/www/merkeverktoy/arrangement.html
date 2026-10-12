@@ -5,6 +5,8 @@
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Arrangementspakke – Cosplay for Alle</title>
 <meta name="theme-color" content="#18181b">
+<link rel="icon" type="image/webp" href="/Media/Logo/cfa-logo.webp"><link rel="shortcut icon" href="/favicon.ico">
+<link rel="apple-touch-icon" href="/Media/Logo/icon-192.png">
 <link rel="stylesheet" href="assets/cfa.css">
 <style>
   .anim-rad { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px; align-items: start; }
@@ -198,7 +200,7 @@
   var VARIGHET = 8;
 
   var $ = function (id) { return document.getElementById(id); };
-  var logo = null, bilde = null;
+  var logo = null, bilde = null, brukerBilde = false;
 
   var aktiveMerkelapper = [
     { tekst: 'Påmelding åpen', farge: 'gull' }
@@ -255,9 +257,11 @@
 
   function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
   function tilstand(k) {
+    var bh = k === 'kvadrat' ? 0.35 : (k === 'fbevent' ? 0.40 : (k === 'story' ? 0.52 : 0.45));
     return {
       format: FM[k], formatKey: k,
-      bilde: bilde, medBilde: $('med-bilde').checked && !!bilde, bildeHoyde: 0.63,
+      bilde: bilde, medBilde: $('med-bilde').checked && !!bilde, bildeHoyde: bh,
+      erEksempel: !brukerBilde,
       fx: +$('fokus-x').value / 100, fy: +$('fokus-y').value / 100,
       merkelapper: aktiveMerkelapper.slice(), lappStorrelse: +verdi('lapp-str'), tittel: $('tittel').value.trim(),
       hva: $('hva').value.trim(), nar: $('nar').value.trim(), hvor: $('hvor').value.trim(),
@@ -447,7 +451,7 @@
   CfA.filSone($('bilde-sone'), $('bilde'), function (fil) {
     if (!/^image\//.test(fil.type)) { status('Velg en bildefil (JPG eller PNG).'); return; }
     CfA.lastBilde(URL.createObjectURL(fil)).then(function (img) {
-      bilde = img; $('med-bilde').checked = true;
+      bilde = img; brukerBilde = true; $('med-bilde').checked = true;
       status('Bruker ' + fil.name + ' (' + img.naturalWidth + ' × ' + img.naturalHeight + ' px)');
       oppdater();
     }).catch(function () { status('Klarte ikke å lese bildet. Prøv JPG eller PNG.'); });
