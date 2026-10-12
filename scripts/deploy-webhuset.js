@@ -95,12 +95,22 @@ uploadFile('locales/en.json', 'locales/en.json');
 const mediaFiles = [
   'Media/Bilder/cosplay-gruppe-mobile.webp',
   'Media/Bilder/cosplay-gruppe.webp',
+  'Media/Bilder/cosplay-gruppe.jpg',
   'Media/Bilder/cosplay-trapp-mobile.webp',
   'Media/Bilder/cosplay-trapp.webp',
-  'Media/Logo/cfa-logo.webp'
+  'Media/Bilder/cosplay-trapp.jpg',
+  'Media/Logo/cfa-logo.webp',
+  'Media/Logo/logo-farge.svg',
+  'Media/Logo/logo-farge.pdf',
+  'Media/Logo/logo-farge.png',
+  'Media/Logo/cfa-logo.svg',
+  'Media/Logo/cfa-logo.jpg',
+  'cfa-logopakke.zip'
 ];
 for (const mf of mediaFiles) {
-  uploadFile(mf, mf);
+  if (fs.existsSync(path.join(rootDir, mf))) {
+    uploadFile(mf, mf);
+  }
 }
 
 // 6. Upload HTML Pages

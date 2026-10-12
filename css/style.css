@@ -530,11 +530,11 @@ p {
   text-decoration: none;
 }
 
-.logo-img {
+.logo-img,
+.footer-logo {
   height: 3rem;
   width: 3rem;
-  border-radius: var(--border-radius-full);
-  object-fit: cover;
+  object-fit: contain;
 }
 
 .logo-text {

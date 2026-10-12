@@ -148,16 +148,7 @@ Vi gleder oss ihvertfall masse!!
       else if (linje !== m[0].trim()) legg(m.index, m.index + m[0].length, 'tips', 'Slagord', 'Slagordet står alene på egen linje, aldri inni en setning.', null);
     }
 
-    // STORE BOKSTAVER i hele ord
-    re = new RegExp('(^|[^' + BOKSTAV + '])([A-ZÆØÅ]{4,})(?![' + BOKSTAV + '])', 'g');
-    while ((m = re.exec(tekst))) {
-      if (FORKORTELSER.indexOf(m[2]) >= 0) continue;
-      var s = m.index + m[1].length;
-      var forran = tekst.slice(0, s).replace(/[^\S\n]+$/, '');
-      var setningsstart = !forran || /[.!?\n]$/.test(forran) || /^\W*$/.test(tekst.slice(tekst.lastIndexOf('\n', s - 1) + 1, s));
-      var lav = m[2].toLowerCase();
-      legg(s, s + m[2].length, 'feil', 'Store bokstaver', 'Ikke store bokstaver i hele ord. Bruk fet skrift eller la ordet stå alene.', setningsstart ? lav.charAt(0).toUpperCase() + lav.slice(1) : lav);
-    }
+
 
     // Engelske måneder og dager
     Object.keys(ENGELSK).forEach(function (eng) {

@@ -129,6 +129,9 @@ const appIndexHtml = `<!DOCTYPE html>
             width: 96px;
             height: 96px;
             border-radius: 50%;
+            object-fit: contain;
+            background: #ffffff;
+            padding: 8px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.25);
             margin-bottom: 1.25rem;
         }
@@ -158,7 +161,7 @@ const appIndexHtml = `<!DOCTYPE html>
 </head>
 <body>
     <div class="splash-container">
-        <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle" class="splash-logo">
+        <img src="Media/Logo/logo-farge.svg" alt="Cosplay for alle" class="splash-logo">
         <div class="splash-title">Cosplay for alle</div>
         <div class="splash-spinner"></div>
     </div>
@@ -197,8 +200,8 @@ const iosDir = path.join(memberAppDir, 'ios');
 
 if (fs.existsSync(androidDir) || fs.existsSync(iosDir)) {
   try {
-    console.log('📱 Syncing into native platform directories via Capacitor...');
-    execSync('npx cap copy', { cwd: memberAppDir, stdio: 'inherit' });
+    const npxCmd = process.platform === 'win32' ? 'npx.cmd' : 'npx';
+    execSync(`${npxCmd} cap copy`, { cwd: memberAppDir, stdio: 'inherit' });
     console.log('✓ Capacitor copy complete!');
   } catch (e) {
     console.warn('⚠️ Could not run cap copy automatically:', e.message);

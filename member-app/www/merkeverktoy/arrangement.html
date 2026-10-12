@@ -23,9 +23,38 @@
     <form class="panel" id="skjema" autocomplete="off">
       <fieldset>
         <legend>Arrangementet</legend>
-        <div class="felt">
-          <label for="merkelapp">Merkelapp <span class="hint">(valgfri)</span></label>
-          <input type="text" id="merkelapp" value="Påmelding åpen" maxlength="24">
+        <div class="felt merkelapp-gruppe">
+          <label>Merkelapper <span class="hint">(valgfrie piller i gull, lys grå, vinrød m.m.)</span></label>
+          <div class="merkelapp-liste" id="merkelapp-liste"></div>
+
+          <div class="merkelapp-ny-rad">
+            <input type="text" id="ny-merkelapp-tekst" placeholder="Skriv ny merkelapp..." maxlength="24">
+            <select id="ny-merkelapp-farge">
+              <option value="gull">Gull</option>
+              <option value="lysgra">Lys grå</option>
+              <option value="vinrod">Vinrød</option>
+              <option value="hvit">Hvit</option>
+              <option value="stalgra">Stålgrå</option>
+            </select>
+            <button type="button" class="knapp omriss" id="legg-til-lapp" style="padding: 7px 12px; font-size: 13px;">+ Legg til</button>
+          </div>
+
+          <div class="merkelapp-hurtigvalg">
+            <span class="hurtig-tekst">Hurtigvalg:</span>
+            <button type="button" data-tekst="Påmelding åpen" data-farge="gull">+ Påmelding åpen (Gull)</button>
+            <button type="button" data-tekst="Gratis" data-farge="gull">+ Gratis (Gull)</button>
+            <button type="button" data-tekst="13+" data-farge="lysgra">+ 13+ (Lys grå)</button>
+            <button type="button" data-tekst="Kun medlemmer" data-farge="vinrod">+ Kun medlemmer (Vinrød)</button>
+          </div>
+
+          <div style="display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 2px;">
+            <span class="etikett" style="font-size: 12px; color: var(--tekst-svak);">Størrelse på merkelapper:</span>
+            <div class="valg" role="radiogroup">
+              <input type="radio" name="lapp-str" id="lstr-s" value="0"><label for="lstr-s" style="padding: 4px 10px; font-size: 12px;">Liten</label>
+              <input type="radio" name="lapp-str" id="lstr-m" value="1" checked><label for="lstr-m" style="padding: 4px 10px; font-size: 12px;">Middels</label>
+              <input type="radio" name="lapp-str" id="lstr-l" value="2"><label for="lstr-l" style="padding: 4px 10px; font-size: 12px;">Stor</label>
+            </div>
+          </div>
         </div>
         <div class="felt">
           <label for="tittel">Tittel</label>
@@ -171,6 +200,54 @@
   var $ = function (id) { return document.getElementById(id); };
   var logo = null, bilde = null;
 
+  var aktiveMerkelapper = [
+    { tekst: 'Påmelding åpen', farge: 'gull' }
+  ];
+
+  function tegnMerkelapperListe() {
+    var listeEl = $('merkelapp-liste');
+    listeEl.innerHTML = '';
+    if (aktiveMerkelapper.length === 0) {
+      listeEl.innerHTML = '<span style="font-size:12px; color:var(--tekst-svak); font-style:italic;">Ingen merkelapper (trykk på hurtigvalg eller legg til ny)</span>';
+      return;
+    }
+    aktiveMerkelapper.forEach(function (lp, idx) {
+      var chip = document.createElement('div');
+      chip.className = 'merkelapp-chip farge-' + lp.farge;
+      chip.innerHTML = '<span>' + lp.tekst + '</span>' +
+        '<select title="Endre farge" aria-label="Endre farge">' +
+          '<option value="gull"' + (lp.farge === 'gull' ? ' selected' : '') + '>Gull</option>' +
+          '<option value="lysgra"' + (lp.farge === 'lysgra' || lp.farge === 'gra' ? ' selected' : '') + '>Lys grå</option>' +
+          '<option value="vinrod"' + (lp.farge === 'vinrod' ? ' selected' : '') + '>Vinrød</option>' +
+          '<option value="hvit"' + (lp.farge === 'hvit' ? ' selected' : '') + '>Hvit</option>' +
+          '<option value="stalgra"' + (lp.farge === 'stalgra' ? ' selected' : '') + '>Stålgrå</option>' +
+        '</select>' +
+        '<button type="button" class="slett-chip" title="Fjern merkelapp" aria-label="Fjern merkelapp">&times;</button>';
+
+      chip.querySelector('select').addEventListener('change', function (e) {
+        lp.farge = e.target.value;
+        chip.className = 'merkelapp-chip farge-' + lp.farge;
+        oppdater();
+      });
+
+      chip.querySelector('.slett-chip').addEventListener('click', function () {
+        aktiveMerkelapper.splice(idx, 1);
+        tegnMerkelapperListe();
+        oppdater();
+      });
+
+      listeEl.appendChild(chip);
+    });
+  }
+
+  function leggTilMerkelapp(tekst, farge) {
+    var t = (tekst || '').trim();
+    if (!t) return;
+    aktiveMerkelapper.push({ tekst: t, farge: farge || 'gull' });
+    tegnMerkelapperListe();
+    oppdater();
+  }
+
   $('formatvalg').innerHTML = PAKKE.map(function (p) {
     return '<label class="bryter" for="m-' + p.id + '"><input type="checkbox" id="m-' + p.id + '" checked> ' +
       p.navn + ' <span class="hint">· ' + p.merk + '</span></label>';
@@ -182,7 +259,7 @@
       format: FM[k], formatKey: k,
       bilde: bilde, medBilde: $('med-bilde').checked && !!bilde, bildeHoyde: 0.63,
       fx: +$('fokus-x').value / 100, fy: +$('fokus-y').value / 100,
-      merkelapp: $('merkelapp').value.trim(), tittel: $('tittel').value.trim(),
+      merkelapper: aktiveMerkelapper.slice(), lappStorrelse: +verdi('lapp-str'), tittel: $('tittel').value.trim(),
       hva: $('hva').value.trim(), nar: $('nar').value.trim(), hvor: $('hvor').value.trim(),
       beskrivelse: $('beskrivelse').value.trim(),
       storrelse: +verdi('storrelse'), bakgrunn: verdi('bakgrunn'), logotype: verdi('logotype'),
@@ -375,6 +452,30 @@
       oppdater();
     }).catch(function () { status('Klarte ikke å lese bildet. Prøv JPG eller PNG.'); });
   });
+  // Merkelapp event listeners
+  $('legg-til-lapp').addEventListener('click', function () {
+    var inp = $('ny-merkelapp-tekst');
+    var farge = $('ny-merkelapp-farge').value;
+    leggTilMerkelapp(inp.value, farge);
+    inp.value = '';
+    inp.focus();
+  });
+  $('ny-merkelapp-tekst').addEventListener('keydown', function (e) {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      $('legg-til-lapp').click();
+    }
+  });
+  document.querySelectorAll('.merkelapp-hurtigvalg button').forEach(function (btn) {
+    btn.addEventListener('click', function () {
+      leggTilMerkelapp(btn.getAttribute('data-tekst'), btn.getAttribute('data-farge'));
+    });
+  });
+  document.querySelectorAll('input[name="lapp-str"]').forEach(function (r) {
+    r.addEventListener('change', oppdater);
+  });
+  tegnMerkelapperListe();
+
   $('skjema').addEventListener('input', oppdater);
   $('skjema').addEventListener('change', oppdater);
   $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });

@@ -265,3 +265,38 @@ input[type="range"] { width: 100%; accent-color: var(--rosa); }
 .miniatyr { display: grid; gap: 6px; justify-items: center; font-size: 12px; color: var(--tekst-svak); text-align: center; min-width: 0; }
 .miniatyr canvas { max-width: 100%; height: auto; border-radius: 3px; box-shadow: 0 6px 18px rgba(0,0,0,.45); background: #fff; }
 .miniatyr b { color: var(--tekst); font-weight: 600; font-size: 13px; }
+
+/* Merkelapper editor */
+.merkelapp-gruppe { display: grid; gap: 10px; }
+.merkelapp-liste { display: flex; flex-wrap: wrap; gap: 8px; min-height: 28px; align-items: center; }
+.merkelapp-chip {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; border-radius: 999px;
+  font-size: 13px; font-weight: 700; letter-spacing: 0.02em; user-select: none;
+}
+.merkelapp-chip.farge-gull { background: #F3B716; color: #6D0C32; }
+.merkelapp-chip.farge-gra, .merkelapp-chip.farge-lysgra { background: #EAEAEA; color: #222222; border: 1px solid #D0D0D5; }
+.merkelapp-chip.farge-vinrod { background: #6D0C32; color: #FFFFFF; }
+.merkelapp-chip.farge-hvit { background: #FFFFFF; color: #6D0C32; border: 1px solid #E0E0E0; }
+.merkelapp-chip.farge-stalgra { background: #909090; color: #FFFFFF; }
+
+.merkelapp-chip select {
+  font-size: 11px; padding: 2px 4px; border-radius: 6px;
+  background: rgba(0,0,0,0.12); color: inherit; border: none; cursor: pointer;
+}
+.merkelapp-chip button.slett-chip {
+  background: none; border: none; color: inherit; cursor: pointer;
+  padding: 0 3px; font-size: 15px; line-height: 1; opacity: 0.75;
+}
+.merkelapp-chip button.slett-chip:hover { opacity: 1; }
+
+.merkelapp-ny-rad { display: flex; gap: 8px; align-items: center; }
+.merkelapp-ny-rad input[type="text"] { flex: 1; }
+.merkelapp-ny-rad select { width: auto; min-width: 105px; }
+.merkelapp-hurtigvalg { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; font-size: 12px; }
+.merkelapp-hurtigvalg .hurtig-tekst { color: var(--tekst-svak); }
+.merkelapp-hurtigvalg button {
+  background: var(--bg); border: 1px dashed var(--kant); color: var(--tekst-svak);
+  border-radius: 999px; padding: 3px 10px; font-size: 12px; cursor: pointer; transition: all .15s ease;
+}
+.merkelapp-hurtigvalg button:hover { color: var(--tekst); border-color: var(--rosa); }

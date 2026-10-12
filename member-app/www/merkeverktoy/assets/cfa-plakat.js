@@ -51,12 +51,70 @@
     var avst = trykk ? { a4: 4 * f, a8: 8 * f, a12: 12 * f } : { a4: 14, a8: 28, a12: 42 };
     var tittelStr = trykk ? TITTEL_PT[t.storrelse] * PT * f : TITTEL_PX[t.storrelse];
     var brodStr = trykk ? 13 * PT * f : 36;
-    var lappStr = trykk ? 10 * PT * f : 28;
+    var lappSkala = (t.lappStorrelse === 'liten' || t.lappStorrelse === 0 || t.lappStorrelse === '0') ? 0.8 : ((t.lappStorrelse === 'stor' || t.lappStorrelse === 2 || t.lappStorrelse === '2') ? 1.25 : 1.0);
+    var lappStr = Math.round((trykk ? 10 * PT * f : 28) * lappSkala);
     var logoH = fm.logo;
     var x = CfA.frisone(logoH);
     var innB = W - sone.l - sone.r;
     var y = sone.t;
     var undertekst = t.lokallag || 'Sammen om kreativitet';
+
+    var LAPP_STILER = {
+      gull: { bg: F.gull, fg: F.vinrod, border: null },
+      lysgra: { bg: '#EAEAEA', fg: F.tekst, border: '#CCCCCC' },
+      gra: { bg: '#EAEAEA', fg: F.tekst, border: '#CCCCCC' },
+      vinrod: { bg: F.vinrod, fg: F.hvit, border: null },
+      hvit: { bg: F.hvit, fg: F.vinrod, border: '#D5D5D5' },
+      stalgra: { bg: F.stalgra, fg: F.hvit, border: null }
+    };
+
+    function finnMerkelapper(obj) {
+      if (Array.isArray(obj.merkelapper) && obj.merkelapper.length > 0) {
+        return obj.merkelapper.map(function (item) {
+          if (typeof item === 'string') return { tekst: item.trim(), farge: obj.lappFarge || 'gull' };
+          return { tekst: (item.tekst || '').trim(), farge: item.farge || obj.lappFarge || 'gull' };
+        }).filter(function (it) { return it.tekst.length > 0; });
+      }
+      if (obj.merkelapp) {
+        return String(obj.merkelapp).split(/[,;]/).map(function (s) {
+          return { tekst: s.trim(), farge: obj.lappFarge || 'gull' };
+        }).filter(function (it) { return it.tekst.length > 0; });
+      }
+      return [];
+    }
+
+    var lapper = finnMerkelapper(t);
+
+    function beregnLappRader(ctxInst, lpListe, maksB) {
+      if (!lpListe.length) return { rader: [], totalH: 0, radH: 0, radAvst: 0, gap: 0 };
+      ctxInst.save();
+      settFont(ctxInst, '700', lappStr, 0.02);
+      var lp = lappStr * 0.55;
+      var radH = lappStr * 1.6;
+      var radAvst = lappStr * 0.35;
+      var gap = lappStr * 0.4;
+      var rader = [];
+      var currRad = [];
+      var currB = 0;
+
+      lpListe.forEach(function (lpItem) {
+        var tekstB = ctxInst.measureText(lpItem.tekst).width;
+        var boksB = tekstB + 2 * lp;
+        if (currRad.length > 0 && currB + gap + boksB > maksB) {
+          rader.push(currRad);
+          currRad = [{ item: lpItem, b: boksB, lp: lp }];
+          currB = boksB;
+        } else {
+          currRad.push({ item: lpItem, b: boksB, lp: lp });
+          currB += (currRad.length === 1 ? 0 : gap) + boksB;
+        }
+      });
+      if (currRad.length > 0) rader.push(currRad);
+      ctxInst.restore();
+
+      var totalH = rader.length * radH + Math.max(0, rader.length - 1) * radAvst;
+      return { rader: rader, totalH: totalH, radH: radH, radAvst: radAvst, gap: gap };
+    }
 
     // Liggende format: bildet fyller høyre halvdel, teksten står i venstre panel
     var panelB = W;
@@ -116,7 +174,10 @@
     function tekstHoyde() {
       var h = 0;
       c.save();
-      if (t.merkelapp) h += lappStr * 1.6 + avst.a8;
+      if (lapper.length) {
+        var lappPlan = beregnLappRader(c, lapper, innB);
+        h += lappPlan.totalH + avst.a8;
+      }
       h += tittelLinjer.length * tittelStr * 1.04 + avst.a8;
       var rr = [t.hva, t.nar, t.hvor].filter(Boolean);
       if (rr.length) {
@@ -168,22 +229,36 @@
       c.restore();
     }
 
-    // Merkelapp i gull (små ord, side 10)
-    if (t.merkelapp) {
+    // Merkelapper (kan være én eller flere, med farge og størrelse)
+    if (lapper.length) {
       var ly0 = y;
+      var plan = beregnLappRader(c, lapper, innB);
       gruppe('lapp', function () {
         c.save();
         settFont(c, '700', lappStr, 0.02);
-        var lb = c.measureText(t.merkelapp).width;
-        var lp = lappStr * 0.5;
-        c.fillStyle = F.gull;
-        CfA.rundRekt(c, sone.l, ly0, lb + 2 * lp, lappStr * 1.6, lappStr * 0.25); c.fill();
-        c.fillStyle = F.vinrod;
-        c.textBaseline = 'middle';
-        c.fillText(t.merkelapp, sone.l + lp, ly0 + lappStr * 0.82);
+        var curY = ly0;
+        plan.rader.forEach(function (rad) {
+          var curX = sone.l;
+          rad.forEach(function (bLapp) {
+            var stil = LAPP_STILER[bLapp.item.farge] || LAPP_STILER.gull;
+            c.fillStyle = stil.bg;
+            CfA.rundRekt(c, curX, curY, bLapp.b, plan.radH, plan.radH * 0.25);
+            c.fill();
+            if (stil.border) {
+              c.strokeStyle = stil.border;
+              c.lineWidth = Math.max(1, lappStr * 0.05);
+              c.stroke();
+            }
+            c.fillStyle = stil.fg;
+            c.textBaseline = 'middle';
+            c.fillText(bLapp.item.tekst, curX + bLapp.lp, curY + plan.radH * 0.52);
+            curX += bLapp.b + plan.gap;
+          });
+          curY += plan.radH + plan.radAvst;
+        });
         c.restore();
       });
-      y += lappStr * 1.6 + avst.a8;
+      y += plan.totalH + avst.a8;
     }
 
     // Tittel: linjeavstand 1,0, sporing −2 %
@@ -316,13 +391,12 @@
     if (m.bildeKrympet && !m.overlapp) p(true, 'Bildet er gjort lavere så teksten får plass');
     if (m.tittelLinjer > 3 || t.tittel.length > 60) p(false, 'Tittelen er lang. Korte titler på én til to linjer leses best.');
     else if (!t.tittel) p(false, 'Plakaten mangler tittel');
-    else p(true, 'Én tydelig overskrift');
-    var alt = [t.tittel, t.hva, t.nar, t.hvor, t.beskrivelse, t.merkelapp, t.lokallag].join(' \n ');
+    var lappeTekster = (t.merkelapper || []).map(function (l) { return typeof l === 'string' ? l : (l.tekst || ''); }).join(' ');
+    var alt = [t.tittel, t.hva, t.nar, t.hvor, t.beskrivelse, t.merkelapp, lappeTekster, t.lokallag].join(' \n ');
     var feil = navnFeil(alt);
     if (feil.length) p(false, 'Navnet skrives «Cosplay for Alle», ikke «' + feil[0] + '»');
     else if (/\bCfA\b/.test(alt)) p(false, 'CfA brukes ikke alene på plakater. Skriv Cosplay for Alle.');
     else p(true, 'Navnet er skrevet riktig');
-    if (/[A-ZÆØÅ]{5,}/.test(t.tittel)) p(false, 'Unngå store bokstaver i hele ord. Vi bruker vanlig setningsstil.');
     return punkter;
   }
 
