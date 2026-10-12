@@ -8,9 +8,19 @@ export async function initProfilePage() {
 
     try {
         const authRes = await AuthAPI.getAuthState();
-        if (!authRes.authenticated) {
-            window.location.href = 'login';
+        if (!authRes || !authRes.authenticated || !authRes.user) {
+            try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+            const isHtml = window.location.pathname.endsWith('.html');
+            window.location.replace(isHtml ? 'login.html' : 'login');
             return;
+        }
+
+        // Vis siden for autorisert bruker
+        const guardStyle = document.getElementById('auth-guard-style');
+        if (guardStyle) {
+            guardStyle.remove();
+        } else {
+            document.documentElement.style.display = '';
         }
 
         const user = authRes.user;
@@ -26,6 +36,9 @@ export async function initProfilePage() {
         setupProfileForm(user);
     } catch (err) {
         console.error("Profil error:", err);
+        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+        const isHtml = window.location.pathname.endsWith('.html');
+        window.location.replace(isHtml ? 'login.html' : 'login');
     }
 }
 

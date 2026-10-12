@@ -1,7 +1,6 @@
 (function () {
     // 1. Initialiser tema umiddelbart for å unngå FOUC
     const savedTheme = localStorage.getItem('theme');
-    const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
     const isDark = savedTheme === 'dark'; // Alltid light mode som standard hvis ikke lagret som 'dark'
 
     document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
@@ -13,7 +12,12 @@
 
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('theme', newTheme);
-        updateDarkModeIcons(newTheme === 'dark');
+        window.updateDarkModeIcons(newTheme === 'dark');
+
+        const themeLabel = document.getElementById('pwa-current-theme-label');
+        if (themeLabel) {
+            themeLabel.textContent = newTheme === 'dark' ? 'Mørkt tema' : 'Lyst tema';
+        }
     };
 
     // 3. Oppdater ikoner (sol/måne)
@@ -30,17 +34,25 @@
         }
     };
 
-    // 4. Når DOM er klar, sett opp lyttere og korrekturles ikoner
-    document.addEventListener('DOMContentLoaded', () => {
+    // 4. Koble til alle knapper med .theme-toggle klasse
+    function initThemeButtons() {
         const isDarkNow = document.documentElement.getAttribute('data-theme') === 'dark';
-        updateDarkModeIcons(isDarkNow);
+        window.updateDarkModeIcons(isDarkNow);
 
-        // Koble til alle knapper med .theme-toggle klasse
         document.querySelectorAll('.theme-toggle').forEach(btn => {
-            btn.addEventListener('click', (e) => {
-                // e.preventDefault();
-                window.toggleTheme();
-            });
+            if (!btn.dataset.themeBound) {
+                btn.dataset.themeBound = 'true';
+                btn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    window.toggleTheme();
+                });
+            }
         });
-    });
+    }
+
+    if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', initThemeButtons);
+    } else {
+        initThemeButtons();
+    }
 })();

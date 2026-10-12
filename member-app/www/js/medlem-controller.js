@@ -24,6 +24,36 @@ export function closeModal(modalId) {
 }
 
 export async function initMedlemPage() {
+    // 1. Rigorøs autentiseringssjekk FØR noe innhold eller elementer vises
+    let authRes = null;
+    try {
+        authRes = await AuthAPI.getAuthState();
+    } catch (err) {
+        console.warn("Auth check failed:", err);
+    }
+
+    if (!authRes || !authRes.authenticated || !authRes.user) {
+        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+        const isHtml = window.location.pathname.endsWith('.html');
+        window.location.replace(isHtml ? 'login.html' : 'login');
+        return;
+    }
+
+    if (authRes.must_accept_tos || authRes.must_change_password) {
+        const isHtml = window.location.pathname.endsWith('.html');
+        window.location.replace(isHtml ? 'login.html' : 'login');
+        return;
+    }
+
+    // Bruker er autorisert og gyldig: avdekk siden trygt
+    currentUser = authRes.user;
+    const guardStyle = document.getElementById('auth-guard-style');
+    if (guardStyle) {
+        guardStyle.remove();
+    } else {
+        document.documentElement.style.display = '';
+    }
+
     detectAndApplyStandaloneMode();
     registerServiceWorker();
     setupPwaNavigation();
@@ -31,7 +61,7 @@ export async function initMedlemPage() {
     setupModals();
     setupNotificationsToggle();
     setupPushNotificationUI();
-    await setupProfileData();
+    setupProfileData(currentUser);
     setupProfileForm();
     setupAdminEditMemberForm();
     setupDocuments();
@@ -210,8 +240,10 @@ function setupModals() {
         } catch (e) {
             console.error('Logout error:', e);
         }
+        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
         const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
-        window.location.href = isStandalone ? 'login' : '/';
+        const isHtml = window.location.pathname.endsWith('.html');
+        window.location.href = isStandalone ? (isHtml ? 'login.html' : 'login') : '/';
     };
     bindClick('logout-button', handleLogout);
     bindClick('dropdown-logout-button', handleLogout);
@@ -1865,9 +1897,26 @@ function setupNotificationsToggle() {
     }
 }
 
-async function setupProfileData() {
+async function setupProfileData(preloadedUser = null) {
     try {
-        const authRes = await AuthAPI.getAuthState();
+        let user = preloadedUser;
+        if (!user) {
+            const authRes = await AuthAPI.getAuthState();
+            if (!authRes || !authRes.authenticated || !authRes.user) {
+                try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+                const isHtml = window.location.pathname.endsWith('.html');
+                window.location.replace(isHtml ? 'login.html' : 'login');
+                return;
+            }
+            if (authRes.must_accept_tos || authRes.must_change_password) {
+                const isHtml = window.location.pathname.endsWith('.html');
+                window.location.replace(isHtml ? 'login.html' : 'login');
+                return;
+            }
+            user = authRes.user;
+        }
+
+        currentUser = user;
         const profileName = document.getElementById('profile-name');
         const profileRole = document.getElementById('profile-role-text');
         const profileImg = document.getElementById('profile-img');
@@ -1875,38 +1924,31 @@ async function setupProfileData() {
         const adminPublishCard = document.getElementById('admin-publish-card');
         const adminTriggerContainer = document.getElementById('admin-trigger-container');
 
-        if (authRes.authenticated && authRes.user) {
-            if (authRes.must_accept_tos || authRes.must_change_password) {
-                window.location.href = 'login';
-                return;
-            }
-            currentUser = authRes.user;
-            if (profileName) profileName.textContent = authRes.user.display_name || authRes.user.email.split('@')[0];
-            if (profileRole) profileRole.textContent = authRes.user.role === 'admin' ? 'Administrator' : 'Medlem';
-            if (profileImg && authRes.user.photo_url) profileImg.src = authRes.user.photo_url;
-            const pwaHeaderAvatar = document.getElementById('pwa-header-avatar');
-            if (pwaHeaderAvatar) {
-                pwaHeaderAvatar.src = authRes.user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(authRes.user.display_name || authRes.user.email)}&background=random`;
-            }
+        if (profileName) profileName.textContent = user.display_name || user.email.split('@')[0];
+        if (profileRole) profileRole.textContent = user.role === 'admin' ? 'Administrator' : 'Medlem';
+        if (profileImg && user.photo_url) profileImg.src = user.photo_url;
+        const pwaHeaderAvatar = document.getElementById('pwa-header-avatar');
+        if (pwaHeaderAvatar) {
+            pwaHeaderAvatar.src = user.photo_url || `https://ui-avatars.com/api/?name=${encodeURIComponent(user.display_name || user.email)}&background=random`;
+        }
 
-            if (authRes.user.member_since && memberDurationEl) {
-                const joinDate = new Date(authRes.user.member_since);
-                const now = new Date();
-                const months = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
-                memberDurationEl.textContent = months > 0 ? `${months} mnd` : 'Ny innmeldt';
-            }
+        if (user.member_since && memberDurationEl) {
+            const joinDate = new Date(user.member_since);
+            const now = new Date();
+            const months = (now.getFullYear() - joinDate.getFullYear()) * 12 + (now.getMonth() - joinDate.getMonth());
+            memberDurationEl.textContent = months > 0 ? `${months} mnd` : 'Ny innmeldt';
+        }
 
-            if (authRes.user.role === 'admin') {
-                if (adminPublishCard) adminPublishCard.classList.remove('hidden');
-                if (adminTriggerContainer) adminTriggerContainer.classList.remove('hidden');
-                const quickEditBtn = document.getElementById('quick-edit-status-btn');
-                if (quickEditBtn) {
-                    quickEditBtn.classList.remove('hidden');
-                    quickEditBtn.onclick = () => {
-                        populateStatusModal();
-                        openModal('admin-status-modal');
-                    };
-                }
+        if (user.role === 'admin') {
+            if (adminPublishCard) adminPublishCard.classList.remove('hidden');
+            if (adminTriggerContainer) adminTriggerContainer.classList.remove('hidden');
+            const quickEditBtn = document.getElementById('quick-edit-status-btn');
+            if (quickEditBtn) {
+                quickEditBtn.classList.remove('hidden');
+                quickEditBtn.onclick = () => {
+                    populateStatusModal();
+                    openModal('admin-status-modal');
+                };
             }
         }
     } catch (e) {
