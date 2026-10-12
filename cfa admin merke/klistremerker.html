@@ -1,0 +1,137 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Klistremerker og buttons – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<link rel="stylesheet" href="assets/cfa.css">
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="klistremerker" aria-label="Merkeverktøy"></nav>
+  <h1>Klistremerker og buttons</h1>
+  <p class="ingress">Utskriftsark med runde merker i riktig størrelse etter side 15: klistremerke Ø 50 mm med 35 mm logo, og button Ø 38 mm med 26 mm logo.</p>
+
+  <div class="verktoy">
+    <form class="panel" id="skjema" autocomplete="off">
+      <fieldset>
+        <legend>Type</legend>
+        <div class="valg" role="radiogroup" aria-label="Type">
+          <input type="radio" name="type" id="t-klistre" value="klistre" checked><label for="t-klistre">Klistremerke<small>Ø 50 mm, logo 35 mm</small></label>
+          <input type="radio" name="type" id="t-button" value="button"><label for="t-button">Button<small>Ø 38 mm, logo 26 mm</small></label>
+        </div>
+        <div class="felt" id="kant-felt" hidden>
+          <label for="kant">Skjærediameter for buttonmaskinen</label>
+          <input type="range" id="kant" min="38" max="52" value="47">
+          <p class="hint" id="kant-tekst">47 mm. Sjekk tallet i bruksanvisningen til maskinen. Mange 38 mm-maskiner bruker 46–48 mm.</p>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Ark</legend>
+        <div class="felt">
+          <label for="ark">Antall ark</label>
+          <input type="range" id="ark" min="1" max="10" value="1">
+          <p class="hint" id="ark-tekst">1 ark</p>
+        </div>
+        <label class="bryter" for="linjer"><input type="checkbox" id="linjer" checked> Skjærelinjer</label>
+        <p class="hint">Logoen står alltid på hvit bunn med alle tre farger. Til brodering og trykk på tekstil: bruk SVG-filen fra sentralleddet.</p>
+      </fieldset>
+    </form>
+
+    <section class="visning kort" aria-label="Forhåndsvisning">
+      <div class="kort-hode"><h2>Ark</h2><span class="lapp" id="lapp">15 per ark</span></div>
+      <div class="kort-kropp">
+        <div class="lerret-ramme" id="ramme"><canvas id="lerret" width="420" height="594"></canvas></div>
+        <div class="mal" id="mal"></div>
+        <div class="knapper"><button type="button" class="knapp" id="last-pdf">Last ned PDF</button></div>
+        <p class="status" id="status" role="status"></p>
+        <p class="boks stripe"><strong>Skriv ut i 100 %.</strong> Mål ett merke med linjal før du skriver ut alle arkene.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/cfa-merke.js"></script>
+<script>
+(function () {
+  'use strict';
+  var $ = function (id) { return document.getElementById(id); };
+  var logo = null;
+  function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
+
+  function oppsett() {
+    var button = verdi('type') === 'button';
+    var synlig = button ? 38 : 50;
+    var logoH = button ? 26 : 35;
+    var kutt = button ? +$('kant').value : 50;
+    var gap = 3, marg = 8;
+    var kol = Math.floor((210 - 2 * marg + gap) / (kutt + gap));
+    var rad = Math.floor((297 - 2 * marg + gap) / (kutt + gap));
+    var bruktB = kol * kutt + (kol - 1) * gap, bruktH = rad * kutt + (rad - 1) * gap;
+    return { button: button, synlig: synlig, logoH: logoH, kutt: kutt, gap: gap, kol: kol, rad: rad,
+      x0: (210 - bruktB) / 2, y0: (297 - bruktH) / 2 };
+  }
+
+  function tegnArk(c, s, o, forhånd) {
+    c.save();
+    c.setTransform(s, 0, 0, s, 0, 0);
+    c.fillStyle = '#fff'; c.fillRect(0, 0, 210, 297);
+    for (var r = 0; r < o.rad; r++) for (var k = 0; k < o.kol; k++) {
+      var cx = o.x0 + k * (o.kutt + o.gap) + o.kutt / 2;
+      var cy = o.y0 + r * (o.kutt + o.gap) + o.kutt / 2;
+      CfA.tegnLogo(c, logo, cx - CfA.logoBredde(o.logoH) / 2, cy - o.logoH / 2, o.logoH);
+      if ($('linjer').checked) {
+        c.strokeStyle = '#9a9a9a'; c.lineWidth = 0.15;
+        c.beginPath(); c.arc(cx, cy, o.kutt / 2, 0, Math.PI * 2); c.stroke();
+      }
+      if (forhånd && o.button) {
+        c.strokeStyle = 'rgba(192,50,90,.7)'; c.lineWidth = 0.3; c.setLineDash([1, 1]);
+        c.beginPath(); c.arc(cx, cy, o.synlig / 2, 0, Math.PI * 2); c.stroke(); c.setLineDash([]);
+      }
+    }
+    c.restore();
+  }
+
+  var lerret = $('lerret');
+  function vis() {
+    if (!logo) return;
+    var o = oppsett();
+    $('kant-felt').hidden = !o.button;
+    $('kant-tekst').textContent = o.kutt + ' mm. Sjekk tallet i bruksanvisningen til maskinen. Mange 38 mm-maskiner bruker 46–48 mm.';
+    var ark = +$('ark').value;
+    $('ark-tekst').textContent = ark + ' ark · ' + ark * o.kol * o.rad + ' merker';
+    var visB = Math.min($('ramme').clientWidth - 40, window.innerHeight * 0.7 * 210 / 297);
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    lerret.width = Math.round(visB * dpr); lerret.height = Math.round(visB * 297 / 210 * dpr);
+    lerret.style.width = Math.round(visB) + 'px'; lerret.style.height = Math.round(visB * 297 / 210) + 'px';
+    tegnArk(lerret.getContext('2d'), lerret.width / 210, o, true);
+    $('lapp').textContent = o.kol * o.rad + ' per ark';
+    $('mal').innerHTML = '<span>Merke <b>Ø ' + o.synlig + ' mm</b></span><span>Logo <b>' + o.logoH + ' mm</b> høy</span>' +
+      (o.button ? '<span>Skjærekant <b>Ø ' + o.kutt + ' mm</b></span><span>Stiplet: synlig flate</span>' : '') + '<span>PDF <b>A4, 300 dpi</b></span>';
+  }
+
+  $('last-pdf').addEventListener('click', function () {
+    var o = oppsett();
+    var antall = +$('ark').value;
+    $('status').textContent = 'Lager PDF …';
+    var m = CfA.mmLerret(210, 297, 300);
+    tegnArk(m.ctx, m.s, o, false);
+    var sider = [];
+    for (var i = 0; i < antall; i++) sider.push({ c: m.c, mmB: 210, mmH: 297 });
+    CfA.pdfAvLerreter(sider, 0.94).then(function (pdf) {
+      var n = (o.button ? 'buttons-38mm' : 'klistremerker-50mm') + '.pdf';
+      CfA.lastNed(pdf, n);
+      $('status').textContent = 'Lastet ned ' + n + ' (' + antall + ' ark, ' + antall * o.kol * o.rad + ' merker).';
+    });
+  });
+
+  $('skjema').addEventListener('input', vis);
+  $('skjema').addEventListener('change', vis);
+  $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });
+  window.addEventListener('resize', vis);
+  CfA.logo().then(function (l) { logo = l; vis(); });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,218 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Lokallag-logo – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<link rel="stylesheet" href="assets/cfa.css">
+<style>
+  .sjakk { background-color: #fff; background-image: linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%), linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px; }
+  #lerret { box-shadow: none; border-radius: 0; }
+  .lopende { font-size: 15px; }
+  .lopende code { font-family: inherit; background: var(--bg); border: 1px solid var(--kant); border-radius: 8px; padding: 6px 10px; display: inline-block; }
+</style>
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="lokallag" aria-label="Merkeverktøy"></nav>
+  <h1>Logo for lokallag</h1>
+  <p class="ingress">Skriv inn stedsnavnet, så får dere logoen med lokallagets navn slik side 4 i håndboken viser. Stedsnavnet står der slagordet ellers står.</p>
+
+  <div class="verktoy">
+    <form class="panel" id="skjema" autocomplete="off">
+      <fieldset>
+        <legend>Lokallaget</legend>
+        <div class="felt">
+          <label for="sted">Stedsnavn</label>
+          <input type="text" id="sted" value="Agder" maxlength="40">
+          <p class="hint">Bare stedet, for eksempel Agder, Bergen eller Norge. Tom rute gir slagordet.</p>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Versjon</legend>
+        <div class="valg" role="radiogroup" aria-label="Versjon">
+          <input type="radio" name="versjon" id="v-ligg" value="liggende" checked><label for="v-ligg">Liggende<small>brev, nett, e-post</small></label>
+          <input type="radio" name="versjon" id="v-staa" value="staaende"><label for="v-staa">Stående<small>roll-up, stand, forsider</small></label>
+        </div>
+        <div class="felt">
+          <span class="etikett" id="bak-etikett">Bakgrunn i filen</span>
+          <div class="valg" role="radiogroup" aria-labelledby="bak-etikett">
+            <input type="radio" name="bakgrunn" id="b-gj" value="gjennomsiktig" checked><label for="b-gj">Gjennomsiktig</label>
+            <input type="radio" name="bakgrunn" id="b-hv" value="hvit"><label for="b-hv">Hvit</label>
+          </div>
+          <p class="hint">Velg hvit når logoen skal på mørke flater. Da følger platen med.</p>
+        </div>
+        <label class="bryter" for="frisone"><input type="checkbox" id="frisone" checked> Ta med frihetssonen i filen</label>
+      </fieldset>
+    </form>
+
+    <section class="visning kort" aria-label="Forhåndsvisning">
+      <div class="kort-hode"><h2>Forhåndsvisning</h2><span class="lapp" id="lapp">Liggende</span></div>
+      <div class="kort-kropp">
+        <div class="lerret-ramme sjakk" id="ramme"><canvas id="lerret" width="600" height="300"></canvas></div>
+        <div class="mal" id="mal"></div>
+        <div class="knapper">
+          <button type="button" class="knapp" id="last-svg">Last ned SVG</button>
+          <button type="button" class="knapp omriss" id="last-png">Last ned PNG (2000 px)</button>
+          <button type="button" class="knapp omriss" id="last-alt">Alle filer (zip)</button>
+        </div>
+        <p class="status" id="status" role="status"></p>
+        <div class="boks stripe lopende">
+          <strong>I løpende tekst</strong> skrives navn, tankestrek og sted: <code id="lopende">Cosplay for Alle – Agder</code>
+        </div>
+        <p class="boks"><strong>Til trykkeriet:</strong> SVG-filen bruker skriften Arial. Be trykkeriet gjøre teksten om til omriss, eller send PNG-filen hvis de ikke har Arial.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/cfa-merke.js"></script>
+<script>
+(function () {
+  'use strict';
+  var F = CfA.FARGE;
+  var $ = function (id) { return document.getElementById(id); };
+  var logo = null;
+  var mc = document.createElement('canvas').getContext('2d');
+
+  function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
+  function bredde(tekst, vekt, px) { mc.font = vekt + ' ' + px + 'px ' + CfA.FONT; return mc.measureText(tekst).width; }
+
+  /** Regn ut oppsettet i enheter der logohøyden H = 1000. */
+  function oppsett() {
+    var H = 1000, B = CfA.logoBredde(H), x = B / 4;
+    var sted = $('sted').value.trim();
+    var under = sted || 'Sammen om kreativitet';
+    var v = verdi('versjon');
+    var pad = $('frisone').checked ? x : 0;
+    var el = { logo: null, tekster: [] };
+    var w, h;
+    if (v === 'liggende') {
+      // Side 4 og 7: avstand x, navn 0,35 × H, sted 0,45 × navnet, #222
+      var navnPx = 0.35 * H, underPx = 0.45 * navnPx;
+      var cap1 = navnPx * 0.716, luft = navnPx * 0.42, cap2 = underPx * 0.716;
+      var blokk = cap1 + luft + cap2;
+      var top = (H - blokk) / 2;
+      var tx = B + x;
+      var tb = Math.max(bredde('Cosplay for Alle', 700, navnPx), bredde(under, 400, underPx));
+      el.logo = { x: pad, y: pad, h: H };
+      el.tekster.push({ t: 'Cosplay for Alle', x: pad + tx, y: pad + top + cap1, px: navnPx, vekt: 700, farge: F.vinrod, anker: 'start' });
+      el.tekster.push({ t: under, x: pad + tx, y: pad + top + cap1 + luft + cap2, px: underPx, vekt: 400, farge: F.tekst, anker: 'start' });
+      w = tx + tb + 2 * pad; h = H + 2 * pad;
+    } else {
+      // Side 7: stående, avstand x, navn 0,18 × H
+      var np = 0.18 * H, up = 0.45 * np;
+      var nb = bredde('Cosplay for Alle', 700, np), ub = bredde(under, 400, up);
+      var innB = Math.max(B, nb, ub);
+      var c1 = np * 0.716, l2 = np * 0.42, c2 = up * 0.716;
+      w = innB + 2 * pad;
+      el.logo = { x: pad + (innB - B) / 2, y: pad, h: H };
+      var y1 = pad + H + x + c1;
+      el.tekster.push({ t: 'Cosplay for Alle', x: w / 2, y: y1, px: np, vekt: 700, farge: F.vinrod, anker: 'middle' });
+      el.tekster.push({ t: under, x: w / 2, y: y1 + l2 + c2, px: up, vekt: 400, farge: F.tekst, anker: 'middle' });
+      h = y1 + l2 + c2 + up * 0.25 + pad;
+    }
+    return { w: Math.ceil(w), h: Math.ceil(h), el: el, sted: sted, x: x, hvit: verdi('bakgrunn') === 'hvit' };
+  }
+
+  function tegn(c, o, s) {
+    c.save();
+    c.setTransform(s, 0, 0, s, 0, 0);
+    c.clearRect(0, 0, o.w, o.h);
+    if (o.hvit) { c.fillStyle = '#fff'; c.fillRect(0, 0, o.w, o.h); }
+    CfA.tegnLogo(c, logo, o.el.logo.x, o.el.logo.y, o.el.logo.h);
+    o.el.tekster.forEach(function (t) {
+      CfA.settFont(c, t.vekt, t.px, 0);
+      c.fillStyle = t.farge;
+      c.textAlign = t.anker === 'middle' ? 'center' : 'left';
+      c.textBaseline = 'alphabetic';
+      c.fillText(t.t, t.x, t.y);
+    });
+    c.restore();
+  }
+
+  function esc(t) { return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
+
+  function lagSvg(o) {
+    return CfA.logoSvg().then(function (kilde) {
+      var vb = (kilde.match(/viewBox="([^"]+)"/) || [])[1] || '566 316 1870 2544';
+      var indre = kilde.replace(/^[\s\S]*?<svg[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+      var B = CfA.logoBredde(o.el.logo.h);
+      var deler = ['<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ' + o.w + ' ' + o.h + '" width="' + (o.w / 10).toFixed(1) + 'mm" height="' + (o.h / 10).toFixed(1) + 'mm">'];
+      deler.push('<title>Cosplay for Alle' + (o.sted ? ' – ' + esc(o.sted) : '') + '</title>');
+      if (o.hvit) deler.push('<rect width="100%" height="100%" fill="#ffffff"/>');
+      deler.push('<svg x="' + o.el.logo.x.toFixed(2) + '" y="' + o.el.logo.y.toFixed(2) + '" width="' + B.toFixed(2) + '" height="' + o.el.logo.h + '" viewBox="' + vb + '">' + indre + '</svg>');
+      o.el.tekster.forEach(function (t) {
+        deler.push('<text x="' + t.x.toFixed(2) + '" y="' + t.y.toFixed(2) + '" font-family="Arial, Helvetica, sans-serif" font-weight="' + t.vekt + '" font-size="' + t.px.toFixed(2) + '" fill="' + t.farge + '"' + (t.anker === 'middle' ? ' text-anchor="middle"' : '') + '>' + esc(t.t) + '</text>');
+      });
+      deler.push('</svg>');
+      return new Blob([deler.join('\n')], { type: 'image/svg+xml' });
+    });
+  }
+
+  function lagPng(o, hoyde) {
+    var s = hoyde / o.h;
+    var c = document.createElement('canvas');
+    c.width = Math.round(o.w * s); c.height = Math.round(o.h * s);
+    tegn(c.getContext('2d'), o, s);
+    return CfA.lerretTilBlob(c, 'image/png');
+  }
+
+  function basisnavn(o) { return 'cfa-logo-' + (o.sted ? CfA.filnavn(o.sted) + '-' : '') + verdi('versjon'); }
+
+  var lerret = $('lerret');
+  function vis() {
+    if (!logo) return;
+    var o = oppsett();
+    var ramme = $('ramme');
+    var maksB = ramme.clientWidth - 40, maksH = 340;
+    var s = Math.min(maksB / o.w, maksH / o.h);
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    lerret.width = Math.round(o.w * s * dpr); lerret.height = Math.round(o.h * s * dpr);
+    lerret.style.width = Math.round(o.w * s) + 'px'; lerret.style.height = Math.round(o.h * s) + 'px';
+    tegn(lerret.getContext('2d'), o, s * dpr);
+    $('lapp').textContent = verdi('versjon') === 'liggende' ? 'Liggende' : 'Stående';
+    $('lopende').textContent = 'Cosplay for Alle' + (o.sted ? ' – ' + o.sted : '');
+    var px = Math.round(2000 * o.w / o.h);
+    $('mal').innerHTML = '<span>Navn <b>Arial Bold, vinrød</b></span><span>Sted <b>Arial Regular, #222222</b></span><span>PNG <b>' + px + ' × 2000 px</b></span>';
+  }
+
+  function status(t) { $('status').textContent = t; }
+  $('last-svg').addEventListener('click', function () {
+    var o = oppsett();
+    lagSvg(o).then(function (b) { CfA.lastNed(b, basisnavn(o) + '.svg'); status('Lastet ned ' + basisnavn(o) + '.svg'); })
+      .catch(function (e) { status(e.message); });
+  });
+  $('last-png').addEventListener('click', function () {
+    var o = oppsett();
+    lagPng(o, 2000).then(function (b) { CfA.lastNed(b, basisnavn(o) + '.png'); status('Lastet ned ' + basisnavn(o) + '.png'); });
+  });
+  $('last-alt').addEventListener('click', function () {
+    var sted = $('sted').value.trim();
+    var filer = [];
+    var opprinnelig = verdi('versjon');
+    var jobber = ['liggende', 'staaende'].map(function (v) {
+      document.getElementById(v === 'liggende' ? 'v-ligg' : 'v-staa').checked = true;
+      var o = oppsett();
+      var navn = basisnavn(o);
+      return Promise.all([lagSvg(o), lagPng(o, 2000), lagPng(o, 400)]).then(function (r) {
+        filer.push({ navn: navn + '.svg', blob: r[0] }, { navn: navn + '.png', blob: r[1] }, { navn: navn + '-nett.png', blob: r[2] });
+      });
+    });
+    document.getElementById(opprinnelig === 'liggende' ? 'v-ligg' : 'v-staa').checked = true;
+    Promise.all(jobber).then(function () { return CfA.lagZip(filer); }).then(function (z) {
+      var n = 'cfa-logo-' + (sted ? CfA.filnavn(sted) : 'slagord') + '.zip';
+      CfA.lastNed(z, n); status('Lastet ned ' + n + ' med liggende og stående versjon.');
+    });
+  });
+
+  $('skjema').addEventListener('input', vis);
+  $('skjema').addEventListener('change', vis);
+  $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });
+  window.addEventListener('resize', vis);
+  CfA.logo().then(function (l) { logo = l; vis(); });
+})();
+</script>
+</body>
+</html>

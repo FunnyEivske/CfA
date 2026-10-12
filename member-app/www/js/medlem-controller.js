@@ -101,6 +101,13 @@ function setupModals() {
     bindClick('open-admin-control-btn', () => openModal('admin-control-modal'));
     bindClick('close-admin-control-modal', () => closeModal('admin-control-modal'));
     bindClick('close-admin-control-footer', () => closeModal('admin-control-modal'));
+    bindClick('admin-control-modal-overlay', () => closeModal('admin-control-modal'));
+
+    // 1b. Merkeverktøy & Media Panel (Admin)
+    bindClick('open-brand-control-btn', () => openModal('brand-control-modal'));
+    bindClick('close-brand-control-modal', () => closeModal('brand-control-modal'));
+    bindClick('close-brand-control-footer', () => closeModal('brand-control-modal'));
+    bindClick('brand-control-modal-overlay', () => closeModal('brand-control-modal'));
 
     // 2. Medlemsadministrasjon (Admin)
     bindClick('admin-panel-members-btn', () => {
@@ -2298,6 +2305,12 @@ function loadPwaSettings() {
             else adminSection.classList.add('hidden');
         }
 
+        const brandSection = document.getElementById('pwa-brand-section');
+        if (brandSection) {
+            if (currentUser.role === 'admin') brandSection.classList.remove('hidden');
+            else brandSection.classList.add('hidden');
+        }
+
         const publishSection = document.getElementById('pwa-admin-publish-section');
         if (publishSection) {
             if (currentUser.role === 'admin') publishSection.classList.remove('hidden');
@@ -2327,6 +2340,7 @@ function loadPwaSettings() {
     bindClick('pwa-btn-retningslinjer', () => document.getElementById('btn-retningslinjer')?.click());
     bindClick('pwa-btn-vedtekter', () => document.getElementById('btn-vedtekter')?.click());
     bindClick('pwa-open-admin-modal-btn', () => openModal('admin-control-modal'));
+    bindClick('pwa-open-brand-modal-btn', () => openModal('brand-control-modal'));
     bindClick('pwa-logout-row', () => {
         document.getElementById('logout-button')?.click();
     });

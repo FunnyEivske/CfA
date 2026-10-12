@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Arrangementspakke – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<link rel="stylesheet" href="assets/cfa.css">
+<style>
+  .anim-rad { display: grid; grid-template-columns: minmax(0, 220px) minmax(0, 1fr); gap: 20px; align-items: start; }
+  @media (max-width: 640px) { .anim-rad { grid-template-columns: 1fr; } }
+  .anim-rad canvas { width: 100%; height: auto; border-radius: 4px; box-shadow: 0 8px 24px rgba(0,0,0,.45); background: #fff; }
+  .formatvalg { display: grid; gap: 8px; }
+</style>
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="arrangement" aria-label="Merkeverktøy"></nav>
+  <h1>Arrangementspakke</h1>
+  <p class="ingress">Fyll inn arrangementet én gang. Du får plakat til trykk, innlegg, story og bilde til Facebook-arrangementet i én nedlasting, og en animert story-video hvis du vil.</p>
+
+  <div class="verktoy">
+    <form class="panel" id="skjema" autocomplete="off">
+      <fieldset>
+        <legend>Arrangementet</legend>
+        <div class="felt">
+          <label for="merkelapp">Merkelapp <span class="hint">(valgfri)</span></label>
+          <input type="text" id="merkelapp" value="Påmelding åpen" maxlength="24">
+        </div>
+        <div class="felt">
+          <label for="tittel">Tittel</label>
+          <input type="text" id="tittel" value="Kostymekveld med sying for nybegynnere" maxlength="90">
+        </div>
+        <div class="felt">
+          <label for="hva">Hva</label>
+          <input type="text" id="hva" value="Vi går gjennom symaskinen og de vanligste sømmene">
+        </div>
+        <div class="felt">
+          <label for="nar">Når</label>
+          <input type="text" id="nar" value="Torsdag 19. november kl. 18–20">
+        </div>
+        <div class="felt">
+          <label for="hvor">Hvor</label>
+          <input type="text" id="hvor" value="Kirkegaten 2B, Arendal">
+        </div>
+        <div class="felt">
+          <label for="beskrivelse">Mer info</label>
+          <textarea id="beskrivelse" rows="3">Du trenger ikke ha sydd før. Ta med stoff hvis du har, ellers har vi rester du kan øve på.</textarea>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Bilde</legend>
+        <label class="fil" id="bilde-sone" for="bilde">
+          <input type="file" id="bilde" accept="image/*">
+          <strong>Velg bilde</strong>
+          <span class="hint">eller dra det hit. Bruk et stort bilde, gjerne 3000 px eller mer, så det holder til trykk.</span>
+        </label>
+        <label class="bryter" for="med-bilde"><input type="checkbox" id="med-bilde" checked> Bruk bilde</label>
+        <div class="rad">
+          <div class="felt">
+            <label for="fokus-x">Utsnitt sideveis</label>
+            <input type="range" id="fokus-x" min="0" max="100" value="50">
+          </div>
+          <div class="felt">
+            <label for="fokus-y">Utsnitt opp/ned</label>
+            <input type="range" id="fokus-y" min="0" max="100" value="45">
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Utseende</legend>
+        <div class="felt">
+          <span class="etikett" id="bak-etikett">Bakgrunn</span>
+          <div class="valg" role="radiogroup" aria-labelledby="bak-etikett">
+            <input type="radio" name="bakgrunn" id="b-hvit" value="hvit" checked><label for="b-hvit">Hvit</label>
+            <input type="radio" name="bakgrunn" id="b-gra" value="gra"><label for="b-gra">Lys grå</label>
+            <input type="radio" name="bakgrunn" id="b-vin" value="vinrod"><label for="b-vin">Vinrød</label>
+          </div>
+        </div>
+        <div class="felt">
+          <span class="etikett" id="logo-etikett">Logo</span>
+          <div class="valg" role="radiogroup" aria-labelledby="logo-etikett">
+            <input type="radio" name="logotype" id="l-alene" value="alene"><label for="l-alene">Logo alene</label>
+            <input type="radio" name="logotype" id="l-navn" value="navn" checked><label for="l-navn">Med navn</label>
+          </div>
+        </div>
+        <div class="felt">
+          <label for="lokallag">Lokallag <span class="hint">(erstatter slagordet)</span></label>
+          <input type="text" id="lokallag" value="" placeholder="For eksempel Agder">
+        </div>
+        <div class="felt">
+          <span class="etikett" id="storrelse-etikett">Tittelstørrelse</span>
+          <div class="valg" role="radiogroup" aria-labelledby="storrelse-etikett">
+            <input type="radio" name="storrelse" id="s-s" value="0"><label for="s-s">Liten</label>
+            <input type="radio" name="storrelse" id="s-m" value="1" checked><label for="s-m">Middels</label>
+            <input type="radio" name="storrelse" id="s-l" value="2"><label for="s-l">Stor</label>
+          </div>
+        </div>
+      </fieldset>
+
+      <fieldset>
+        <legend>Hva skal være med</legend>
+        <div class="formatvalg" id="formatvalg"></div>
+      </fieldset>
+    </form>
+
+    <div class="panel">
+      <section class="kort" aria-label="Alle formater">
+        <div class="kort-hode"><h2>Pakken</h2><span class="lapp" id="antall-lapp">5 filer</span></div>
+        <div class="kort-kropp">
+          <div class="lerret-ramme"><div class="miniatyrer" id="miniatyrer" style="width:100%"></div></div>
+          <div class="knapper">
+            <button type="button" class="knapp" id="last-alt">Last ned alt (zip)</button>
+          </div>
+          <div class="fremdrift" id="fremdrift-zip" hidden><i></i></div>
+          <p class="status" id="status" role="status"></p>
+          <div>
+            <h2>Sjekkliste</h2>
+            <ul class="sjekk" id="sjekk"></ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="kort" aria-label="Animert video">
+        <div class="kort-hode"><h2>Animert video</h2><span class="lapp">8 sekunder</span></div>
+        <div class="kort-kropp">
+          <div class="anim-rad">
+            <canvas id="anim" width="270" height="480" aria-label="Forhåndsvisning av animasjonen"></canvas>
+            <div class="panel" style="gap:14px">
+              <div class="felt">
+                <span class="etikett" id="vf-etikett">Format</span>
+                <div class="valg" role="radiogroup" aria-labelledby="vf-etikett">
+                  <input type="radio" name="videoformat" id="vf-story" value="story" checked><label for="vf-story">Story 9:16<small>Reels, TikTok, Shorts</small></label>
+                  <input type="radio" name="videoformat" id="vf-innlegg" value="innlegg"><label for="vf-innlegg">Innlegg 4:5<small>feed</small></label>
+                </div>
+              </div>
+              <p class="hint">Bildet zoomer sakte inn mens merkelapp, tittel og info glir inn. Logoen står stille hele tiden, slik håndboken sier.</p>
+              <div class="knapper">
+                <button type="button" class="knapp omriss" id="spill">Spill av</button>
+                <button type="button" class="knapp" id="lag-video">Last ned video</button>
+              </div>
+              <div class="fremdrift" id="fremdrift" hidden><i></i></div>
+              <p class="status" id="video-status" role="status"></p>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+  </div>
+</main>
+
+<script src="assets/cfa-merke.js"></script>
+<script src="assets/cfa-plakat.js"></script>
+<script>
+(function () {
+  'use strict';
+  var FM = CfA.PLAKAT.FORMATER;
+  var PAKKE = [
+    { k: 'a4', navn: 'A4-plakat', fil: 'pdf', merk: 'PDF til trykk, 300 dpi' },
+    { k: 'a4', navn: 'A4-plakat', fil: 'png', merk: 'PNG til utskrift på kontoret', id: 'a4png' },
+    { k: 'innlegg', navn: 'Innlegg 4:5', fil: 'jpg', merk: 'Instagram og Facebook' },
+    { k: 'kvadrat', navn: 'Kvadrat 1:1', fil: 'jpg', merk: 'Instagram og Facebook' },
+    { k: 'story', navn: 'Story 9:16', fil: 'jpg', merk: 'Story, Reels, TikTok' },
+    { k: 'fbevent', navn: 'Facebook-arrangement', fil: 'jpg', merk: '1920 × 1005, Facebooks mål' }
+  ];
+  PAKKE.forEach(function (p) { p.id = p.id || p.k + p.fil; });
+  var VARIGHET = 8;
+
+  var $ = function (id) { return document.getElementById(id); };
+  var logo = null, bilde = null;
+
+  $('formatvalg').innerHTML = PAKKE.map(function (p) {
+    return '<label class="bryter" for="m-' + p.id + '"><input type="checkbox" id="m-' + p.id + '" checked> ' +
+      p.navn + ' <span class="hint">· ' + p.merk + '</span></label>';
+  }).join('');
+
+  function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
+  function tilstand(k) {
+    return {
+      format: FM[k], formatKey: k,
+      bilde: bilde, medBilde: $('med-bilde').checked && !!bilde, bildeHoyde: 0.63,
+      fx: +$('fokus-x').value / 100, fy: +$('fokus-y').value / 100,
+      merkelapp: $('merkelapp').value.trim(), tittel: $('tittel').value.trim(),
+      hva: $('hva').value.trim(), nar: $('nar').value.trim(), hvor: $('hvor').value.trim(),
+      beskrivelse: $('beskrivelse').value.trim(),
+      storrelse: +verdi('storrelse'), bakgrunn: verdi('bakgrunn'), logotype: verdi('logotype'),
+      lokallag: $('lokallag').value.trim()
+    };
+  }
+  function valgte() { return PAKKE.filter(function (p) { return $('m-' + p.id).checked; }); }
+
+  // ---------- miniatyrer ----------
+  var visteFormater = PAKKE.filter(function (p) { return p.fil !== 'png'; });
+  $('miniatyrer').innerHTML = visteFormater.map(function (p) {
+    return '<div class="miniatyr" id="mini-' + p.id + '"><canvas></canvas><span><b>' + p.navn + '</b><br>' + FM[p.k].b + ' × ' + FM[p.k].h + (FM[p.k].trykk ? ' mm' : ' px') + '</span></div>';
+  }).join('');
+
+  var planlagt = false;
+  function oppdater() {
+    if (planlagt) return; planlagt = true;
+    requestAnimationFrame(function () { planlagt = false; tegnAlle(); });
+  }
+  function tegnAlle() {
+    if (!logo) return;
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    var punkter = [];
+    var sett = {};
+    visteFormater.forEach(function (p) {
+      var fm = FM[p.k];
+      var boks = $('mini-' + p.id);
+      boks.hidden = !$('m-' + p.id).checked && !(p.k === 'a4' && $('m-a4png').checked);
+      var c = boks.querySelector('canvas');
+      var visH = fm.liggende ? 120 : 210;
+      var visB = visH * fm.b / fm.h;
+      c.width = Math.round(visB * dpr); c.height = Math.round(visH * dpr);
+      c.style.width = Math.round(visB) + 'px';
+      var t = tilstand(p.k);
+      var m = CfA.tegnPlakat(c.getContext('2d'), t, c.width / fm.b, false, logo);
+      if (boks.hidden) return;
+      CfA.sjekkPlakat(t, m).forEach(function (x) {
+        if (x.ok) { if (!sett[x.tekst]) { sett[x.tekst] = 1; } return; }
+        var tekst = fm.navn + ': ' + x.tekst;
+        if (/Navnet|CfA|store bokstaver|Tittelen/.test(x.tekst)) tekst = x.tekst;
+        if (!sett[tekst]) { sett[tekst] = 1; punkter.push({ ok: false, tekst: tekst }); }
+      });
+    });
+    if (!punkter.length) punkter.push({ ok: true, tekst: 'Alle formatene følger håndboken' });
+    else punkter.unshift({ ok: true, tekst: 'Logo, marger og farger er satt etter håndboken' });
+    $('sjekk').innerHTML = CfA.sjekkHtml(punkter);
+    var n = valgte().length;
+    $('antall-lapp').textContent = n + (n === 1 ? ' fil' : ' filer');
+    $('last-alt').disabled = n === 0;
+    tegnAnimRamme(animTid);
+  }
+
+  // ---------- zip ----------
+  function status(t) { $('status').textContent = t; }
+  $('last-alt').addEventListener('click', function () {
+    var liste = valgte();
+    if (!liste.length) return;
+    var navn = CfA.filnavn($('tittel').value);
+    var filer = [];
+    var knapp = $('last-alt');
+    knapp.disabled = true;
+    $('fremdrift-zip').hidden = false;
+    status('Lager filene …');
+    liste.reduce(function (p, item, i) {
+      return p.then(function () {
+        return new Promise(function (ok) { setTimeout(ok, 30); }).then(function () {
+          var t = tilstand(item.k);
+          var c = CfA.eksportPlakat(t, logo);
+          var ferdig;
+          if (item.fil === 'pdf') {
+            ferdig = CfA.pdfAvLerreter([{ c: c, mmB: t.format.b, mmH: t.format.h }], 0.95);
+          } else {
+            ferdig = CfA.lerretTilBlob(c, item.fil === 'png' ? 'image/png' : 'image/jpeg', 0.92);
+          }
+          return ferdig.then(function (b) {
+            filer.push({ navn: navn + '-' + item.k + (item.k === 'fbevent' ? '' : '') + '.' + item.fil, blob: b });
+            $('fremdrift-zip').firstElementChild.style.width = Math.round((i + 1) / liste.length * 100) + '%';
+          });
+        });
+      });
+    }, Promise.resolve()).then(function () {
+      return CfA.lagZip(filer);
+    }).then(function (zip) {
+      CfA.lastNed(zip, navn + '-pakke.zip');
+      status('Lastet ned ' + navn + '-pakke.zip med ' + filer.length + ' filer.');
+    }).catch(function (e) {
+      status('Noe gikk galt: ' + e.message);
+    }).then(function () {
+      knapp.disabled = false;
+      setTimeout(function () { $('fremdrift-zip').hidden = true; }, 600);
+    });
+  });
+
+  // ---------- animasjon ----------
+  function animVerdier(sek) {
+    return {
+      zoom: 1 + 0.07 * Math.min(1, sek / VARIGHET),
+      lapp: (sek - 0.3) / 0.6,
+      tittel: (sek - 0.6) / 0.8,
+      info: (sek - 1.4) / 0.8,
+      tekst: (sek - 2.1) / 0.8
+    };
+  }
+  var animC = $('anim');
+  var animTid = VARIGHET; // vis sluttbildet når den står stille
+  var spiller = false, start = 0;
+
+  function tegnAnimRamme(sek, mal) {
+    if (!logo) return;
+    var k = verdi('videoformat');
+    var fm = FM[k];
+    var c = mal || animC;
+    if (!mal) {
+      var dpr = Math.min(2, window.devicePixelRatio || 1);
+      var b = 220 * dpr, h = b * fm.h / fm.b;
+      if (c.width !== Math.round(b) || c.height !== Math.round(h)) { c.width = Math.round(b); c.height = Math.round(h); }
+    }
+    var t = tilstand(k);
+    t.anim = animVerdier(sek);
+    CfA.tegnPlakat(c.getContext('2d'), t, c.width / fm.b, false, logo);
+  }
+
+  function spillLoop(nå) {
+    if (!spiller) return;
+    animTid = (nå - start) / 1000;
+    if (animTid >= VARIGHET) { animTid = VARIGHET; spiller = false; $('spill').textContent = 'Spill av'; }
+    tegnAnimRamme(animTid);
+    if (spiller) requestAnimationFrame(spillLoop);
+  }
+  $('spill').addEventListener('click', function () {
+    if (spiller) { spiller = false; $('spill').textContent = 'Spill av'; return; }
+    spiller = true; $('spill').textContent = 'Stopp';
+    start = performance.now();
+    requestAnimationFrame(spillLoop);
+  });
+
+  function videoType() {
+    var typer = ['video/mp4;codecs=avc1.640028', 'video/mp4;codecs=avc1', 'video/mp4', 'video/webm;codecs=vp9', 'video/webm'];
+    for (var i = 0; i < typer.length; i++) if (MediaRecorder.isTypeSupported(typer[i])) return typer[i];
+    return '';
+  }
+
+  $('lag-video').addEventListener('click', function () {
+    if (typeof MediaRecorder === 'undefined' || !HTMLCanvasElement.prototype.captureStream) {
+      $('video-status').textContent = 'Nettleseren din kan ikke lage video. Prøv Chrome eller Edge.';
+      return;
+    }
+    var k = verdi('videoformat');
+    var fm = FM[k];
+    var c = document.createElement('canvas');
+    c.width = fm.b; c.height = fm.h;
+    var type = videoType();
+    var strom = c.captureStream(30);
+    var rec = new MediaRecorder(strom, type ? { mimeType: type, videoBitsPerSecond: 8e6 } : undefined);
+    var biter = [];
+    rec.ondataavailable = function (e) { if (e.data.size) biter.push(e.data); };
+    var knapp = $('lag-video');
+    knapp.disabled = true;
+    $('fremdrift').hidden = false;
+    $('video-status').textContent = 'Lager video. Det tar like lang tid som videoen varer.';
+    rec.onstop = function () {
+      knapp.disabled = false;
+      $('fremdrift').hidden = true;
+      var ext = /mp4/.test(type) ? 'mp4' : 'webm';
+      var navn = CfA.filnavn($('tittel').value) + '-' + k + '.' + ext;
+      CfA.lastNed(new Blob(biter, { type: type || 'video/webm' }), navn);
+      $('video-status').textContent = 'Lastet ned ' + navn + (ext === 'webm' ? '. Nettleseren lager WebM. Last den opp via CapCut hvis appen ikke tar den.' : '.');
+    };
+    var t0 = null;
+    function ramme(nå) {
+      if (t0 === null) t0 = nå;
+      var sek = (nå - t0) / 1000;
+      tegnAnimRamme(Math.min(sek, VARIGHET), c);
+      tegnAnimRamme(Math.min(sek, VARIGHET));
+      $('fremdrift').firstElementChild.style.width = Math.min(100, sek / VARIGHET * 100).toFixed(1) + '%';
+      if (sek < VARIGHET + 0.3) requestAnimationFrame(ramme);
+      else rec.stop();
+    }
+    tegnAnimRamme(0, c);
+    rec.start(250);
+    requestAnimationFrame(ramme);
+  });
+
+  // ---------- oppsett ----------
+  CfA.filSone($('bilde-sone'), $('bilde'), function (fil) {
+    if (!/^image\//.test(fil.type)) { status('Velg en bildefil (JPG eller PNG).'); return; }
+    CfA.lastBilde(URL.createObjectURL(fil)).then(function (img) {
+      bilde = img; $('med-bilde').checked = true;
+      status('Bruker ' + fil.name + ' (' + img.naturalWidth + ' × ' + img.naturalHeight + ' px)');
+      oppdater();
+    }).catch(function () { status('Klarte ikke å lese bildet. Prøv JPG eller PNG.'); });
+  });
+  $('skjema').addEventListener('input', oppdater);
+  $('skjema').addEventListener('change', oppdater);
+  $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });
+  document.querySelectorAll('input[name="videoformat"]').forEach(function (r) { r.addEventListener('change', function () { tegnAnimRamme(animTid); }); });
+  window.addEventListener('resize', oppdater);
+
+  Promise.all([
+    CfA.logo(),
+    CfA.lastBilde(CfA.ASSETS + 'eksempel-gruppe.jpg').catch(function () { return null; })
+  ]).then(function (r) {
+    logo = r[0]; bilde = r[1];
+    if (bilde) status('Eksempelbilde er lastet inn. Velg ditt eget bilde.');
+    tegnAlle();
+  });
+})();
+</script>
+</body>
+</html>

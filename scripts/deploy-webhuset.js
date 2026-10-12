@@ -43,10 +43,25 @@ function uploadFile(localRelative, remoteRelative) {
   if (!fs.existsSync(localPath)) return;
   const remoteUrl = `${FTP_BASE}/${remoteRelative.replace(/\\/g, '/')}`;
   try {
-    execSync(`curl.exe -s --user "${AUTH}" -T "${localPath}" "${remoteUrl}"`, { stdio: 'inherit' });
+    execSync(`curl.exe -s --ftp-create-dirs --user "${AUTH}" -T "${localPath}" "${remoteUrl}"`, { stdio: 'inherit' });
     console.log(`✓ Uploaded: ${remoteRelative}`);
   } catch (err) {
     console.error(`✗ Failed to upload ${localRelative}:`, err.message);
+  }
+}
+
+function uploadDirRecursive(localDir, remoteDir) {
+  const fullLocalDir = path.join(rootDir, localDir);
+  if (!fs.existsSync(fullLocalDir)) return;
+  const entries = fs.readdirSync(fullLocalDir, { withFileTypes: true });
+  for (const entry of entries) {
+    const subLocal = path.join(localDir, entry.name);
+    const subRemote = `${remoteDir}/${entry.name}`;
+    if (entry.isDirectory()) {
+      uploadDirRecursive(subLocal, subRemote);
+    } else {
+      uploadFile(subLocal, subRemote);
+    }
   }
 }
 
@@ -107,5 +122,12 @@ for (const file of htmlFiles) {
   uploadFile(pagePath, `pages/${file}`);
   uploadFile(pagePath, file);
 }
+
+// 7. Upload .htaccess
+uploadFile('.htaccess', '.htaccess');
+
+// 8. Upload Merkeverktøy
+console.log('🎨 Uploading Merkeverktøy suite...');
+uploadDirRecursive('merkeverktoy', 'merkeverktoy');
 
 console.log('✅ Deployment to Webhuset complete!');

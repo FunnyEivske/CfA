@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Navnelapper – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<link rel="stylesheet" href="assets/cfa.css">
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="navnelapper" aria-label="Merkeverktøy"></nav>
+  <h1>Navnelapper</h1>
+  <p class="ingress">Lim inn navnene, ett per linje. Du får et utskriftsark med logo på hver lapp, klart for klistrelapper eller navneskilt-lommer.</p>
+
+  <div class="verktoy">
+    <form class="panel" id="skjema" autocomplete="off">
+      <fieldset>
+        <legend>Navn</legend>
+        <div class="felt">
+          <label for="navn">Ett navn per linje</label>
+          <textarea id="navn" rows="9" spellcheck="false">Kari Nordmann | Styret
+Ola Nordmann | Workshopleder
+Ingrid
+Sander | han/ham
+Amalie | hun/henne
+Jonas</textarea>
+          <p class="hint">Skriv en strek | etter navnet for en linje til, for eksempel rolle eller pronomen.</p>
+        </div>
+        <label class="bryter" for="tomme"><input type="checkbox" id="tomme" checked> Fyll siste ark med tomme lapper</label>
+      </fieldset>
+      <fieldset>
+        <legend>Lappene</legend>
+        <div class="felt">
+          <span class="etikett" id="type-etikett">Type</span>
+          <div class="valg" role="radiogroup" aria-labelledby="type-etikett">
+            <input type="radio" name="type" id="t-klistre" value="klistre" checked><label for="t-klistre">Klistrelapper<small>70 × 37 mm, 24 per ark</small></label>
+            <input type="radio" name="type" id="t-skilt" value="skilt"><label for="t-skilt">Navneskilt<small>90 × 55 mm, 10 per ark</small></label>
+          </div>
+        </div>
+        <div class="felt">
+          <label for="arrangement">Arrangement <span class="hint">(valgfri, nederst på lappen)</span></label>
+          <input type="text" id="arrangement" value="Workshop: EVA-skum" maxlength="40">
+        </div>
+        <div class="felt">
+          <label for="lokallag">Lokallag <span class="hint">(valgfri)</span></label>
+          <input type="text" id="lokallag" value="" placeholder="For eksempel Agder">
+        </div>
+        <label class="bryter" for="merker"><input type="checkbox" id="merker"> Skjæremerker</label>
+      </fieldset>
+    </form>
+
+    <section class="visning kort" aria-label="Forhåndsvisning">
+      <div class="kort-hode"><h2>Ark 1</h2><span class="lapp" id="lapp">1 ark</span></div>
+      <div class="kort-kropp">
+        <div class="lerret-ramme" id="ramme"><canvas id="lerret" width="420" height="594"></canvas></div>
+        <div class="mal" id="mal"></div>
+        <div class="knapper">
+          <button type="button" class="knapp" id="last-pdf">Last ned PDF</button>
+        </div>
+        <p class="status" id="status" role="status"></p>
+        <p class="boks stripe"><strong>Skriv ut i 100 %.</strong> Slå av «Tilpass til side» i utskriftsvinduet, ellers treffer ikke lappene arket.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/cfa-merke.js"></script>
+<script>
+(function () {
+  'use strict';
+  var F = CfA.FARGE;
+  var $ = function (id) { return document.getElementById(id); };
+  var logo = null;
+
+  // Arkoppsett i mm. Klistrelapper 70 × 37 fyller A4 3 × 8. Navneskilt 90 × 55 passer vanlige plastlommer.
+  var TYPER = {
+    klistre: { b: 70, h: 37, kol: 3, rad: 8, venstre: 0, topp: 0.5, gapX: 0, gapY: 0, pad: 4, logo: 24 },
+    skilt: { b: 90, h: 55, kol: 2, rad: 5, venstre: 15, topp: 11, gapX: 0, gapY: 0, pad: 6, logo: 30 }
+  };
+
+  function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
+
+  function personer() {
+    return $('navn').value.split('\n').map(function (l) { return l.trim(); }).filter(Boolean).map(function (l) {
+      var d = l.split('|');
+      return { navn: d[0].trim(), ekstra: (d[1] || '').trim() };
+    });
+  }
+
+  function tilpassFont(c, tekst, vekt, maksPx, maksB) {
+    var px = maksPx;
+    CfA.settFont(c, vekt, px, 0);
+    var b = c.measureText(tekst).width;
+    if (b > maksB) { px = px * maksB / b; CfA.settFont(c, vekt, px, 0); }
+    return px;
+  }
+
+  function tegnLapp(c, T, x0, y0, p) {
+    var pad = T.pad;
+    // tynn gull kant øverst (aksent, ikke flate)
+    c.fillStyle = F.gull;
+    c.fillRect(x0, y0, T.b, 1.2);
+    var lh = Math.min(T.logo, T.h - 2 * pad);
+    var ly = y0 + (T.h - lh) / 2;
+    CfA.tegnLogo(c, logo, x0 + pad, ly, lh);
+    var tx = x0 + pad + CfA.logoBredde(lh) + CfA.frisone(lh);
+    var maksB = x0 + T.b - pad - tx;
+    var midt = y0 + T.h / 2;
+    var arr = $('arrangement').value.trim();
+    var lag = $('lokallag').value.trim();
+    var bunnTekst = [arr, lag ? 'Cosplay for Alle – ' + lag : ''].filter(Boolean).join(' · ');
+    c.textBaseline = 'alphabetic';
+    c.textAlign = 'left';
+    if (p && p.navn) {
+      var nPx = tilpassFont(c, p.navn, 700, T.h * 0.24, maksB);
+      c.fillStyle = F.vinrod;
+      var ny = midt + nPx * 0.3 - (p.ekstra ? nPx * 0.35 : 0);
+      c.fillText(p.navn, tx, ny);
+      if (p.ekstra) {
+        var ePx = tilpassFont(c, p.ekstra, 400, nPx * 0.5, maksB);
+        c.fillStyle = F.tekst;
+        c.fillText(p.ekstra, tx, ny + ePx * 1.5);
+      }
+    } else {
+      // tom lapp: skrivelinje
+      c.strokeStyle = '#c8c8c8'; c.lineWidth = 0.25;
+      c.beginPath(); c.moveTo(tx, midt + 3); c.lineTo(x0 + T.b - pad, midt + 3); c.stroke();
+      CfA.settFont(c, 400, 2.4, 0); c.fillStyle = '#909090';
+      c.fillText('Navn', tx, midt + 6.5);
+    }
+    if (bunnTekst) {
+      tilpassFont(c, bunnTekst, 400, 2.6, maksB);
+      c.fillStyle = '#5a5a5a';
+      c.fillText(bunnTekst, tx, y0 + T.h - pad + 0.8);
+    }
+  }
+
+  function sider() {
+    var T = TYPER[verdi('type')];
+    var liste = personer();
+    var perArk = T.kol * T.rad;
+    if ($('tomme').checked) {
+      var rest = liste.length % perArk;
+      if (rest || !liste.length) for (var i = 0; i < (liste.length ? perArk - rest : perArk); i++) liste.push(null);
+    }
+    var ut = [];
+    for (var j = 0; j < liste.length; j += perArk) ut.push(liste.slice(j, j + perArk));
+    if (!ut.length) ut.push([]);
+    return { T: T, ark: ut, antall: personer().length };
+  }
+
+  function tegnArk(c, s, T, ark, visKanter) {
+    c.save();
+    c.setTransform(s, 0, 0, s, 0, 0);
+    c.fillStyle = '#fff'; c.fillRect(0, 0, 210, 297);
+    ark.forEach(function (p, i) {
+      var kx = i % T.kol, ry = Math.floor(i / T.kol);
+      var x0 = T.venstre + kx * (T.b + T.gapX), y0 = T.topp + ry * (T.h + T.gapY);
+      tegnLapp(c, T, x0, y0, p);
+      if (visKanter) {
+        c.strokeStyle = 'rgba(0,0,0,.18)'; c.lineWidth = 0.2; c.setLineDash([1, 1]);
+        c.strokeRect(x0, y0, T.b, T.h); c.setLineDash([]);
+      }
+    });
+    if ($('merker').checked) {
+      c.strokeStyle = '#000'; c.lineWidth = 0.15;
+      var xs = [], ys = [];
+      for (var k = 0; k <= T.kol; k++) xs.push(T.venstre + k * T.b);
+      for (var r = 0; r <= T.rad; r++) ys.push(T.topp + r * T.h);
+      xs.forEach(function (x) { c.beginPath(); c.moveTo(x, 0); c.lineTo(x, Math.max(1, ys[0] - 2)); c.moveTo(x, Math.min(296, ys[ys.length - 1] + 2)); c.lineTo(x, 297); c.stroke(); });
+      ys.forEach(function (y) { c.beginPath(); c.moveTo(0, y); c.lineTo(Math.max(1, xs[0] - 2), y); c.moveTo(Math.min(209, xs[xs.length - 1] + 2), y); c.lineTo(210, y); c.stroke(); });
+    }
+    c.restore();
+  }
+
+  var lerret = $('lerret');
+  function vis() {
+    if (!logo) return;
+    var d = sider();
+    var ramme = $('ramme');
+    var visB = Math.min(ramme.clientWidth - 40, (window.innerHeight * 0.72) * 210 / 297);
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    lerret.width = Math.round(visB * dpr); lerret.height = Math.round(visB * 297 / 210 * dpr);
+    lerret.style.width = Math.round(visB) + 'px'; lerret.style.height = Math.round(visB * 297 / 210) + 'px';
+    tegnArk(lerret.getContext('2d'), lerret.width / 210, d.T, d.ark[0], true);
+    $('lapp').textContent = d.ark.length + (d.ark.length === 1 ? ' ark' : ' ark');
+    $('mal').innerHTML = '<span><b>' + d.antall + '</b> navn</span><span>Lapp <b>' + d.T.b + ' × ' + d.T.h + ' mm</b></span><span>Logo <b>' + Math.min(d.T.logo, d.T.h - 2 * d.T.pad) + ' mm</b> høy</span><span>PDF <b>A4, 300 dpi</b></span>';
+  }
+
+  $('last-pdf').addEventListener('click', function () {
+    var d = sider();
+    $('status').textContent = 'Lager PDF …';
+    var lerreter = d.ark.map(function (ark) {
+      var m = CfA.mmLerret(210, 297, 300);
+      tegnArk(m.ctx, m.s, d.T, ark, false);
+      return { c: m.c, mmB: 210, mmH: 297 };
+    });
+    CfA.pdfAvLerreter(lerreter, 0.94).then(function (pdf) {
+      var n = 'navnelapper-' + CfA.filnavn($('arrangement').value || 'cfa') + '.pdf';
+      CfA.lastNed(pdf, n);
+      $('status').textContent = 'Lastet ned ' + n + ' (' + d.ark.length + ' ark).';
+    });
+  });
+
+  $('skjema').addEventListener('input', vis);
+  $('skjema').addEventListener('change', vis);
+  $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });
+  window.addEventListener('resize', vis);
+  CfA.logo().then(function (l) { logo = l; vis(); });
+})();
+</script>
+</body>
+</html>

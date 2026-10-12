@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Samtykkeskjema – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<link rel="stylesheet" href="assets/cfa.css">
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="samtykke" aria-label="Merkeverktøy"></nav>
+  <h1>Samtykkeskjema for bilder</h1>
+  <p class="ingress">Skriv ut før arrangementet og la alle som blir fotografert skrive under. Er noen under 15 år, skriver en foresatt også under, slik side 12 sier.</p>
+
+  <div class="verktoy">
+    <form class="panel" id="skjema" autocomplete="off">
+      <fieldset>
+        <legend>Skjema</legend>
+        <div class="valg" role="radiogroup" aria-label="Type skjema">
+          <input type="radio" name="mal" id="m-en" value="en" checked><label for="m-en">Ett per person<small>med plass til foresatt</small></label>
+          <input type="radio" name="mal" id="m-liste" value="liste"><label for="m-liste">Liste<small>12 personer per ark</small></label>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Arrangementet</legend>
+        <div class="felt"><label for="arr">Arrangement</label><input type="text" id="arr" value="Kostymekveld"></div>
+        <div class="rad">
+          <div class="felt"><label for="dato">Dato</label><input type="text" id="dato" value="19. november 2026"></div>
+          <div class="felt"><label for="lag">Lokallag</label><input type="text" id="lag" value="" placeholder="Agder"></div>
+        </div>
+      </fieldset>
+      <fieldset>
+        <legend>Hvor bildene kan brukes</legend>
+        <label class="bryter" for="b-nett"><input type="checkbox" id="b-nett" checked> Nettsiden vår</label>
+        <label class="bryter" for="b-some"><input type="checkbox" id="b-some" checked> Sosiale medier (Facebook, Instagram, TikTok)</label>
+        <label class="bryter" for="b-trykk"><input type="checkbox" id="b-trykk" checked> Plakater, flyere og roll-up</label>
+        <label class="bryter" for="b-intern"><input type="checkbox" id="b-intern"> Bare internt i foreningen</label>
+        <p class="hint">Hver person krysser selv av for det de sier ja til.</p>
+      </fieldset>
+      <fieldset>
+        <legend>Kontakt</legend>
+        <div class="felt"><label for="epost">E-post for å trekke samtykket</label><input type="text" id="epost" value="kontakt@cosplayforalle.no"></div>
+      </fieldset>
+    </form>
+
+    <section class="visning kort" aria-label="Forhåndsvisning">
+      <div class="kort-hode"><h2>Forhåndsvisning</h2><span class="lapp" id="lapp">A4</span></div>
+      <div class="kort-kropp">
+        <div class="lerret-ramme" id="ramme"><canvas id="lerret" width="420" height="594"></canvas></div>
+        <div class="knapper">
+          <button type="button" class="knapp" id="last-pdf">Last ned PDF</button>
+        </div>
+        <p class="status" id="status" role="status"></p>
+        <p class="boks stripe">Skjemaet er en mal fra Cosplay for Alle, ikke juridisk rådgivning. Oppbevar de utfylte skjemaene trygt, og kast dem når bildene ikke brukes lenger.</p>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script src="assets/cfa-merke.js"></script>
+<script>
+(function () {
+  'use strict';
+  var F = CfA.FARGE;
+  var PT = 25.4 / 72;
+  var $ = function (id) { return document.getElementById(id); };
+  var logo = null;
+  function verdi(n) { var el = document.querySelector('input[name="' + n + '"]:checked'); return el ? el.value : null; }
+
+  function bruk() {
+    return [['b-nett', 'Nettsiden cosplayforalle.no'], ['b-some', 'Sosiale medier (Facebook, Instagram, TikTok)'],
+      ['b-trykk', 'Plakater, flyere og roll-up'], ['b-intern', 'Bare internt i foreningen']]
+      .filter(function (b) { return $(b[0]).checked; }).map(function (b) { return b[1]; });
+  }
+
+  function tekst(c, t, x, y, vekt, pt, farge, maksB) {
+    CfA.settFont(c, vekt, pt * PT, 0);
+    c.fillStyle = farge || F.tekst;
+    var linjer = maksB ? CfA.brytTekst(c, t, maksB) : [t];
+    linjer.forEach(function (l, i) { c.fillText(l, x, y + i * pt * PT * 1.45); });
+    return y + linjer.length * pt * PT * 1.45;
+  }
+  function linje(c, x1, x2, y) { c.strokeStyle = '#909090'; c.lineWidth = 0.25; c.beginPath(); c.moveTo(x1, y); c.lineTo(x2, y); c.stroke(); }
+  function boks(c, x, y) { c.strokeStyle = F.tekst; c.lineWidth = 0.3; c.strokeRect(x, y - 3.2, 3.6, 3.6); }
+
+  function hode(c, M, W) {
+    var lag = $('lag').value.trim();
+    CfA.tegnLogoMedNavn(c, logo, M, M, 20, lag || 'Sammen om kreativitet');
+    var y = M + 20 + 12;
+    y = tekst(c, 'Samtykke til bilder', M, y + 9, 700, 24, F.vinrod);
+    var info = [$('arr').value.trim(), $('dato').value.trim()].filter(Boolean).join(', ');
+    if (info) y = tekst(c, info, M, y + 1, 400, 11, '#4a4a4a');
+    return y + 4;
+  }
+
+  function tegnEn(c, s) {
+    var W = 210, H = 297, M = 15, innB = W - 2 * M;
+    c.save(); c.setTransform(s, 0, 0, s, 0, 0);
+    c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+    var y = hode(c, M, W);
+    y = tekst(c, 'Vi tar bilder på arrangementene våre for å vise hva vi driver med, og for at flere skal få lyst til å være med. Vi spør deg før vi deler bilder der du kan kjennes igjen.', M, y + 4, 400, 10.5, F.tekst, 165);
+    y += 6;
+    y = tekst(c, 'Kryss av for det du sier ja til', M, y + 4, 700, 12, F.vinrod);
+    bruk().forEach(function (b) { boks(c, M, y + 3); y = tekst(c, b, M + 7, y + 3, 400, 10.5); y += 1.5; });
+    y += 4;
+    y = tekst(c, 'Du kan når som helst trekke samtykket. Send e-post til ' + ($('epost').value.trim() || 'oss') + ', så fjerner vi bildene fra det vi selv har publisert så raskt vi kan. Vi bruker aldri bilder som henger ut, seksualiserer eller bare viser én type cosplay.', M, y + 2, 400, 10.5, F.tekst, 165);
+    y += 8;
+    // deltaker
+    y = tekst(c, 'Deltaker', M, y + 4, 700, 12, F.vinrod);
+    y += 8; linje(c, M, M + 100, y); linje(c, M + 110, W - M, y);
+    tekst(c, 'Navn', M, y + 4, 400, 8.5, '#5a5a5a'); tekst(c, 'Fødselsår', M + 110, y + 4, 400, 8.5, '#5a5a5a');
+    y += 16; linje(c, M, M + 100, y); linje(c, M + 110, W - M, y);
+    tekst(c, 'Underskrift', M, y + 4, 400, 8.5, '#5a5a5a'); tekst(c, 'Dato', M + 110, y + 4, 400, 8.5, '#5a5a5a');
+    y += 14;
+    // foresatt
+    c.fillStyle = F.lysgra; c.fillRect(M, y, innB, 58);
+    c.fillStyle = F.gull; c.fillRect(M, y, 1.2, 58);
+    var fy = tekst(c, 'Foresatt, hvis deltakeren er under 15 år', M + 6, y + 8, 700, 12, F.vinrod);
+    fy = tekst(c, 'Jeg er foresatt og samtykker på vegne av barnet til det som er krysset av over.', M + 6, fy + 1, 400, 10, F.tekst, innB - 12);
+    fy += 10; linje(c, M + 6, M + 100, fy); linje(c, M + 110, W - M - 6, fy);
+    tekst(c, 'Navn', M + 6, fy + 4, 400, 8.5, '#5a5a5a'); tekst(c, 'Telefon eller e-post', M + 110, fy + 4, 400, 8.5, '#5a5a5a');
+    fy += 15; linje(c, M + 6, M + 100, fy); linje(c, M + 110, W - M - 6, fy);
+    tekst(c, 'Underskrift', M + 6, fy + 4, 400, 8.5, '#5a5a5a'); tekst(c, 'Dato', M + 110, fy + 4, 400, 8.5, '#5a5a5a');
+    bunn(c, M, W, H);
+    c.restore();
+  }
+
+  function tegnListe(c, s) {
+    var W = 210, H = 297, M = 15;
+    c.save(); c.setTransform(s, 0, 0, s, 0, 0);
+    c.fillStyle = '#fff'; c.fillRect(0, 0, W, H);
+    c.textBaseline = 'alphabetic'; c.textAlign = 'left';
+    var y = hode(c, M, W);
+    var b = bruk();
+    y = tekst(c, 'Ved å skrive under sier du ja til at bilder der du kan kjennes igjen kan brukes på: ' + b.join(', ').toLowerCase().replace('nettsiden cosplayforalle.no', 'nettsiden cosplayforalle.no') + '. Du kan trekke samtykket når som helst ved å sende e-post til ' + ($('epost').value.trim() || 'oss') + '. Under 15 år: en foresatt skriver under i siste kolonne.', M, y + 3, 400, 9.5, F.tekst, 180);
+    y += 5;
+    var kol = [M, M + 62, M + 82, M + 132, W - M];
+    var navn = ['Navn', 'Født', 'Underskrift', 'Foresatt (under 15 år)'];
+    CfA.settFont(c, 700, 9 * PT, 0); c.fillStyle = F.vinrod;
+    navn.forEach(function (n, i) { c.fillText(n, kol[i] + 1, y + 3); });
+    y += 5;
+    c.strokeStyle = F.vinrod; c.lineWidth = 0.4; c.beginPath(); c.moveTo(M, y); c.lineTo(W - M, y); c.stroke();
+    var radH = (H - M - 14 - y) / 12;
+    for (var r = 1; r <= 12; r++) {
+      var ry = y + r * radH;
+      c.strokeStyle = '#bdbdbd'; c.lineWidth = 0.25;
+      c.beginPath(); c.moveTo(M, ry); c.lineTo(W - M, ry); c.stroke();
+    }
+    c.strokeStyle = '#d9d9d9';
+    kol.slice(1, -1).forEach(function (x) { c.beginPath(); c.moveTo(x, y); c.lineTo(x, y + 12 * radH); c.stroke(); });
+    bunn(c, M, W, H);
+    c.restore();
+  }
+
+  function bunn(c, M, W, H) {
+    CfA.settFont(c, 400, 8 * PT, 0); c.fillStyle = '#5a5a5a';
+    c.fillText('Cosplay for Alle · Kirkegaten 2B, 4836 Arendal · Org.nr 938 323 143 · ' + ($('epost').value.trim() || 'kontakt@cosplayforalle.no'), M, H - M + 3);
+  }
+
+  var lerret = $('lerret');
+  function vis() {
+    if (!logo) return;
+    var visB = Math.min($('ramme').clientWidth - 40, window.innerHeight * 0.72 * 210 / 297);
+    var dpr = Math.min(2, window.devicePixelRatio || 1);
+    lerret.width = Math.round(visB * dpr); lerret.height = Math.round(visB * 297 / 210 * dpr);
+    lerret.style.width = Math.round(visB) + 'px'; lerret.style.height = Math.round(visB * 297 / 210) + 'px';
+    (verdi('mal') === 'en' ? tegnEn : tegnListe)(lerret.getContext('2d'), lerret.width / 210);
+    $('lapp').textContent = verdi('mal') === 'en' ? 'Ett per person' : 'Liste';
+  }
+
+  $('last-pdf').addEventListener('click', function () {
+    var m = CfA.mmLerret(210, 297, 300);
+    (verdi('mal') === 'en' ? tegnEn : tegnListe)(m.ctx, m.s);
+    CfA.pdfAvLerreter([{ c: m.c, mmB: 210, mmH: 297 }], 0.94).then(function (pdf) {
+      var n = 'samtykke-' + (verdi('mal') === 'en' ? 'person' : 'liste') + '-' + CfA.filnavn($('arr').value) + '.pdf';
+      CfA.lastNed(pdf, n);
+      $('status').textContent = 'Lastet ned ' + n + '. Skriv ut så mange du trenger.';
+    });
+  });
+
+  $('skjema').addEventListener('input', vis);
+  $('skjema').addEventListener('change', vis);
+  $('skjema').addEventListener('submit', function (e) { e.preventDefault(); });
+  window.addEventListener('resize', vis);
+  CfA.logo().then(function (l) { logo = l; vis(); });
+})();
+</script>
+</body>
+</html>

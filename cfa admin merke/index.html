@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="nb">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Merkeverktøy – Cosplay for Alle</title>
+<meta name="theme-color" content="#18181b">
+<meta name="description" content="Verktøy for lokallag og styrer i Cosplay for Alle: plakatgenerator og logo på video og innlegg, laget etter merkehåndboken.">
+<link rel="stylesheet" href="assets/cfa.css">
+<style>
+  .gruppe { font-size: 15px; font-family: var(--sans); font-weight: 600; color: var(--tekst-svak); text-transform: uppercase; letter-spacing: .06em; margin: 28px 0 12px; }
+  .vk-rad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+  @media (max-width: 1100px) { .vk-rad { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  @media (max-width: 560px) { .vk-rad { grid-template-columns: 1fr; } }
+  .vk { display: grid; color: var(--tekst); text-decoration: none; transition: border-color .15s, transform .15s; }
+  .vk:hover { border-color: var(--rosa); transform: translateY(-2px); }
+  .vk-tekst { padding: 18px 18px 16px; display: grid; gap: 8px; align-content: start; grid-template-rows: auto 1fr auto; }
+  .vk-topp { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
+  .vk-tekst h3 { font-family: var(--serif); font-size: 19px; margin: 0; }
+  .vk-tekst p { margin: 0; color: #d4d4d8; font-size: 14px; }
+  .vk-lenke { color: var(--rosa-tekst); font-weight: 700; font-size: 14px; }
+  .lapp::before { display: none; }
+  .vk .lapp { padding: 2px 9px; font-size: 11px; }
+  .fakta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; margin-top: 40px; }
+  @media (max-width: 920px) { .fakta { grid-template-columns: 1fr; } }
+  .farger { display: grid; gap: 12px; }
+  .farge { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
+  .farge i { width: 36px; height: 36px; border-radius: 50%; display: block; border: 2px solid var(--kant); }
+  .farge span small { color: var(--tekst-svak); }
+  .farge code { font-family: inherit; font-variant-numeric: tabular-nums; color: var(--tekst-svak); font-size: 13px; }
+  .tabell { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
+  .tabell th { text-align: left; color: var(--tekst-svak); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding: 0 0 8px; }
+  .tabell td { padding: 9px 0; border-top: 1px solid var(--kant); }
+  .tabell td:last-child, .tabell th:last-child { text-align: right; }
+  .tabell td:last-child { color: var(--rosa-tekst); font-weight: 600; }
+  .hero { text-align: center; max-width: 720px; margin: 8px auto 8px; }
+  .hero .ingress { margin: 0 auto; }
+  .hero .lapp::before { display: block; }
+</style>
+</head>
+<body>
+<main class="side">
+  <nav class="faner" data-aktiv="index" aria-label="Merkeverktøy"></nav>
+  <div class="hero">
+    <span class="lapp">For styrer og lokallag</span>
+    <h1 style="margin-top:14px">Merkeverktøy</h1>
+    <p class="ingress">Alt styret og lokallagene trenger for å lage ting som ser ut som Cosplay for Alle. Verktøyene følger merkehåndboken, så marger, logo og farger blir riktige av seg selv.</p>
+  </div>
+
+  <h2 class="gruppe">Lag innhold</h2>
+  <div class="vk-rad">
+    <a class="vk kort" href="arrangement.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Arrangementspakke</h3><span class="lapp">Ny</span></div>
+        <p>Fyll inn arrangementet én gang og få plakat, innlegg, story og Facebook-bilde i én zip. Med animert video.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="plakat.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Plakatgenerator</h3></div>
+        <p>A5, A4 og A3 til trykk, eller innlegg og story. Riktig marg, skrift og logo.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="logo-plassering.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Logo på video</h3></div>
+        <p>Logoen på riktig plass for Instagram, TikTok, Facebook og YouTube, også på video.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="lokallag.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Lokallag-logo</h3><span class="lapp">Ny</span></div>
+        <p>«Cosplay for Alle – Agder» som SVG og PNG, liggende og stående.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+  </div>
+
+  <h2 class="gruppe">Workshop og stand</h2>
+  <div class="vk-rad">
+    <a class="vk kort" href="navnelapper.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Navnelapper</h3><span class="lapp">Ny</span></div>
+        <p>Lim inn navnene og skriv ut på klistrelapper eller navneskilt.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="deltakerbevis.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Deltakerbevis</h3><span class="lapp">Ny</span></div>
+        <p>Ett bevis per deltaker i samme PDF, klart til utskrift.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="klistremerker.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Klistremerker og buttons</h3><span class="lapp">Ny</span></div>
+        <p>Utskriftsark med Ø 50 mm klistremerker og Ø 38 mm buttons.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="trykksaker.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Visittkort og roll-up</h3><span class="lapp">Ny</span></div>
+        <p>Trykkfiler med 3 mm utfallende, eller visittkort du skriver ut selv.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+  </div>
+
+  <h2 class="gruppe">Bilder og tekst</h2>
+  <div class="vk-rad">
+    <a class="vk kort" href="bildekrymper.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Bildekrymper</h3><span class="lapp">Ny</span></div>
+        <p>Mange bilder samtidig, ferdige til nett. Under 500 kB og uten GPS-data.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="samtykke.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Samtykkeskjema</h3><span class="lapp">Ny</span></div>
+        <p>Fotosamtykke for én person eller en hel gruppe, med foresatt under 15 år.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+    <a class="vk kort" href="tekstsjekk.html">
+      <div class="vk-tekst">
+        <div class="vk-topp"><h3>Tekstsjekk</h3><span class="lapp">Ny</span></div>
+        <p>Sjekker navnet, slagordet, store bokstaver, stivt språk og skrivefeil.</p>
+        <span class="vk-lenke">Åpne →</span>
+      </div>
+    </a>
+  </div>
+
+  <div class="fakta">
+    <section class="kort">
+      <div class="kort-hode"><h2>Logofargene</h2></div>
+      <div class="kort-kropp farger">
+        <div class="farge"><i style="background:#6D0C32"></i><span>Vinrød<br><small>Saksehåndtakene</small></span><code>#6D0C32</code></div>
+        <div class="farge"><i style="background:#909090"></i><span>Stålgrå<br><small>Nålen og bladene</small></span><code>#909090</code></div>
+        <div class="farge"><i style="background:#F3B716"></i><span>Gullbånd<br><small>Båndet</small></span><code>#F3B716</code></div>
+        <p class="hint">Logoen brukes alltid i alle tre fargene. På mørk bakgrunn står den på en hvit plate.</p>
+      </div>
+    </section>
+    <section class="kort">
+      <div class="kort-hode"><h2>Logostørrelser</h2></div>
+      <div class="kort-kropp">
+        <table class="tabell">
+          <thead><tr><th>Format</th><th>Logohøyde</th></tr></thead>
+          <tbody>
+            <tr><td>A5-flyer</td><td>25 mm</td></tr>
+            <tr><td>A4-plakat</td><td>35 mm</td></tr>
+            <tr><td>A3-plakat</td><td>50 mm</td></tr>
+            <tr><td>Story, Reels, TikTok</td><td>200 px</td></tr>
+            <tr><td>Innlegg 4:5 og 1:1</td><td>180 px</td></tr>
+            <tr><td>YouTube-video</td><td>140 px</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+    <section class="kort">
+      <div class="kort-hode"><h2>Før du publiserer</h2></div>
+      <div class="kort-kropp">
+        <ul class="sjekk">
+          <li>Logoen i sine tre farger, med luft rundt</li>
+          <li>Minst 20 mm på trykk og 80 px på skjerm</li>
+          <li>Én tydelig overskrift</li>
+          <li>Navnet skrevet riktig: Cosplay for Alle</li>
+          <li>Samtykke fra alle som er med på bildene</li>
+        </ul>
+      </div>
+    </section>
+  </div>
+</main>
+<script src="assets/cfa-merke.js"></script>
+</body>
+</html>

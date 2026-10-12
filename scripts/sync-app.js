@@ -185,7 +185,8 @@ const appIndexHtml = `<!DOCTYPE html>
 </body>
 </html>`;
 
-fs.writeFileSync(path.join(appWwwDir, 'index.html'), appIndexHtml, 'utf8');
+// 8. Sync Merkeverktoy into member app
+copyDirRecursive(path.join(rootDir, 'merkeverktoy'), path.join(appWwwDir, 'merkeverktoy'));
 
 console.log('✓ Member App web assets synchronized to member-app/www/');
 

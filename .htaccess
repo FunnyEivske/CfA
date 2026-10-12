@@ -23,6 +23,14 @@ DirectoryIndex pages/index.html index.html index.php
     RewriteCond %{DOCUMENT_ROOT}/uploads/$1.webp -f
     RewriteRule ^uploads/(.+)\.(jpe?g|png)$ uploads/$1.webp [T=image/webp,E=accept:1,L]
 
+    # Omadresser cfa admin merke til ren /merkeverktoy/ URL
+    RewriteRule ^cfa(?:%20|\s|-)admin(?:%20|\s|-)merke(?:/(.*))?$ /merkeverktoy/$1 [R=301,L,NE]
+
+    # Server merkeverktoy .html-filer uten filendelse
+    RewriteCond %{REQUEST_FILENAME} !-d
+    RewriteCond %{DOCUMENT_ROOT}/merkeverktoy/$1.html -f
+    RewriteRule ^merkeverktoy/(.*?)/?$ merkeverktoy/$1.html [L]
+
     # Server .html-filen internt fra pages/ hvis forespørselen matcher en fil i pages/
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{DOCUMENT_ROOT}/pages/$1.html -f
