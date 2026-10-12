@@ -19,10 +19,10 @@ const credPath = path.join(rootDir, 'webhuset-credentials.json');
 if ((!user || !pass) && fs.existsSync(credPath)) {
   try {
     const creds = JSON.parse(fs.readFileSync(credPath, 'utf8'));
-    user = user || creds.user;
-    pass = pass || creds.pass;
-    host = host || creds.host;
-    remoteRoot = remoteRoot || creds.remoteRoot || '/www';
+    user = user || (creds.ftp && creds.ftp.username) || creds.user || creds.username;
+    pass = pass || (creds.ftp && creds.ftp.password) || creds.pass || creds.password;
+    host = host || (creds.ftp && creds.ftp.server) || creds.host || creds.server;
+    remoteRoot = remoteRoot || (creds.ftp && creds.ftp.remote_root) || creds.remoteRoot || '/www';
   } catch (e) {
     console.error('Kunne ikke lese webhuset-credentials.json:', e.message);
   }
