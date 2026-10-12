@@ -39,30 +39,17 @@ function deferAuthUI() {
         return;
     }
 
-    // For public visitors: do not make a blocking network request if no session exists
     let hasSession = false;
     try {
         hasSession = localStorage.getItem('cfa_has_session') === '1';
     } catch (e) {}
 
-    if (!hasSession) {
-        updateHeaderUI(null);
-        return;
-    }
+    // 1. Umiddelbar synkron UI-oppdatering for å unngå layout-forsinkelse
+    updateHeaderUI(hasSession ? { authenticated: true } : null);
 
-    // For logged-in users returning to the site: check session when browser is idle
-    const runCheck = () => {
-        if ('requestIdleCallback' in window) {
-            window.requestIdleCallback(() => setupAuthUI(), { timeout: 4000 });
-        } else {
-            setTimeout(setupAuthUI, 3000);
-        }
-    };
-
-    if (document.readyState === 'complete') {
-        runCheck();
-    } else {
-        window.addEventListener('load', runCheck, { once: true });
+    // 2. Hvis brukeren har eller nylig hadde sesjon, bekreft med serveren
+    if (hasSession) {
+        setupAuthUI();
     }
 }
 
@@ -72,6 +59,7 @@ async function setupAuthUI() {
         if (res.authenticated) {
             authState.user = res.user;
             authState.role = res.user.role;
+            try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
             updateHeaderUI(res.user);
 
             // Sjekk om innlogget bruker må godta vilkår eller endre passord på login-siden
@@ -80,10 +68,12 @@ async function setupAuthUI() {
                 handlePostLoginFlow(res);
             }
         } else {
+            try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
             updateHeaderUI(null);
         }
     } catch (e) {
         console.warn("Could not fetch auth state:", e);
+        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
         updateHeaderUI(null);
     }
 }
@@ -99,52 +89,107 @@ function updateHeaderUI(user) {
     const mobileLogoutBtns = document.querySelectorAll('#mobile-logout-button');
     const mobileMemberLink = document.getElementById('mobile-member-link');
 
+    // Hero-knapp i landingssiden (Velkommen til Cosplay for alle)
+    const heroCtaBtn = document.getElementById('hero-cta-btn') || document.querySelector('.hero-content a.button');
+
     const isStandalone = window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
 
     if (user) {
-        if (loginLink) loginLink.classList.add('hidden');
+        // INNLOGGET:
+        // "Min side" og "Logg ut" vises. "Logg inn" og "Bli medlem" skjules.
+        if (loginLink) {
+            loginLink.classList.add('hidden');
+            loginLink.style.setProperty('display', 'none', 'important');
+        }
         joinLinks.forEach(link => {
             link.classList.add('hidden');
-            link.style.display = 'none';
+            link.style.setProperty('display', 'none', 'important');
         });
         logoutBtns.forEach(btn => {
             btn.classList.remove('hidden');
+            btn.style.removeProperty('display');
             btn.onclick = async () => {
-                await AuthAPI.logout();
+                try { await AuthAPI.logout(); } catch (e) {}
+                try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
                 window.location.href = isStandalone ? 'login' : '/';
             };
         });
         if (memberLink) {
             memberLink.classList.remove('hidden');
-            memberLink.style.display = '';
+            memberLink.style.removeProperty('display');
         }
-        if (profileLink) profileLink.classList.remove('hidden');
+        if (profileLink) {
+            profileLink.classList.remove('hidden');
+            profileLink.style.removeProperty('display');
+        }
 
-        if (mobileLoginLink) mobileLoginLink.classList.add('hidden');
+        if (mobileLoginLink) {
+            mobileLoginLink.classList.add('hidden');
+            mobileLoginLink.style.setProperty('display', 'none', 'important');
+        }
         mobileLogoutBtns.forEach(btn => {
             btn.classList.remove('hidden');
+            btn.style.removeProperty('display');
             btn.onclick = async () => {
-                await AuthAPI.logout();
+                try { await AuthAPI.logout(); } catch (e) {}
+                try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
                 window.location.href = isStandalone ? 'login' : '/';
             };
         });
         if (mobileMemberLink) {
             mobileMemberLink.classList.remove('hidden');
-            mobileMemberLink.style.display = '';
+            mobileMemberLink.style.removeProperty('display');
+        }
+
+        // Hero-knapp midt på landingssiden: Bytt til "Min side"
+        if (heroCtaBtn) {
+            heroCtaBtn.href = 'medlem';
+            heroCtaBtn.textContent = 'Min side';
+            heroCtaBtn.setAttribute('data-i18n', 'nav_member_page');
         }
     } else {
-        if (loginLink) loginLink.classList.remove('hidden');
+        // IKKE INNLOGGET:
+        // "Logg inn" og "Bli medlem" vises. "Min side" og "Logg ut" skjules.
+        if (loginLink) {
+            loginLink.classList.remove('hidden');
+            loginLink.style.removeProperty('display');
+        }
         joinLinks.forEach(link => {
             link.classList.remove('hidden');
-            link.style.display = '';
+            link.style.removeProperty('display');
         });
-        logoutBtns.forEach(btn => btn.classList.add('hidden'));
-        if (memberLink) memberLink.classList.add('hidden');
-        if (profileLink) profileLink.classList.add('hidden');
+        logoutBtns.forEach(btn => {
+            btn.classList.add('hidden');
+            btn.style.setProperty('display', 'none', 'important');
+        });
+        if (memberLink) {
+            memberLink.classList.add('hidden');
+            memberLink.style.setProperty('display', 'none', 'important');
+        }
+        if (profileLink) {
+            profileLink.classList.add('hidden');
+            profileLink.style.setProperty('display', 'none', 'important');
+        }
 
-        if (mobileLoginLink) mobileLoginLink.classList.remove('hidden');
-        mobileLogoutBtns.forEach(btn => btn.classList.add('hidden'));
-        if (mobileMemberLink) mobileMemberLink.classList.add('hidden');
+        if (mobileLoginLink) {
+            mobileLoginLink.classList.remove('hidden');
+            mobileLoginLink.style.removeProperty('display');
+        }
+        mobileLogoutBtns.forEach(btn => {
+            btn.classList.add('hidden');
+            btn.style.setProperty('display', 'none', 'important');
+        });
+        if (mobileMemberLink) {
+            mobileMemberLink.classList.add('hidden');
+            mobileMemberLink.style.setProperty('display', 'none', 'important');
+        }
+
+        // Hero-knapp midt på landingssiden: Bytt tilbake til "Bli medlem"
+        if (heroCtaBtn) {
+            heroCtaBtn.href = 'bli-medlem';
+            heroCtaBtn.textContent = 'Bli medlem';
+            heroCtaBtn.setAttribute('data-i18n', 'nav_member');
+        }
     }
 }
 

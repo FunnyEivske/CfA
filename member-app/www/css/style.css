@@ -741,6 +741,18 @@ p {
   display: none !important;
 }
 
+/* Skjul eksplisitt når elementer har .hidden klassen (overstyrer spesifikke ID-regler) */
+#member-link.hidden,
+#mobile-member-link.hidden,
+#login-link.hidden,
+#mobile-login-link.hidden,
+#logout-button.hidden,
+#mobile-logout-button.hidden,
+#join-link.hidden,
+#mobile-join-link.hidden {
+  display: none !important;
+}
+
 #member-link:hover,
 #mobile-member-link:hover {
   background-color: var(--color-vinrod-dark) !important;
