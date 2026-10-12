@@ -197,8 +197,8 @@
                         </div>
                         <div id="admin-trigger-container" class="admin-trigger-container hidden">
                             <button id="open-admin-control-btn" class="btn btn-secondary btn-full text-xs"
-                                style="gap: 0.4rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                style="gap: 0.4rem; padding: 0.6rem;">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor"
                                     stroke-width="2">
                                     <circle cx="12" cy="12" r="3" />
                                     <path
@@ -206,16 +206,16 @@
                                 </svg>
                                 Administrasjon
                             </button>
-                            <button id="open-brand-control-btn" class="btn btn-primary btn-full text-xs"
-                                style="gap: 0.4rem; margin-top: 0.4rem;">
-                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                            <button id="open-brand-control-btn" class="btn btn-secondary btn-full text-xs"
+                                style="gap: 0.4rem; padding: 0.6rem; border-color: rgba(224, 87, 127, 0.35);">
+                                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="var(--color-primary)"
                                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M12 19l7-7 3 3-7 7-3-3z" />
                                     <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z" />
                                     <path d="M2 2l7.586 7.586" />
                                     <circle cx="11" cy="11" r="2" />
                                 </svg>
-                                Merkeverktøy & Media
+                                <span>Merkeverktøy & Media</span>
                             </button>
                         </div>
                     </div>
@@ -1336,207 +1336,244 @@
     <!-- Merkeverktøy & Media Admin Modal -->
     <div id="brand-control-modal" class="hidden modal-container">
         <div id="brand-control-modal-overlay" class="modal-overlay"></div>
-        <div class="card modal-content" style="max-width: 900px; max-height: 90vh; overflow-y: auto;">
-            <div class="card-header" style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid var(--color-border); padding-bottom: 1rem;">
-                <div>
-                    <div style="display: flex; align-items: center; gap: 0.5rem;">
-                        <span class="badge" style="background: var(--color-primary); color: #fff; font-size: 0.7rem; padding: 0.2rem 0.6rem; border-radius: 999px;">Admin & Styre</span>
-                        <h3 class="text-lg" style="margin: 0; font-family: var(--font-heading);">Merkeverktøy & Media</h3>
+        <div class="card modal-content" style="max-width: 960px; max-height: 90vh; display: flex; flex-direction: column;">
+            <div class="card-header" style="border-bottom: 1px solid var(--color-border); padding: 1.25rem 1.5rem 1rem;">
+                <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 1rem;">
+                    <div>
+                        <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.25rem;">
+                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.7rem; font-weight: 700; padding: 0.2rem 0.6rem; border-radius: 999px;">Admin & Styre</span>
+                            <h3 class="text-xl" style="margin: 0; font-family: var(--font-heading);">Merkeverktøy & Media</h3>
+                        </div>
+                        <p class="text-xs text-muted" style="margin: 0;">Offisielle verktøy for plakater, sosiale medier, stand og trykksaker iht. merkehåndboken.</p>
                     </div>
-                    <p class="text-xs text-muted" style="margin: 0.35rem 0 0 0;">Generatorer for plakater, sosiale medier, video, trykksaker og grafikk iht. merkehåndboken.</p>
+                    <button id="close-brand-control-modal" class="btn btn-ghost" style="padding: 0.5rem; border-radius: 50%;" aria-label="Lukk">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <path d="M18 6L6 18M6 6l12 12" />
+                        </svg>
+                    </button>
                 </div>
-                <button id="close-brand-control-modal" class="btn btn-ghost" style="padding: 0.5rem;" aria-label="Lukk">
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <path d="M18 6L6 18M6 6l12 12" />
-                    </svg>
-                </button>
+
+                <!-- Søk & Kategori-filter -->
+                <div style="margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem;">
+                    <div style="position: relative;">
+                        <input type="search" id="brand-tools-search" placeholder="Søk etter verktøy (f.eks. plakat, bevis, video, logo, samtykke)..."
+                            style="width: 100%; padding: 0.65rem 1rem 0.65rem 2.4rem; background: var(--color-bg-subtle); border: 1px solid var(--color-border); border-radius: 8px; color: var(--color-text-main); font-size: 0.85rem; outline: none;">
+                        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position: absolute; left: 0.85rem; top: 50%; transform: translateY(-50%); color: var(--color-text-muted); pointer-events: none;">
+                            <circle cx="11" cy="11" r="8"></circle>
+                            <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+                        </svg>
+                    </div>
+
+                    <div class="brand-filter-tabs" style="display: flex; gap: 0.5rem; flex-wrap: wrap;">
+                        <button type="button" class="brand-filter-btn active" data-cat="all" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid var(--color-primary); background: var(--color-primary); color: #fff;">Alle (12)</button>
+                        <button type="button" class="brand-filter-btn" data-cat="innhold" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid var(--color-border); background: var(--color-bg-subtle); color: var(--color-text-main);">📢 Plakater & SoMe</button>
+                        <button type="button" class="brand-filter-btn" data-cat="stand" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid var(--color-border); background: var(--color-bg-subtle); color: var(--color-text-main);">🎪 Stand, Trykk & Kurs</button>
+                        <button type="button" class="brand-filter-btn" data-cat="tekst" style="padding: 0.4rem 0.85rem; border-radius: 999px; font-size: 0.75rem; font-weight: 600; cursor: pointer; border: 1px solid var(--color-border); background: var(--color-bg-subtle); color: var(--color-text-main);">🛠️ Bilder & Tekst</button>
+                    </div>
+                </div>
             </div>
-            <div class="card-body" style="padding: 1.25rem 1rem;">
-                <div class="admin-panel-grid" style="grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 1rem;">
-                    
-                    <a href="merkeverktoy/arrangement.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
-                                    <line x1="16" y1="2" x2="16" y2="6"></line>
-                                    <line x1="8" y1="2" x2="8" y2="6"></line>
-                                    <line x1="3" y1="10" x2="21" y2="10"></line>
+
+            <!-- Modal Kropp med kategoriserte seksjoner -->
+            <div class="card-body" id="brand-tools-body" style="padding: 1.25rem 1.5rem; overflow-y: auto; flex: 1;">
+                
+                <!-- Seksjon 1: Innhold, Plakater & Video -->
+                <div class="brand-cat-section" data-cat="innhold" style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;">
+                        <span style="font-size: 1.1rem;">📢</span>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.04em;">Plakater & Sosiale medier</h4>
+                        <span class="badge" style="background: rgba(255,255,255,0.06); font-size: 0.7rem; color: var(--color-text-muted); padding: 0.15rem 0.5rem; border-radius: 999px;">4 verktøy</span>
+                    </div>
+
+                    <div class="admin-panel-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem;">
+                        <a href="merkeverktoy/arrangement.html" class="brand-tool-card admin-tool-item" data-keywords="arrangement arrangementspakke plakat innlegg story facebook video banner zip" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
+                                <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+                                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                        <rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect>
+                                        <line x1="16" y1="2" x2="16" y2="6"></line>
+                                        <line x1="8" y1="2" x2="8" y2="6"></line>
+                                        <line x1="3" y1="10" x2="21" y2="10"></line>
+                                    </svg>
+                                </div>
+                                <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Anbefalt</span>
+                            </div>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Arrangementspakke</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Fyll inn info én gang – få plakat, innlegg, story, Facebook-bilde og video i én zip.</p>
+                            <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
+
+                        <a href="merkeverktoy/plakat.html" class="brand-tool-card admin-tool-item" data-keywords="plakat plakatgenerator a5 a4 a3 trykk innlegg story marg logo" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
+                                    <polyline points="14 2 14 8 20 8"></polyline>
+                                    <line x1="16" y1="13" x2="8" y2="13"></line>
+                                    <line x1="16" y1="17" x2="8" y2="17"></line>
+                                    <polyline points="10 9 9 9 8 9"></polyline>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Arrangementspakke</h4>
-                        <p class="admin-tool-desc">Fyll inn arrangementet og få plakat, innlegg, story, Facebook-bilde og video i én zip.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Plakatgenerator</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">A5, A4 og A3 til trykk, eller innlegg og story med korrekte marger og logo.</p>
+                            <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/plakat.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
-                                <polyline points="14 2 14 8 20 8"></polyline>
-                                <line x1="16" y1="13" x2="8" y2="13"></line>
-                                <line x1="16" y1="17" x2="8" y2="17"></line>
-                                <polyline points="10 9 9 9 8 9"></polyline>
-                            </svg>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Plakatgenerator</h4>
-                        <p class="admin-tool-desc">A5, A4 og A3 til trykk, eller innlegg og story. Følger merkehåndboken for marg og logo.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                        <a href="merkeverktoy/logo-plassering.html" class="brand-tool-card admin-tool-item" data-keywords="logo video innlegg instagram tiktok facebook youtube overlay hjørne" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polygon points="23 7 16 12 23 17 23 7"></polygon>
+                                    <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
+                                </svg>
+                            </div>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Logo på video & innlegg</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Plasser logoen optimalt på videoer og bilder for Instagram, TikTok, Facebook og YouTube.</p>
+                            <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/logo-plassering.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <polygon points="23 7 16 12 23 17 23 7"></polygon>
-                                <rect x="1" y="5" width="15" height="14" rx="2" ry="2"></rect>
-                            </svg>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Logo på video & innlegg</h4>
-                        <p class="admin-tool-desc">Plasser logoen riktig på videoer og bilder for Instagram, TikTok, Facebook og YouTube.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
-
-                    <a href="merkeverktoy/lokallag.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/lokallag.html" class="brand-tool-card admin-tool-item" data-keywords="lokallag logo fylke svg png liggende stående avdeling" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path>
                                     <circle cx="12" cy="10" r="3"></circle>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Lokallag-logo</h4>
-                        <p class="admin-tool-desc">Generer «Cosplay for Alle – Lokallag» i SVG og PNG, både liggende og stående.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Lokallag-logo</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Generer «Cosplay for Alle – Lokallag» i SVG og PNG, både liggende og stående.</p>
+                            <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
+                    </div>
+                </div>
 
-                    <a href="merkeverktoy/navnelapper.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Seksjon 2: Workshop, Stand & Trykksaker -->
+                <div class="brand-cat-section" data-cat="stand" style="margin-bottom: 2rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;">
+                        <span style="font-size: 1.1rem;">🎪</span>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.04em;">Stand, Workshop & Trykksaker</h4>
+                        <span class="badge" style="background: rgba(255,255,255,0.06); font-size: 0.7rem; color: var(--color-text-muted); padding: 0.15rem 0.5rem; border-radius: 999px;">4 verktøy</span>
+                    </div>
+
+                    <div class="admin-panel-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem;">
+                        <a href="merkeverktoy/navnelapper.html" class="brand-tool-card admin-tool-item" data-keywords="navnelapper navneskilt klistrelapper deltakere stand utskrift a4" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path>
                                     <line x1="7" y1="7" x2="7.01" y2="7"></line>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Navnelapper</h4>
-                        <p class="admin-tool-desc">Lim inn navnelister og generer klistrelapper eller navneskilt klare til utskrift.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Navnelapper</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Lim inn navnelister og generer klistrelapper eller navneskilt klare til utskrift.</p>
+                            <span style="color: #f59e0b; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/deltakerbevis.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/deltakerbevis.html" class="brand-tool-card admin-tool-item" data-keywords="deltakerbevis diplom kurs kursbevis pdf utskrift fullført" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M22 10v6M2 10l10-5 10 5-10 5z"></path>
                                     <path d="M6 12v5c3 3 9 3 12 0v-5"></path>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Deltakerbevis</h4>
-                        <p class="admin-tool-desc">Ett diplom/bevis per deltaker samlet i samme PDF, klart til utskrift etter kurs.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Deltakerbevis</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Ett diplom/bevis per deltaker samlet i samme PDF, klart til utskrift etter kurs.</p>
+                            <span style="color: #f59e0b; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/klistremerker.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/klistremerker.html" class="brand-tool-card admin-tool-item" data-keywords="klistremerker buttons merch utskriftsark runde stand giveaways" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <circle cx="12" cy="12" r="10"></circle>
                                     <circle cx="12" cy="12" r="4"></circle>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Klistremerker & buttons</h4>
-                        <p class="admin-tool-desc">Utskriftsark med Ø 50 mm klistremerker og Ø 38 mm buttons til stand og events.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Klistremerker & buttons</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Utskriftsark med Ø 50 mm klistremerker og Ø 38 mm buttons til stand og events.</p>
+                            <span style="color: #f59e0b; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/trykksaker.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/trykksaker.html" class="brand-tool-card admin-tool-item" data-keywords="trykksaker visittkort rollup roll-up trykk utfallende stand banner" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(245, 158, 11, 0.15); color: #f59e0b; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect>
                                     <path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Visittkort & roll-up</h4>
-                        <p class="admin-tool-desc">Ferdige trykkfiler med 3 mm utfallende, samt visittkort du kan skrive ut lokalt.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Visittkort & roll-up</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Ferdige trykkfiler med 3 mm utfallende eller visittkort du kan skrive ut lokalt.</p>
+                            <span style="color: #f59e0b; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
+                    </div>
+                </div>
 
-                    <a href="merkeverktoy/bildekrymper.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <!-- Seksjon 3: Bilder, Tekst & Merkevare -->
+                <div class="brand-cat-section" data-cat="tekst" style="margin-bottom: 0.5rem;">
+                    <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 0.85rem;">
+                        <span style="font-size: 1.1rem;">🛠️</span>
+                        <h4 style="margin: 0; font-size: 0.95rem; font-weight: 700; color: var(--color-text-main); text-transform: uppercase; letter-spacing: 0.04em;">Bilder, Tekst & Merkevare</h4>
+                        <span class="badge" style="background: rgba(255,255,255,0.06); font-size: 0.7rem; color: var(--color-text-muted); padding: 0.15rem 0.5rem; border-radius: 999px;">4 verktøy</span>
+                    </div>
+
+                    <div class="admin-panel-grid" style="grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 0.85rem;">
+                        <a href="merkeverktoy/bildekrymper.html" class="brand-tool-card admin-tool-item" data-keywords="bildekrymper bilde optimaliser komprimer under 500kb gps metadata foto" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="4 14 10 14 10 20"></polyline>
                                     <polyline points="20 10 14 10 14 4"></polyline>
                                     <line x1="14" y1="10" x2="21" y2="3"></line>
                                     <line x1="3" y1="21" x2="10" y2="14"></line>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Bildekrymper</h4>
-                        <p class="admin-tool-desc">Optimaliser flere bilder på sekunder under 500 kB, og rens sensitiv GPS-metadata.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Bildekrymper</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Optimaliser flere bilder på sekunder under 500 kB, og rens sensitiv GPS-metadata.</p>
+                            <span style="color: #10b981; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/samtykke.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/samtykke.html" class="brand-tool-card admin-tool-item" data-keywords="samtykke fotosamtykke skjema pdf foresatte under 15 år personvern" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path>
                                     <polyline points="14 2 14 8 20 8"></polyline>
                                     <line x1="9" y1="15" x2="15" y2="15"></line>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Samtykkeskjema</h4>
-                        <p class="admin-tool-desc">Generer PDF for fotosamtykke for enkeltperson eller gruppe med foresatte for under 15 år.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Samtykkeskjema</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Generer PDF for fotosamtykke for enkeltperson eller gruppe med foresatte for under 15 år.</p>
+                            <span style="color: #10b981; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/tekstsjekk.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
-                            <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <a href="merkeverktoy/tekstsjekk.html" class="brand-tool-card admin-tool-item" data-keywords="tekstsjekk tekst rettskriving grammatikk slagord organisasjonsnavn korrektur" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                                     <polyline points="9 11 12 14 22 4"></polyline>
                                     <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"></path>
                                 </svg>
                             </div>
-                            <span class="badge" style="background: rgba(224, 87, 127, 0.2); color: #f472b6; font-size: 0.65rem; padding: 0.15rem 0.5rem; border-radius: 999px; font-weight: 700;">Ny</span>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Tekstsjekk</h4>
-                        <p class="admin-tool-desc">Automatisk sjekk av organisasjonsnavn, slagord, store bokstaver og skrivefeil.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne verktøy →</span>
-                    </a>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Tekstsjekk</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Automatisk sjekk av navn, slagord, store bokstaver og skrivefeil i tekster.</p>
+                            <span style="color: #10b981; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne verktøy →</span>
+                        </a>
 
-                    <a href="merkeverktoy/index.html" class="admin-tool-item btn-ghost" style="text-decoration: none; text-align: left; display: flex; flex-direction: column; height: 100%;">
-                        <div class="admin-tool-icon-wrapper" style="width: 38px; height: 38px; border-radius: 8px; background: rgba(224, 87, 127, 0.15); color: var(--color-primary); display: flex; align-items: center; justify-content: center;">
-                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                <circle cx="12" cy="12" r="10"></circle>
-                                <line x1="12" y1="16" x2="12" y2="12"></line>
-                                <line x1="12" y1="8" x2="12.01" y2="8"></line>
-                            </svg>
-                        </div>
-                        <h4 class="admin-tool-title" style="margin-top: 0.75rem;">Full oversikt & regler</h4>
-                        <p class="admin-tool-desc">Se alle logofarger, størrelsestabeller og regler fra merkehåndboken samlet.</p>
-                        <span style="color: var(--color-primary); font-size: 0.75rem; font-weight: 600; margin-top: auto; padding-top: 0.5rem;">Åpne hub →</span>
-                    </a>
-
+                        <a href="merkeverktoy/index.html" class="brand-tool-card admin-tool-item" data-keywords="merkehåndbok farger regler logo størrelser designsystem oversikt" style="text-decoration: none; border-radius: 10px; padding: 1.1rem; display: flex; flex-direction: column; height: 100%;">
+                            <div style="width: 36px; height: 36px; border-radius: 8px; background: rgba(16, 185, 129, 0.15); color: #10b981; display: flex; align-items: center; justify-content: center;">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <circle cx="12" cy="12" r="10"></circle>
+                                    <line x1="12" y1="16" x2="12" y2="12"></line>
+                                    <line x1="12" y1="8" x2="12.01" y2="8"></line>
+                                </svg>
+                            </div>
+                            <h4 class="admin-tool-title" style="margin-top: 0.65rem; font-size: 0.95rem;">Merkehåndbok & farger</h4>
+                            <p class="admin-tool-desc" style="font-size: 0.8rem; line-height: 1.4; color: var(--color-text-muted); margin: 0 0 0.5rem 0;">Se alle logofarger, størrelsestabeller og regler fra merkehåndboken samlet.</p>
+                            <span style="color: #10b981; font-size: 0.75rem; font-weight: 600; margin-top: auto;">Åpne oversikt →</span>
+                        </a>
+                    </div>
                 </div>
+
+                <div id="brand-no-results" class="hidden" style="text-align: center; padding: 3rem 1rem; color: var(--color-text-muted);">
+                    <p style="font-size: 1rem; margin-bottom: 0.5rem;">Ingen verktøy matcher søket ditt.</p>
+                    <button type="button" id="brand-reset-search-btn" class="btn btn-secondary btn-sm">Nullstill søk</button>
+                </div>
+
             </div>
-            <div class="card-footer" style="display: flex; justify-content: flex-end; border-top: 1px solid var(--color-border); padding-top: 0.75rem;">
+
+            <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center; border-top: 1px solid var(--color-border); padding: 0.85rem 1.5rem; background: var(--color-bg-subtle);">
+                <span class="text-xs text-muted">Tips: Alle verktøy har en «← Min side»-knapp øverst.</span>
                 <button type="button" id="close-brand-control-footer" class="btn btn-secondary">Lukk</button>
             </div>
         </div>

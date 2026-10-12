@@ -96,6 +96,84 @@ function setupTabSwitching() {
     }
 }
 
+function setupBrandToolsFilter() {
+    const searchInput = document.getElementById('brand-tools-search');
+    const filterBtns = document.querySelectorAll('.brand-filter-btn');
+    const sections = document.querySelectorAll('.brand-cat-section');
+    const noResults = document.getElementById('brand-no-results');
+    const resetBtn = document.getElementById('brand-reset-search-btn');
+
+    let activeCat = 'all';
+
+    function filterTools() {
+        const query = (searchInput?.value || '').toLowerCase().trim();
+        let visibleCount = 0;
+
+        sections.forEach(sec => {
+            const secCat = sec.getAttribute('data-cat');
+            let secHasMatch = false;
+
+            const secCards = sec.querySelectorAll('.brand-tool-card');
+            secCards.forEach(card => {
+                const keywords = (card.getAttribute('data-keywords') || '').toLowerCase();
+                const text = card.textContent.toLowerCase();
+                const matchesCat = activeCat === 'all' || activeCat === secCat;
+                const matchesSearch = !query || keywords.includes(query) || text.includes(query);
+
+                if (matchesCat && matchesSearch) {
+                    card.style.display = 'flex';
+                    secHasMatch = true;
+                    visibleCount++;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            sec.style.display = secHasMatch ? 'block' : 'none';
+        });
+
+        if (noResults) {
+            noResults.classList.toggle('hidden', visibleCount > 0);
+        }
+    }
+
+    if (searchInput && !searchInput.dataset.initialized) {
+        searchInput.dataset.initialized = 'true';
+        searchInput.addEventListener('input', filterTools);
+    }
+
+    filterBtns.forEach(btn => {
+        if (!btn.dataset.initialized) {
+            btn.dataset.initialized = 'true';
+            btn.addEventListener('click', () => {
+                filterBtns.forEach(b => {
+                    b.classList.remove('active');
+                    b.style.borderColor = 'var(--color-border)';
+                    b.style.background = 'var(--color-bg-subtle)';
+                    b.style.color = 'var(--color-text-main)';
+                });
+                btn.classList.add('active');
+                btn.style.borderColor = 'var(--color-primary)';
+                btn.style.background = 'var(--color-primary)';
+                btn.style.color = '#fff';
+
+                activeCat = btn.getAttribute('data-cat') || 'all';
+                filterTools();
+            });
+        }
+    });
+
+    if (resetBtn && !resetBtn.dataset.initialized) {
+        resetBtn.dataset.initialized = 'true';
+        resetBtn.addEventListener('click', () => {
+            if (searchInput) searchInput.value = '';
+            const allBtn = document.querySelector('.brand-filter-btn[data-cat="all"]');
+            if (allBtn) allBtn.click();
+            else filterTools();
+        });
+    }
+}
+
 function setupModals() {
     // 1. Hoved-Adminpanel
     bindClick('open-admin-control-btn', () => openModal('admin-control-modal'));
@@ -108,6 +186,7 @@ function setupModals() {
     bindClick('close-brand-control-modal', () => closeModal('brand-control-modal'));
     bindClick('close-brand-control-footer', () => closeModal('brand-control-modal'));
     bindClick('brand-control-modal-overlay', () => closeModal('brand-control-modal'));
+    setupBrandToolsFilter();
 
     // 2. Medlemsadministrasjon (Admin)
     bindClick('admin-panel-members-btn', () => {
