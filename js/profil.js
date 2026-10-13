@@ -30,7 +30,7 @@ export async function initProfilePage() {
             profileNameEl.textContent = user.display_name || user.email;
         }
         if (profileEmailEl) profileEmailEl.value = user.email || '';
-        if (profileRoleEl) profileRoleEl.textContent = user.role === 'admin' ? 'Administrator' : 'Medlem';
+        if (profileRoleEl) profileRoleEl.textContent = user.display_role || user.displayRole || (user.role === 'admin' ? 'Styremedlem' : 'Medlem');
         if (profileImgEl && user.photo_url) profileImgEl.src = user.photo_url;
 
         setupProfileForm(user);

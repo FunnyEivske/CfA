@@ -26,6 +26,13 @@ DirectoryIndex pages/index.html index.html index.php
     # Omadresser cfa admin merke til ren /merkeverktoy/ URL
     RewriteRule ^cfa(?:%20|\s|-)admin(?:%20|\s|-)merke(?:/(.*))?$ /merkeverktoy/$1 [R=301,L,NE]
 
+    # La /artcraft/ passere direkte til filene
+    RewriteRule ^artcraft/ - [L]
+
+    # Server creative-tools
+    RewriteRule ^creative-tools/?$ pages/creative-tools.html [L]
+    RewriteRule ^kreative-verktoy/?$ pages/creative-tools.html [L]
+
     # Server merkeverktoy .html-filer uten filendelse
     RewriteCond %{REQUEST_FILENAME} !-d
     RewriteCond %{DOCUMENT_ROOT}/merkeverktoy/$1.html -f
@@ -131,7 +138,16 @@ DirectoryIndex pages/index.html index.html index.php
     <FilesMatch "\.(html|php)$">
         Header set Cache-Control "no-cache, no-store, must-revalidate"
     </FilesMatch>
+
+    # WebAssembly MIME-type og Cross-Origin Isolation for ArtCraft (/artcraft/**)
+    <If "%{REQUEST_URI} =~ m#^/artcraft/#">
+        Header set Cross-Origin-Opener-Policy "same-origin"
+        Header set Cross-Origin-Embedder-Policy "require-corp"
+    </If>
 </IfModule>
+
+# MIME-typer
+AddType application/wasm .wasm
 
 # Øk filopplastingsgrense dersom mod_php er aktiv
 <IfModule mod_php7.c>

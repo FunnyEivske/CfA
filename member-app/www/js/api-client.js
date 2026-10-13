@@ -12,7 +12,16 @@ const API_BASE = (typeof window !== 'undefined' && window.CFA_API_BASE)
     : (isNativeApp ? 'https://cosplayforalle.no/backend/api.php' : '/backend/api.php');
 
 // Local Mock State for Offline / Vite Dev Testing
-const MOCK_STORAGE_KEY = 'cfa_mock_db_v2';
+const MOCK_STORAGE_KEY = 'cfa_mock_db_v3';
+
+export function userHasRole(user, role) {
+    if (!user) return false;
+    const roles = Array.isArray(user.roles)
+        ? user.roles
+        : (typeof user.roles === 'string' ? (JSON.parse(user.roles || '[]') || []) : []);
+    if (roles.includes('admin') || user.role === 'admin') return true;
+    return roles.includes(role);
+}
 
 function getMockDB() {
     let db = localStorage.getItem(MOCK_STORAGE_KEY);
@@ -20,7 +29,16 @@ function getMockDB() {
         db = {
             currentUser: null,
             members: [
-                { id: 'usr_eivind', email: 'eivind@cosplayforalle.no', display_name: 'Eivind', role: 'admin', photo_url: 'Media/Logo/cfa-logo.jpg' }
+                {
+                    id: 'usr_eivind',
+                    email: 'eivind@cosplayforalle.no',
+                    display_name: 'Eivind',
+                    role: 'admin',
+                    display_role: 'Styremedlem',
+                    displayRole: 'Styremedlem',
+                    roles: ['member', 'admin', 'creative'],
+                    photo_url: 'Media/Logo/cfa-logo.jpg'
+                }
             ],
             posts: [
                 {
@@ -75,13 +93,23 @@ function handleMockRequest(action, data) {
 
     switch (action) {
         case 'login': {
-            const loginUser = db.members.find(m => m.email === data.email) || {
-                id: 'usr_' + Date.now(),
-                email: data.email || 'user@cfa.no',
-                display_name: data.email ? data.email.split('@')[0] : 'Medlem',
-                role: data.email && data.email.includes('admin') ? 'admin' : 'medlem',
-                photo_url: 'https://picsum.photos/seed/' + Date.now() + '/150/150'
-            };
+            let loginUser = db.members.find(m => m.email === data.email);
+            if (!loginUser) {
+                const isAdmin = data.email && data.email.includes('admin');
+                loginUser = {
+                    id: 'usr_' + Date.now(),
+                    email: data.email || 'user@cfa.no',
+                    display_name: data.email ? data.email.split('@')[0] : 'Medlem',
+                    role: isAdmin ? 'admin' : 'medlem',
+                    display_role: isAdmin ? 'Styremedlem' : 'Medlem',
+                    displayRole: isAdmin ? 'Styremedlem' : 'Medlem',
+                    roles: isAdmin ? ['member', 'admin', 'creative'] : ['member'],
+                    photo_url: 'https://picsum.photos/seed/' + Date.now() + '/150/150'
+                };
+            }
+            if (!loginUser.display_role) loginUser.display_role = loginUser.role === 'admin' ? 'Styremedlem' : 'Medlem';
+            if (!loginUser.displayRole) loginUser.displayRole = loginUser.display_role;
+            if (!loginUser.roles) loginUser.roles = loginUser.role === 'admin' ? ['member', 'admin', 'creative'] : ['member'];
             db.currentUser = loginUser;
             saveMockDB(db);
             return { success: true, user: loginUser };
@@ -93,6 +121,9 @@ function handleMockRequest(action, data) {
                 email: data.email,
                 display_name: data.name || data.email.split('@')[0],
                 role: 'medlem',
+                display_role: 'Medlem',
+                displayRole: 'Medlem',
+                roles: ['member'],
                 photo_url: 'https://picsum.photos/seed/' + Date.now() + '/150/150'
             };
             db.members.push(newUser);
@@ -103,6 +134,53 @@ function handleMockRequest(action, data) {
 
         case 'auth_state':
             return { authenticated: !!db.currentUser, user: db.currentUser };
+
+        case 'admin_create_member': {
+            const displayRole = data.display_role || data.displayRole || 'Medlem';
+            let roles = data.roles || ['member'];
+            if (!roles.includes('member')) roles.unshift('member');
+            const legacyRole = roles.includes('admin') ? 'admin' : 'medlem';
+            const newMem = {
+                id: 'usr_' + Date.now(),
+                email: data.email,
+                display_name: data.name || 'Medlem',
+                role: legacyRole,
+                display_role: displayRole,
+                displayRole: displayRole,
+                roles: roles,
+                photo_url: 'https://picsum.photos/seed/' + Date.now() + '/150/150',
+                member_since: new Date().toISOString().split('T')[0]
+            };
+            db.members.push(newMem);
+            saveMockDB(db);
+            return { success: true, user: newMem };
+        }
+
+        case 'admin_update_member': {
+            const id = (typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('id') : data.id;
+            const m = db.members.find(u => u.id === id);
+            if (m) {
+                const name = (typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('display_name') : data.display_name;
+                const email = (typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('email') : data.email;
+                const dRole = (typeof FormData !== 'undefined' && data instanceof FormData) ? (data.get('display_role') || data.get('displayRole')) : (data.display_role || data.displayRole);
+                const rawRoles = (typeof FormData !== 'undefined' && data instanceof FormData) ? data.get('roles') : data.roles;
+                let roles = m.roles || ['member'];
+                if (rawRoles) {
+                    roles = typeof rawRoles === 'string' ? JSON.parse(rawRoles) : rawRoles;
+                }
+                if (!roles.includes('member')) roles.unshift('member');
+                if (name) m.display_name = name;
+                if (email) m.email = email;
+                if (dRole) { m.display_role = dRole; m.displayRole = dRole; }
+                m.roles = roles;
+                m.role = roles.includes('admin') ? 'admin' : 'medlem';
+                if (db.currentUser && db.currentUser.id === id) {
+                    db.currentUser = { ...m };
+                }
+                saveMockDB(db);
+            }
+            return { success: true, user: m };
+        }
 
         case 'logout':
             db.currentUser = null;
@@ -494,8 +572,9 @@ export const PostAPI = {
 
 export const MemberAPI = {
     getMembers: () => request('get_members'),
-    createMember: (email, password, name, role = 'medlem') => request('admin_create_member', 'POST', { email, password, name, role }),
-    updateMember: async (dataOrId, displayName, role) => {
+    createMember: (email, password, name, displayRole = 'Medlem', roles = ['member']) => 
+        request('admin_create_member', 'POST', { email, password, name, display_role: displayRole, displayRole, roles }),
+    updateMember: async (dataOrId, displayName, role, displayRole, roles) => {
         if (typeof dataOrId === 'object') {
             if (dataOrId instanceof FormData) {
                 const photo = dataOrId.get('photo');
@@ -507,7 +586,14 @@ export const MemberAPI = {
             }
             return request('admin_update_member', 'POST', dataOrId);
         }
-        return request('admin_update_member', 'POST', { id: dataOrId, display_name: displayName, role });
+        return request('admin_update_member', 'POST', {
+            id: dataOrId,
+            display_name: displayName,
+            role,
+            display_role: displayRole || 'Medlem',
+            displayRole: displayRole || 'Medlem',
+            roles: roles || ['member']
+        });
     },
     deleteMember: (id) => request('delete_member', 'POST', { id })
 };

@@ -3,6 +3,77 @@
 (function (global) {
   'use strict';
 
+  // 1. Ekstremt streng innloggingsvegg og tilgangskontroll for Merkeverktøy:
+  // Siden krever at bruker er innlogget OG har den faktiske rollen 'creative' ELLER 'admin'.
+  (function initAuthGuard() {
+    var hasSession = false;
+    try {
+      hasSession = localStorage.getItem('cfa_has_session') === '1';
+    } catch (e) {}
+
+    if (!hasSession) {
+      window.location.replace('/login');
+      return;
+    }
+
+    if (!document.getElementById('auth-guard-style')) {
+      var style = document.createElement('style');
+      style.id = 'auth-guard-style';
+      style.textContent = 'html { display: none !important; }';
+      document.head.appendChild(style);
+    }
+
+    async function sjekkAuth() {
+      try {
+        var isNativeApp = typeof window !== 'undefined' && (
+          window.location.protocol === 'capacitor:' || 
+          window.location.protocol === 'ionic:' || 
+          window.location.protocol === 'file:' ||
+          (window.location.hostname === 'localhost' && !!window.Capacitor)
+        );
+        var apiBase = (typeof window !== 'undefined' && window.CFA_API_BASE)
+          ? window.CFA_API_BASE
+          : (isNativeApp ? 'https://cosplayforalle.no/backend/api.php' : '/backend/api.php');
+
+        var res = await fetch(apiBase + '?action=auth_state', { credentials: 'include' });
+        var data = await res.json();
+
+        if (!data || !data.authenticated || !data.user) {
+          try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+          window.location.replace('/login');
+          return;
+        }
+
+        var user = data.user;
+        var roles = Array.isArray(user.roles)
+          ? user.roles
+          : (typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : []);
+        var hasAccess = roles.includes('creative') || roles.includes('admin') || user.role === 'admin';
+
+        if (!hasAccess) {
+          alert('Ingen tilgang til Merkeverktøy. Denne seksjonen krever rollen Kreativ eller Administrator.');
+          window.location.replace('/medlem');
+          return;
+        }
+
+        // Bruker autorisert og godkjent: avdekk siden
+        var guard = document.getElementById('auth-guard-style');
+        if (guard) guard.remove();
+        else document.documentElement.style.display = '';
+      } catch (err) {
+        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+          var guard = document.getElementById('auth-guard-style');
+          if (guard) guard.remove();
+          else document.documentElement.style.display = '';
+          return;
+        }
+        window.location.replace('/login');
+      }
+    }
+
+    sjekkAuth();
+  })();
+
   var FARGE = {
     vinrod: '#6D0C32',
     stalgra: '#909090',
@@ -353,7 +424,8 @@
       '</a>' +
       '<nav class="nav">' +
         '<a href="/medlem" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>' +
-        '<a href="index.html" class="' + (window.location.pathname.endsWith('merkeverktoy/') || window.location.pathname.endsWith('index.html') ? 'sterk' : '') + '">Alle verktøy</a>' +
+        '<a href="/creative-tools" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#38bdf8;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path></svg> Kreative Verktøy</a>' +
+        '<a href="index.html" class="' + (window.location.pathname.endsWith('merkeverktoy/') || window.location.pathname.endsWith('index.html') ? 'sterk' : '') + '">Alle merkeverktøy</a>' +
       '</nav>' +
     '</div>';
     document.body.insertBefore(header, document.body.firstChild);

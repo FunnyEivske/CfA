@@ -48,6 +48,7 @@ cfa_webhuset_klar_til_opplasting*
 deploy.ps1
 *.zip
 scratch/
+public/
 
 # Mobile & Capacitor build artifacts
 member-app/android/.gradle/

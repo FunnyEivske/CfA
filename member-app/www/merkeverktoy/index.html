@@ -1,6 +1,18 @@
 <!doctype html>
 <html lang="nb">
 <head>
+  <!-- Streng autentiseringsvakt: Hindrer lasting og rendering for uinnloggede -->
+  <style id="auth-guard-style">
+    html { display: none !important; }
+  </style>
+  <script>
+    (function() {
+      var hasSession = false;
+      try { hasSession = localStorage.getItem('cfa_has_session') === '1'; } catch(e) {}
+      if (!hasSession) { window.location.replace('/login'); }
+    })();
+  </script>
+
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Merkeverktøy – Cosplay for Alle</title>

@@ -76,7 +76,7 @@ if (fs.existsSync(path.join(rootDir, 'css/medlem.css'))) {
 }
 
 // 2. Upload JS files
-const jsFiles = ['script.js', 'api-client.js', 'index-events.js', 'i18n.js', 'theme-switcher.js', 'medlem-controller.js', 'feed.js', 'arrangement.js', 'profil.js', 'cookie-consent.js'];
+const jsFiles = ['script.js', 'api-client.js', 'index-events.js', 'i18n.js', 'theme-switcher.js', 'medlem-controller.js', 'creative-tools.js', 'feed.js', 'arrangement.js', 'profil.js', 'cookie-consent.js'];
 for (const file of jsFiles) {
   uploadFile(`js/${file}`, `js/${file}`);
   uploadFile(`js/${file}`, file);
@@ -126,6 +126,7 @@ const htmlFiles = [
   'profil.html',
   'medlem.html',
   'login.html',
+  'creative-tools.html',
   'app.html',
   'app-start.html'
 ];
@@ -144,5 +145,11 @@ if (fs.existsSync(path.join(rootDir, 'favicon.ico'))) {
 // 8. Upload Merkeverktøy
 console.log('🎨 Uploading Merkeverktøy suite...');
 uploadDirRecursive('merkeverktoy', 'merkeverktoy');
+
+// 9. Upload ArtCraft Suite
+if (fs.existsSync(path.join(rootDir, 'artcraft'))) {
+  console.log('✨ Uploading ArtCraft (Kreative Verktøy) suite...');
+  uploadDirRecursive('artcraft', 'artcraft');
+}
 
 console.log('✅ Deployment to Webhuset complete!');

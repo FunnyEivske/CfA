@@ -111,6 +111,66 @@ function compressImageServerSide($srcPath, $destPath, $maxDim = 800, $quality = 
     return $saved;
 }
 
+try {
+    $pdo->exec("ALTER TABLE users ADD COLUMN display_role VARCHAR(50) DEFAULT 'Medlem'");
+} catch (Exception $e) {}
+try {
+    $pdo->exec("ALTER TABLE users ADD COLUMN roles TEXT DEFAULT NULL");
+} catch (Exception $e) {}
+
+function normalizeUser(&$user) {
+    if (!$user) return;
+    $rawRoles = $user['roles'] ?? null;
+    $rolesArray = [];
+    if (!empty($rawRoles)) {
+        if (is_string($rawRoles)) {
+            $decoded = json_decode($rawRoles, true);
+            if (is_array($decoded)) {
+                $rolesArray = $decoded;
+            } else {
+                $rolesArray = array_map('trim', explode(',', $rawRoles));
+            }
+        } elseif (is_array($rawRoles)) {
+            $rolesArray = $rawRoles;
+        }
+    }
+    if (empty($rolesArray)) {
+        if (($user['role'] ?? '') === 'admin') {
+            $rolesArray = ['member', 'admin', 'creative'];
+        } else {
+            $rolesArray = ['member'];
+        }
+    }
+    if (!in_array('member', $rolesArray)) {
+        array_unshift($rolesArray, 'member');
+    }
+    $rolesArray = array_values(array_unique($rolesArray));
+    $user['roles'] = $rolesArray;
+
+    $displayRole = $user['display_role'] ?? '';
+    if (empty($displayRole)) {
+        $displayRole = in_array('admin', $rolesArray) ? 'Styremedlem' : 'Medlem';
+    }
+    if (!in_array($displayRole, ['Medlem', 'Styremedlem'])) {
+        $displayRole = 'Medlem';
+    }
+    $user['display_role'] = $displayRole;
+    $user['displayRole'] = $displayRole;
+    $user['role'] = in_array('admin', $rolesArray) ? 'admin' : 'medlem';
+}
+
+function userHasRole($requiredRole) {
+    if (!isset($_SESSION['user_id'])) return false;
+    $roles = $_SESSION['roles'] ?? [];
+    if (!is_array($roles)) {
+        $roles = json_decode($roles, true) ?? [];
+    }
+    if (in_array('admin', $roles) || (isset($_SESSION['role']) && $_SESSION['role'] === 'admin')) {
+        return true;
+    }
+    return in_array($requiredRole, $roles);
+}
+
 switch ($action) {
     case 'login':
         if ($_SERVER['REQUEST_METHOD'] !== 'POST') jsonResponse(['error' => 'Method not allowed'], 405);
@@ -123,8 +183,11 @@ switch ($action) {
         $user = $stmt->fetch();
         
         if ($user && password_verify($password, $user['password_hash'])) {
+            normalizeUser($user);
             $_SESSION['user_id'] = $user['id'];
+            $_SESSION['roles'] = $user['roles'];
             $_SESSION['role'] = $user['role'];
+            $_SESSION['display_role'] = $user['display_role'];
             $mustChange = (int)($user['must_change_password'] ?? 0) === 1;
             $mustAcceptTos = (int)($user['tos_accepted'] ?? 0) === 0;
             unset($user['password_hash']);
@@ -173,15 +236,18 @@ switch ($action) {
         
         $hash = password_hash($password, PASSWORD_DEFAULT);
         $id = 'usr_' . bin2hex(random_bytes(8));
+        $defaultRoles = json_encode(['member']);
         
         try {
-            $stmt = $pdo->prepare('INSERT INTO users (id, email, password_hash, display_name, member_since) VALUES (?, ?, ?, ?, CURDATE())');
-            $stmt->execute([$id, $email, $hash, $name]);
+            $stmt = $pdo->prepare('INSERT INTO users (id, email, password_hash, display_name, role, display_role, roles, member_since) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE())');
+            $stmt->execute([$id, $email, $hash, $name, 'medlem', 'Medlem', $defaultRoles]);
             
             $_SESSION['user_id'] = $id;
+            $_SESSION['roles'] = ['member'];
             $_SESSION['role'] = 'medlem';
+            $_SESSION['display_role'] = 'Medlem';
             
-            jsonResponse(['success' => true, 'user' => ['id' => $id, 'email' => $email, 'display_name' => $name, 'role' => 'medlem']]);
+            jsonResponse(['success' => true, 'user' => ['id' => $id, 'email' => $email, 'display_name' => $name, 'role' => 'medlem', 'display_role' => 'Medlem', 'displayRole' => 'Medlem', 'roles' => ['member']]]);
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 jsonResponse(['error' => 'Email already registered'], 400);
@@ -193,7 +259,7 @@ switch ($action) {
     case 'auth_state':
         if (isset($_SESSION['user_id'])) {
             try {
-                $stmt = $pdo->prepare('SELECT id, email, display_name, photo_url, role, member_since, tos_accepted, must_change_password, phone, contact_email FROM users WHERE id = ?');
+                $stmt = $pdo->prepare('SELECT id, email, display_name, photo_url, role, display_role, roles, member_since, tos_accepted, must_change_password, phone, contact_email FROM users WHERE id = ?');
                 $stmt->execute([$_SESSION['user_id']]);
                 $user = $stmt->fetch();
             } catch (Exception $e) {
@@ -202,6 +268,10 @@ switch ($action) {
                 $user = $stmt->fetch();
             }
             if ($user) {
+                normalizeUser($user);
+                $_SESSION['roles'] = $user['roles'];
+                $_SESSION['role'] = $user['role'];
+                $_SESSION['display_role'] = $user['display_role'];
                 $mustChange = (int)($user['must_change_password'] ?? 0) === 1;
                 $mustAcceptTos = (int)($user['tos_accepted'] ?? 0) === 0;
                 unset($user['password_hash']);
@@ -330,16 +400,20 @@ switch ($action) {
 
         // Sikkerhet: Ikke vis privat innloggings-e-post offentlig til andre medlemmer.
         // Kun administratorer kan se innloggings-e-post ved medlemsadministrasjon.
-        $isAdmin = isset($_SESSION['role']) && $_SESSION['role'] === 'admin';
+        $isAdmin = userHasRole('admin');
         $emailField = $isAdmin ? 'email' : 'NULL as email';
 
         try {
-            $stmt = $pdo->query("SELECT id, {$emailField}, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted, phone, contact_email FROM users ORDER BY display_name ASC");
-            jsonResponse(['members' => $stmt->fetchAll()]);
+            $stmt = $pdo->query("SELECT id, {$emailField}, display_name, photo_url, role, display_role, roles, member_since, created_at, must_change_password, tos_accepted, phone, contact_email FROM users ORDER BY display_name ASC");
+            $members = $stmt->fetchAll();
         } catch (Exception $e) {
             $stmt = $pdo->query("SELECT id, {$emailField}, display_name, photo_url, role, member_since, created_at, must_change_password, tos_accepted FROM users ORDER BY display_name ASC");
-            jsonResponse(['members' => $stmt->fetchAll()]);
+            $members = $stmt->fetchAll();
         }
+        foreach ($members as &$m) {
+            normalizeUser($m);
+        }
+        jsonResponse(['members' => $members]);
         break;
 
     case 'get_posts':
@@ -743,7 +817,7 @@ switch ($action) {
 
     case 'delete_member':
         requireAuth();
-        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        if (!userHasRole('admin')) jsonResponse(['error' => 'Forbidden'], 403);
         $data = json_decode(file_get_contents('php://input'), true);
         $userId = $data['id'] ?? '';
         if ($userId === $_SESSION['user_id']) {
@@ -756,7 +830,7 @@ switch ($action) {
 
     case 'delete_gallery':
         requireAuth();
-        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        if (!userHasRole('admin')) jsonResponse(['error' => 'Forbidden'], 403);
         $data = json_decode(file_get_contents('php://input'), true);
         $imgId = (int)($data['id'] ?? 0);
         $stmt = $pdo->prepare('DELETE FROM gallery WHERE id = ?');
@@ -766,7 +840,7 @@ switch ($action) {
 
     case 'delete_event':
         requireAuth();
-        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        if (!userHasRole('admin')) jsonResponse(['error' => 'Forbidden'], 403);
         $data = json_decode(file_get_contents('php://input'), true);
         $eventId = (int)($data['id'] ?? 0);
         $stmt = $pdo->prepare('DELETE FROM events WHERE id = ?');
@@ -776,12 +850,22 @@ switch ($action) {
 
     case 'admin_create_member':
         requireAuth();
-        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        if (!userHasRole('admin')) jsonResponse(['error' => 'Forbidden'], 403);
         $data = json_decode(file_get_contents('php://input'), true);
         $email = strtolower(trim($data['email'] ?? ''));
         $password = trim($data['password'] ?? '123456');
         $name = trim($data['name'] ?? 'Medlem');
-        $role = in_array($data['role'] ?? '', ['admin', 'medlem']) ? $data['role'] : 'medlem';
+        $displayRole = in_array($data['display_role'] ?? $data['displayRole'] ?? '', ['Styremedlem', 'Medlem']) ? ($data['display_role'] ?? $data['displayRole']) : 'Medlem';
+        
+        // Faktiske roller
+        $roles = $data['roles'] ?? [];
+        if (is_string($roles)) $roles = json_decode($roles, true) ?? [];
+        if (!is_array($roles)) $roles = [];
+        if (!in_array('member', $roles)) $roles[] = 'member';
+        $validRoles = ['member', 'admin', 'creative'];
+        $roles = array_values(array_intersect($roles, $validRoles));
+        $rolesJson = json_encode($roles);
+        $legacyRole = in_array('admin', $roles) ? 'admin' : 'medlem';
         
         if (!$email || !$password) jsonResponse(['error' => 'E-post og passord er påkrevd'], 400);
         
@@ -789,9 +873,20 @@ switch ($action) {
         $id = 'usr_' . bin2hex(random_bytes(8));
         
         try {
-            $stmt = $pdo->prepare('INSERT INTO users (id, email, password_hash, display_name, role, member_since, must_change_password) VALUES (?, ?, ?, ?, ?, CURDATE(), 1)');
-            $stmt->execute([$id, $email, $hash, $name, $role]);
-            jsonResponse(['success' => true, 'user' => ['id' => $id, 'email' => $email, 'display_name' => $name, 'role' => $role]]);
+            $stmt = $pdo->prepare('INSERT INTO users (id, email, password_hash, display_name, role, display_role, roles, member_since, must_change_password) VALUES (?, ?, ?, ?, ?, ?, ?, CURDATE(), 1)');
+            $stmt->execute([$id, $email, $hash, $name, $legacyRole, $displayRole, $rolesJson]);
+            jsonResponse([
+                'success' => true,
+                'user' => [
+                    'id' => $id,
+                    'email' => $email,
+                    'display_name' => $name,
+                    'role' => $legacyRole,
+                    'display_role' => $displayRole,
+                    'displayRole' => $displayRole,
+                    'roles' => $roles
+                ]
+            ]);
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 jsonResponse(['error' => 'E-post er allerede registrert'], 400);
@@ -802,15 +897,42 @@ switch ($action) {
 
     case 'admin_update_member':
         requireAuth();
-        if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
+        if (!userHasRole('admin')) jsonResponse(['error' => 'Forbidden'], 403);
         
         $data = json_decode(file_get_contents('php://input'), true) ?? $_POST;
         $id = $data['id'] ?? '';
         $name = trim($data['display_name'] ?? '');
         $email = strtolower(trim($data['email'] ?? ''));
-        $role = in_array($data['role'] ?? '', ['admin', 'medlem']) ? $data['role'] : 'medlem';
+        $displayRole = in_array($data['display_role'] ?? $data['displayRole'] ?? '', ['Styremedlem', 'Medlem']) ? ($data['display_role'] ?? $data['displayRole']) : 'Medlem';
+        
+        // Parse roles
+        $rawRoles = $data['roles'] ?? null;
+        $roles = null;
+        if ($rawRoles !== null) {
+            if (is_string($rawRoles)) {
+                $decoded = json_decode($rawRoles, true);
+                $roles = is_array($decoded) ? $decoded : array_map('trim', explode(',', $rawRoles));
+            } elseif (is_array($rawRoles)) {
+                $roles = $rawRoles;
+            }
+            if (!in_array('member', $roles)) {
+                array_unshift($roles, 'member');
+            }
+            $validRoles = ['member', 'admin', 'creative'];
+            $roles = array_values(array_intersect($roles, $validRoles));
+        }
+        
+        // Fallback dersom bare legacy role ble sendt inn
+        if ($roles === null) {
+            $legacyRole = in_array($data['role'] ?? '', ['admin', 'medlem']) ? $data['role'] : 'medlem';
+            $roles = ($legacyRole === 'admin') ? ['member', 'admin', 'creative'] : ['member'];
+        } else {
+            $legacyRole = in_array('admin', $roles) ? 'admin' : 'medlem';
+        }
+        $rolesJson = json_encode($roles);
+        
         $memberSince = !empty($data['member_since']) ? $data['member_since'] : date('Y-m-d');
-        $newPassword = trim($data['password'] ?? '');
+        $newPassword = trim($data['password'] ?? $data['new_password'] ?? '');
         $photoUrl = trim($data['photo_url'] ?? '');
         
         if (!$id) jsonResponse(['error' => 'Mangler bruker-ID'], 400);
@@ -830,8 +952,8 @@ switch ($action) {
             }
         }
         
-        $sql = 'UPDATE users SET display_name = ?, email = ?, role = ?, member_since = ?';
-        $params = [$name, $email, $role, $memberSince];
+        $sql = 'UPDATE users SET display_name = ?, email = ?, role = ?, display_role = ?, roles = ?, member_since = ?';
+        $params = [$name, $email, $legacyRole, $displayRole, $rolesJson, $memberSince];
         
         if ($photoUrl) {
             $sql .= ', photo_url = ?';
@@ -849,7 +971,27 @@ switch ($action) {
         try {
             $stmt = $pdo->prepare($sql);
             $stmt->execute($params);
-            jsonResponse(['success' => true, 'photo_url' => $photoUrl ?: null]);
+            
+            // Hvis brukeren som ble oppdatert er innlogget administrator, oppdater sesjonen umiddelbart
+            if ($id === $_SESSION['user_id']) {
+                $_SESSION['roles'] = $roles;
+                $_SESSION['role'] = $legacyRole;
+                $_SESSION['display_role'] = $displayRole;
+            }
+            
+            jsonResponse([
+                'success' => true,
+                'user' => [
+                    'id' => $id,
+                    'display_name' => $name,
+                    'email' => $email,
+                    'role' => $legacyRole,
+                    'display_role' => $displayRole,
+                    'displayRole' => $displayRole,
+                    'roles' => $roles
+                ],
+                'photo_url' => $photoUrl ?: null
+            ]);
         } catch (PDOException $e) {
             if ($e->getCode() == 23000) {
                 jsonResponse(['error' => 'E-postadressen er allerede i bruk av en annen bruker.'], 400);

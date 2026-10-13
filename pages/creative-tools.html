@@ -1,0 +1,401 @@
+<!DOCTYPE html>
+<html lang="no" style="overflow-x: hidden;">
+
+<head>
+    <base href="/">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kreative Verktøy (ArtCraft) – Cosplay for Alle</title>
+    <meta name="description" content="Kreative Verktøy for medlemmer i Cosplay for alle (CfA). 9 kraftige ArtCraft WebAssembly-apper direkte i nettleseren.">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@600;700&display=swap">
+
+    <link rel="stylesheet" href="css/style.css?v=3.0">
+    <link rel="stylesheet" href="css/medlem.css?v=3.0">
+
+    <!-- Tema inline for å unngå FOUC -->
+    <script>try{var t=localStorage.getItem('theme');if(t==='dark')document.documentElement.setAttribute('data-theme','dark');}catch(e){}</script>
+
+    <!-- Streng autentiseringsvakt: Hindrer rendering før verifisert innlogging -->
+    <style id="auth-guard-style">
+        html { display: none !important; }
+    </style>
+    <script>
+        (function() {
+            var hasSession = false;
+            try {
+                hasSession = localStorage.getItem('cfa_has_session') === '1';
+            } catch(e) {}
+            if (!hasSession) {
+                var isHtml = window.location.pathname.endsWith('.html');
+                window.location.replace(isHtml ? 'login.html' : 'login');
+            }
+        })();
+    </script>
+
+    <link rel="icon" type="image/webp" href="Media/Logo/cfa-logo.webp">
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#6E0A2D">
+
+    <style>
+        .creative-hero {
+            padding: 3rem 1.5rem 2rem;
+            text-align: center;
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .creative-hero h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.6rem;
+            color: var(--color-primary);
+            margin-bottom: 0.75rem;
+            line-height: 1.2;
+        }
+        .creative-hero p {
+            color: var(--color-text-muted);
+            font-size: 1.1rem;
+            max-width: 680px;
+            margin: 0 auto 1.5rem;
+            line-height: 1.6;
+        }
+        .creative-pill-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: linear-gradient(135deg, rgba(14, 165, 233, 0.12), rgba(236, 72, 153, 0.12));
+            color: var(--color-primary);
+            border: 1px solid rgba(224, 87, 127, 0.3);
+            border-radius: 9999px;
+            padding: 0.4rem 1rem;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .apps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 1.5rem;
+            padding: 1rem 0 4rem;
+        }
+        @media (max-width: 640px) {
+            .apps-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .app-card {
+            background: var(--color-bg-surface);
+            border: 1px solid var(--color-border);
+            border-radius: 16px;
+            padding: 1.75rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        .app-card:hover {
+            transform: translateY(-4px);
+            border-color: var(--color-primary);
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+        }
+
+        .app-icon-box {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+            margin-bottom: 1.25rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.06);
+        }
+
+        .app-alt-tag {
+            font-size: 0.75rem;
+            font-weight: 700;
+            padding: 0.25rem 0.6rem;
+            border-radius: 6px;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+            display: inline-block;
+            margin-bottom: 0.5rem;
+        }
+
+        .app-title {
+            font-size: 1.35rem;
+            font-weight: 700;
+            margin: 0 0 0.5rem;
+            color: var(--color-text-main);
+        }
+        .app-desc {
+            color: var(--color-text-muted);
+            font-size: 0.92rem;
+            line-height: 1.5;
+            margin: 0 0 1.5rem;
+            flex-grow: 1;
+        }
+        .app-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        /* Fullskjerms iframe workspace */
+        #artcraft-workspace {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background: #121214;
+            z-index: 99999;
+            display: flex;
+            flex-direction: column;
+            opacity: 1;
+            transition: opacity 0.2s ease;
+        }
+        #artcraft-workspace.hidden {
+            display: none;
+            opacity: 0;
+        }
+        .workspace-topbar {
+            height: 54px;
+            background: #1c1c20;
+            border-bottom: 1px solid #2e2e34;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 1rem;
+            color: #ffffff;
+            flex-shrink: 0;
+        }
+        .workspace-title-box {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+        .workspace-app-icon {
+            font-size: 1.4rem;
+        }
+        .workspace-app-name {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #ffffff;
+        }
+        .workspace-app-tag {
+            font-size: 0.75rem;
+            background: #2a2a32;
+            color: #a1a1aa;
+            padding: 2px 8px;
+            border-radius: 4px;
+        }
+        .workspace-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+        .workspace-select {
+            background: #27272a;
+            color: #ffffff;
+            border: 1px solid #3f3f46;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+        }
+        .workspace-btn {
+            background: #27272a;
+            color: #ffffff;
+            border: 1px solid #3f3f46;
+            padding: 0.35rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.85rem;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            transition: background 0.15s, border-color 0.15s;
+        }
+        .workspace-btn:hover {
+            background: #3f3f46;
+        }
+        .workspace-close-btn {
+            background: rgba(239, 68, 68, 0.15);
+            color: #f87171;
+            border: 1px solid rgba(239, 68, 68, 0.4);
+            padding: 0.35rem 0.85rem;
+            border-radius: 6px;
+            font-weight: 600;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: background 0.15s;
+        }
+        .workspace-close-btn:hover {
+            background: rgba(239, 68, 68, 0.3);
+        }
+        .workspace-frame-container {
+            flex: 1;
+            width: 100%;
+            height: calc(100vh - 54px);
+            position: relative;
+            background: #09090b;
+        }
+        #artcraft-iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            display: block;
+        }
+        .workspace-loader {
+            position: absolute;
+            inset: 0;
+            background: #121214;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            color: #ffffff;
+            gap: 1rem;
+            z-index: 10;
+        }
+        .workspace-spinner {
+            width: 44px;
+            height: 44px;
+            border: 3px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #38bdf8;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+        }
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="header">
+        <div class="container header-inner">
+            <div style="display: flex; align-items: center; gap: 0.75rem;">
+                <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
+                    <img src="Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" style="height: 40px; width: 40px; object-fit: contain;">
+                    <h2 style="margin: 0; color: var(--color-primary); font-size: 1.5rem; font-weight: bold;">Cosplay for Alle</h2>
+                </a>
+            </div>
+
+            <nav class="nav-desktop">
+                <a href="medlem" class="nav-link" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="19" y1="12" x2="5" y2="12"></line>
+                        <polyline points="12 19 5 12 12 5"></polyline>
+                    </svg>
+                    Min side
+                </a>
+                <a href="merkeverktoy/" class="nav-link">Merkeverktøy</a>
+                <a href="creative-tools" class="nav-link active">Kreative Verktøy</a>
+
+                <!-- Tema veksler -->
+                <button type="button" class="theme-toggle header-theme-toggle" aria-label="Bytt tema" title="Bytt tema">
+                    <svg class="moon-icon" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                    </svg>
+                    <svg class="sun-icon hidden" style="width: 18px; height: 18px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                </button>
+
+                <button id="logout-btn-header" class="button button-secondary" style="padding: 0.45rem 1rem;">Logg ut</button>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Hero seksjon -->
+        <div class="creative-hero">
+            <span class="creative-pill-badge">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+                    <circle cx="12" cy="12" r="10"></circle>
+                    <path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path>
+                </svg>
+                ArtCraft WebAssembly Suite for CfA Skapere
+            </span>
+            <h1>Kreative Verktøy</h1>
+            <p>
+                En komplett samling av 9 kraftige skaper-apper for bilderedigering, mønsterdesign, videoredigering, lydopptak og visuelle effekter. Alle appene kjører 100% lokalt i nettleseren din via WebAssembly, med lynrask ytelse og fullt personvern.
+            </p>
+            <div style="display: flex; align-items: center; justify-content: center; gap: 1rem; flex-wrap: wrap;">
+                <a href="merkeverktoy/" class="btn btn-secondary text-sm" style="display: inline-flex; align-items: center; gap: 6px;">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 19l7-7 3 3-7 7-3-3z"></path>
+                        <path d="M18 13l-1.5-7.5L2 2l3.5 14.5L13 18l5-5z"></path>
+                    </svg>
+                    Gå til Merkeverktøy
+                </a>
+                <a href="medlem" class="btn btn-ghost text-sm">Tilbake til Min side</a>
+            </div>
+        </div>
+
+        <!-- De 9 ArtCraft-appene i Grid -->
+        <div class="apps-grid" id="apps-container">
+            <!-- App-kort genereres dynamisk av js/creative-tools.js -->
+        </div>
+    </main>
+
+    <!-- Fullskjerms ArtCraft Arbeidsområde (iFrame Workspace) -->
+    <div id="artcraft-workspace" class="hidden" role="dialog" aria-modal="true" aria-label="Kreativ app">
+        <header class="workspace-topbar">
+            <div class="workspace-title-box">
+                <span id="ws-app-icon" class="workspace-app-icon">🎨</span>
+                <span id="ws-app-name" class="workspace-app-name">ArtCraft</span>
+                <span id="ws-app-tag" class="workspace-app-tag">WebAssembly</span>
+            </div>
+
+            <div class="workspace-actions">
+                <label for="ws-switch-select" class="sr-only">Bytt app</label>
+                <select id="ws-switch-select" class="workspace-select" aria-label="Bytt app">
+                    <option value="photocraft">PhotoCraft (Bilderedigering)</option>
+                    <option value="vectorcraft">VectorCraft (Vektor/Mønster)</option>
+                    <option value="filmcraft">FilmCraft (Video)</option>
+                    <option value="lightcraft">LightCraft (RAW/Farge)</option>
+                    <option value="pdfcraft">PdfCraft (PDF-mønster)</option>
+                    <option value="effectcraft">EffectCraft (VFX/Effekter)</option>
+                    <option value="designcraft">DesignCraft (Sideoppsett)</option>
+                    <option value="figcraft">FigCraft (UI/UX)</option>
+                    <option value="soundcraft">SoundCraft (Lydredigering)</option>
+                </select>
+
+                <button type="button" id="ws-open-tab-btn" class="workspace-btn" title="Åpne i ny fane">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                        <polyline points="15 3 21 3 21 9"></polyline>
+                        <line x1="10" y1="14" x2="21" y2="3"></line>
+                    </svg>
+                    Ny fane
+                </button>
+
+                <button type="button" id="ws-close-btn" class="workspace-close-btn" title="Lukk app (Esc)">
+                    ✕ Lukk
+                </button>
+            </div>
+        </header>
+
+        <div class="workspace-frame-container">
+            <div id="ws-loader" class="workspace-loader">
+                <div class="workspace-spinner"></div>
+                <p id="ws-loader-text" style="font-weight: 500; font-size: 1rem;">Laster inn WebAssembly-applikasjonen...</p>
+            </div>
+            <iframe id="artcraft-iframe" src="about:blank" allow="cross-origin-isolated; autoplay; fullscreen; clipboard-read; clipboard-write;" title="ArtCraft Application"></iframe>
+        </div>
+    </div>
+
+    <script type="module" src="js/creative-tools.js"></script>
+    <script src="js/theme-switcher.js"></script>
+</body>
+
+</html>

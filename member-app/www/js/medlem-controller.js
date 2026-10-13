@@ -1,4 +1,4 @@
-import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI, optimizeImageForUpload, PushAPI, registerServiceWorker, subscribeUserToPush } from './api-client.js';
+import { AuthAPI, MemberAPI, GalleryAPI, EventAPI, SettingsAPI, DocumentAPI, optimizeImageForUpload, PushAPI, registerServiceWorker, subscribeUserToPush, userHasRole } from './api-client.js';
 
 let currentUser = null;
 let currentWorkshopData = null;
@@ -258,8 +258,9 @@ function setupModals() {
 
             const modalRoleBadge = document.getElementById('profile-modal-role-badge');
             if (modalRoleBadge) {
-                modalRoleBadge.textContent = currentUser.role === 'admin' ? 'Styre / Leder' : 'Medlem';
-                modalRoleBadge.style.background = currentUser.role === 'admin' ? 'var(--color-primary)' : 'var(--color-secondary)';
+                const dRole = currentUser.display_role || currentUser.displayRole || (currentUser.role === 'admin' ? 'Styremedlem' : 'Medlem');
+                modalRoleBadge.textContent = dRole;
+                modalRoleBadge.style.background = dRole === 'Styremedlem' ? 'var(--color-primary)' : 'var(--color-secondary)';
             }
 
             const modalDuration = document.getElementById('profile-modal-duration-badge');
@@ -631,8 +632,8 @@ async function loadSidebarMembers() {
         const res = await MemberAPI.getMembers();
         cachedMembersList = res.members || [];
 
-        // På nettsiden (ikke PWA) vises kun styret/ledelsen
-        const boardMembers = cachedMembersList.filter(m => m.role === 'admin');
+        // På nettsiden (ikke PWA) vises kun styret/ledelsen (brukere med displayRole Styremedlem)
+        const boardMembers = cachedMembersList.filter(m => (m.display_role || m.displayRole) === 'Styremedlem' || m.role === 'admin');
 
         if (countEl) countEl.textContent = boardMembers.length;
         const pwaCountEl = document.getElementById('pwa-member-count');
@@ -931,13 +932,29 @@ async function renderAdminMembersList() {
             
             const joinDateFormatted = m.member_since ? new Date(m.member_since).toLocaleDateString('nb-NO') : 'Ikke satt';
 
+            const dRole = m.display_role || m.displayRole || (m.role === 'admin' ? 'Styremedlem' : 'Medlem');
+            const mRoles = Array.isArray(m.roles) ? m.roles : (typeof m.roles === 'string' ? (JSON.parse(m.roles || '[]') || []) : (m.role === 'admin' ? ['member', 'admin', 'creative'] : ['member']));
+            const isAdmin = mRoles.includes('admin') || m.role === 'admin';
+            const isCreative = mRoles.includes('creative');
+
+            let roleBadgesHtml = `
+                <span style="font-size: 0.72rem; padding: 2px 7px; border-radius: 4px; font-weight: 600; background: ${dRole === 'Styremedlem' ? 'rgba(243, 183, 22, 0.2)' : 'var(--color-bg-surface)'}; color: ${dRole === 'Styremedlem' ? '#d97706' : 'var(--color-text-main)'}; border: 1px solid var(--color-border);">${dRole}</span>
+                <span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; background: rgba(14, 165, 233, 0.15); color: #0284c7;">Medlem</span>
+            `;
+            if (isAdmin) {
+                roleBadgesHtml += `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; background: var(--color-primary); color: #FFFFFF;">Admin</span>`;
+            }
+            if (isCreative) {
+                roleBadgesHtml += `<span style="font-size: 0.65rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; background: rgba(236, 72, 153, 0.18); color: #db2777;">Kreativ</span>`;
+            }
+
             item.innerHTML = `
                 <div style="display: flex; align-items: center; gap: 0.9rem;">
                     <img src="${m.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(m.display_name)}" style="width: 44px; height: 44px; border-radius: 50%; object-fit: cover; border: 2px solid var(--color-border);">
                     <div>
-                        <div style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+                        <div style="display: flex; align-items: center; gap: 0.4rem; flex-wrap: wrap;">
                             <strong style="color: var(--color-text-main); font-size: 0.95rem;">${m.display_name}</strong>
-                            <span style="font-size: 0.7rem; padding: 2px 6px; border-radius: 4px; font-weight: 600; background: ${m.role === 'admin' ? 'var(--color-primary)' : 'var(--color-bg-surface)'}; color: ${m.role === 'admin' ? '#FFFFFF' : 'var(--color-text-muted)'}; border: 1px solid var(--color-border);">${m.role === 'admin' ? 'Admin' : 'Medlem'}</span>
+                            ${roleBadgesHtml}
                         </div>
                         <div style="font-size: 0.8rem; color: var(--color-text-muted); margin-top: 2px;">${m.email}</div>
                         <div style="font-size: 0.72rem; color: var(--color-text-muted); opacity: 0.8;">Medlem siden: ${joinDateFormatted}</div>
@@ -971,6 +988,8 @@ async function renderAdminMembersList() {
                             id: m.id,
                             display_name: m.display_name,
                             role: m.role,
+                            display_role: dRole,
+                            roles: mRoles,
                             new_password: newPw.trim()
                         });
                         alert(`✅ Passordet for ${m.display_name} ble oppdatert til: ${newPw.trim()}\n\nBrukeren må skifte passord ved neste innlogging.`);
@@ -1007,7 +1026,9 @@ function openAdminEditMemberModal(member) {
     const idInput = document.getElementById('edit-member-id');
     const nameInput = document.getElementById('edit-member-name');
     const emailInput = document.getElementById('edit-member-email');
-    const roleSelect = document.getElementById('edit-member-role');
+    const dRoleSelect = document.getElementById('edit-member-display-role');
+    const adminRoleCb = document.getElementById('edit-member-role-admin');
+    const creativeRoleCb = document.getElementById('edit-member-role-creative');
     const sinceInput = document.getElementById('edit-member-since');
     const avatarPreview = document.getElementById('edit-member-avatar-preview');
     const avatarFileInput = document.getElementById('edit-member-avatar-input');
@@ -1016,7 +1037,13 @@ function openAdminEditMemberModal(member) {
     if (idInput) idInput.value = member.id || '';
     if (nameInput) nameInput.value = member.display_name || '';
     if (emailInput) emailInput.value = member.email || '';
-    if (roleSelect) roleSelect.value = member.role || 'medlem';
+    
+    const dRole = member.display_role || member.displayRole || (member.role === 'admin' ? 'Styremedlem' : 'Medlem');
+    if (dRoleSelect) dRoleSelect.value = dRole;
+
+    if (adminRoleCb) adminRoleCb.checked = userHasRole(member, 'admin');
+    if (creativeRoleCb) creativeRoleCb.checked = userHasRole(member, 'creative');
+
     if (sinceInput) sinceInput.value = member.member_since ? member.member_since.split('T')[0] : '';
     if (avatarPreview) avatarPreview.src = member.photo_url || 'https://ui-avatars.com/api/?name=' + encodeURIComponent(member.display_name);
     if (avatarFileInput) avatarFileInput.value = '';
@@ -1045,9 +1072,13 @@ function setupAdminEditMemberForm() {
             const id = document.getElementById('edit-member-id').value;
             const name = document.getElementById('edit-member-name').value.trim();
             const email = document.getElementById('edit-member-email').value.trim();
-            const role = document.getElementById('edit-member-role').value;
+            const dRole = document.getElementById('edit-member-display-role')?.value || 'Medlem';
             const memberSince = document.getElementById('edit-member-since').value;
             const password = document.getElementById('edit-member-password').value.trim();
+
+            const roles = ['member'];
+            if (document.getElementById('edit-member-role-admin')?.checked) roles.push('admin');
+            if (document.getElementById('edit-member-role-creative')?.checked) roles.push('creative');
 
             if (!name || !email) {
                 alert('Vennligst fyll ut navn og e-post.');
@@ -1064,7 +1095,10 @@ function setupAdminEditMemberForm() {
                 formData.append('id', id);
                 formData.append('display_name', name);
                 formData.append('email', email);
-                formData.append('role', role);
+                formData.append('display_role', dRole);
+                formData.append('displayRole', dRole);
+                formData.append('roles', JSON.stringify(roles));
+                formData.append('role', roles.includes('admin') ? 'admin' : 'medlem');
                 formData.append('member_since', memberSince);
                 if (password) {
                     formData.append('password', password);
@@ -2010,8 +2044,9 @@ async function setupProfileData(preloadedUser = null) {
         const adminPublishCard = document.getElementById('admin-publish-card');
         const adminTriggerContainer = document.getElementById('admin-trigger-container');
 
+        const dRole = user.display_role || user.displayRole || (user.role === 'admin' ? 'Styremedlem' : 'Medlem');
         if (profileName) profileName.textContent = user.display_name || user.email.split('@')[0];
-        if (profileRole) profileRole.textContent = user.role === 'admin' ? 'Administrator' : 'Medlem';
+        if (profileRole) profileRole.textContent = dRole;
         if (profileImg && user.photo_url) profileImg.src = user.photo_url;
         const pwaHeaderAvatar = document.getElementById('pwa-header-avatar');
         if (pwaHeaderAvatar) {
@@ -2025,7 +2060,16 @@ async function setupProfileData(preloadedUser = null) {
             memberDurationEl.textContent = months > 0 ? `${months} mnd` : 'Ny innmeldt';
         }
 
-        if (user.role === 'admin') {
+        const isAdmin = userHasRole(user, 'admin');
+        const hasCreative = userHasRole(user, 'creative') || isAdmin;
+
+        const creativeAccessContainer = document.getElementById('creative-access-container');
+        if (creativeAccessContainer) {
+            if (hasCreative) creativeAccessContainer.classList.remove('hidden');
+            else creativeAccessContainer.classList.add('hidden');
+        }
+
+        if (isAdmin) {
             if (adminPublishCard) adminPublishCard.classList.remove('hidden');
             if (adminTriggerContainer) adminTriggerContainer.classList.remove('hidden');
             const quickEditBtn = document.getElementById('quick-edit-status-btn');
@@ -2036,6 +2080,9 @@ async function setupProfileData(preloadedUser = null) {
                     openModal('admin-status-modal');
                 };
             }
+        } else {
+            if (adminPublishCard) adminPublishCard.classList.add('hidden');
+            if (adminTriggerContainer) adminTriggerContainer.classList.add('hidden');
         }
     } catch (e) {
         console.warn("Error setting up profile data:", e);
@@ -2375,24 +2422,34 @@ function loadPwaSettings() {
         const roleEl = document.getElementById('pwa-settings-role');
         const adminSection = document.getElementById('pwa-admin-section');
 
+        const dRole = currentUser.display_role || currentUser.displayRole || (currentUser.role === 'admin' ? 'Styremedlem' : 'Medlem');
         if (avatarEl && currentUser.photo_url) avatarEl.src = currentUser.photo_url;
         if (nameEl) nameEl.textContent = currentUser.display_name || currentUser.email;
-        if (roleEl) roleEl.textContent = currentUser.role === 'admin' ? 'Administrator' : 'Medlem';
+        if (roleEl) roleEl.textContent = dRole;
+
+        const isAdmin = userHasRole(currentUser, 'admin');
+        const hasCreative = userHasRole(currentUser, 'creative') || isAdmin;
 
         if (adminSection) {
-            if (currentUser.role === 'admin') adminSection.classList.remove('hidden');
+            if (isAdmin) adminSection.classList.remove('hidden');
             else adminSection.classList.add('hidden');
+        }
+
+        const creativeSection = document.getElementById('pwa-creative-section');
+        if (creativeSection) {
+            if (hasCreative) creativeSection.classList.remove('hidden');
+            else creativeSection.classList.add('hidden');
         }
 
         const brandSection = document.getElementById('pwa-brand-section');
         if (brandSection) {
-            if (currentUser.role === 'admin') brandSection.classList.remove('hidden');
+            if (hasCreative) brandSection.classList.remove('hidden');
             else brandSection.classList.add('hidden');
         }
 
         const publishSection = document.getElementById('pwa-admin-publish-section');
         if (publishSection) {
-            if (currentUser.role === 'admin') publishSection.classList.remove('hidden');
+            if (isAdmin) publishSection.classList.remove('hidden');
             else publishSection.classList.add('hidden');
         }
     }

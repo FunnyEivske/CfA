@@ -5,6 +5,8 @@
   "main": "feed.js",
   "type": "module",
   "scripts": {
+    "fetch-artcraft": "node scripts/download-artcraft.mjs",
+    "prebuild": "node scripts/download-artcraft.mjs",
     "dev": "vite --host",
     "build": "vite build",
     "preview": "vite preview",
@@ -16,6 +18,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "adm-zip": "^0.6.1",
     "vite": "^7.3.1"
   }
 }

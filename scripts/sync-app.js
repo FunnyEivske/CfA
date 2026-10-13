@@ -58,6 +58,7 @@ const jsFiles = [
   'script.js',
   'api-client.js',
   'medlem-controller.js',
+  'creative-tools.js',
   'feed.js',
   'arrangement.js',
   'profil.js',
@@ -98,6 +99,7 @@ syncHtmlPage('medlem.html');
 syncHtmlPage('profil.html');
 syncHtmlPage('login.html');
 syncHtmlPage('app-start.html');
+syncHtmlPage('creative-tools.html');
 
 // 7. Create App Entry Point (index.html)
 const appIndexHtml = `<!DOCTYPE html>

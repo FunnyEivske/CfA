@@ -8,7 +8,9 @@ CREATE TABLE IF NOT EXISTS users (
     photo_url VARCHAR(255) DEFAULT NULL,
     phone VARCHAR(50) DEFAULT NULL,
     contact_email VARCHAR(255) DEFAULT NULL,
-    role VARCHAR(50) DEFAULT 'medlem', -- 'admin', 'medlem'
+    role VARCHAR(50) DEFAULT 'medlem', -- 'admin', 'medlem' (bevares for bakoverkompatibilitet)
+    display_role VARCHAR(50) DEFAULT 'Medlem', -- 'Medlem', 'Styremedlem'
+    roles TEXT DEFAULT NULL, -- JSON array: e.g. ["member"], ["member", "creative"], ["member", "admin", "creative"]
     member_since DATE DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
