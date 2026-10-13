@@ -8,13 +8,18 @@ DirectoryIndex pages/index.html index.html index.php
     RewriteEngine On
     RewriteBase /
 
+    # Unnta /artcraft/ direkte fra all omskriving og omdirigering
+    RewriteRule ^artcraft(/.*)?$ - [L]
+
     # Server pages/index.html ved rot-forespørsel (/)
     RewriteRule ^$ pages/index.html [L]
 
     # Omadresser forespørsler med /pages/ eller .html til ren URL i adressefeltet (f.eks. /pages/galleri.html -> /galleri)
+    RewriteCond %{THE_REQUEST} !/artcraft/ [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/(?:pages/)?([^.]+)\.html [NC]
     RewriteRule ^ /%1 [R=301,L]
 
+    RewriteCond %{THE_REQUEST} !/artcraft/ [NC]
     RewriteCond %{THE_REQUEST} ^[A-Z]{3,}\s/pages/([^\s]+) [NC]
     RewriteRule ^ /%1 [R=301,L]
 
@@ -25,9 +30,6 @@ DirectoryIndex pages/index.html index.html index.php
 
     # Omadresser cfa admin merke til ren /merkeverktoy/ URL
     RewriteRule ^cfa(?:%20|\s|-)admin(?:%20|\s|-)merke(?:/(.*))?$ /merkeverktoy/$1 [R=301,L,NE]
-
-    # La /artcraft/ passere direkte til filene
-    RewriteRule ^artcraft/ - [L]
 
     # Server creative-tools
     RewriteRule ^creative-tools/?$ pages/creative-tools.html [L]

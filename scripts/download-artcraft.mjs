@@ -141,7 +141,12 @@ async function main() {
   // Opprett .htaccess for artcraft-katalogen for COOP/COEP WebAssembly-støtte
   const htaccessContent = `# ArtCraft WebAssembly Hosting Config
 Options -Indexes
+DirectoryIndex index.html
 AddType application/wasm .wasm
+
+<IfModule mod_rewrite.c>
+    RewriteEngine Off
+</IfModule>
 
 <IfModule mod_headers.c>
     Header set Cross-Origin-Opener-Policy "same-origin"
