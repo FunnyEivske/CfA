@@ -5,106 +5,206 @@ const ARTCRAFT_APPS = [
     {
         id: 'photocraft',
         title: 'PhotoCraft',
-        alt: 'Photoshop-alternativ',
-        altColor: '#0284c7',
-        altBg: 'rgba(2, 132, 199, 0.12)',
-        icon: '🎨',
-        iconBg: 'linear-gradient(135deg, #0284c7, #38bdf8)',
         desc: 'Komplett bilderedigering med lagstøtte, masker, markeringer, filter og retusjering av cosplay-bilder.',
-        path: '/artcraft/photocraft/index.html'
+        path: '/artcraft/photocraft/index.html',
+        cfa: {
+            alt: 'CfA • Bilderedigering',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'PC',
+            badgeBg: '#0284c7'
+        },
+        adobe: {
+            alt: 'Photoshop-alternativ',
+            altColor: '#31a8ff',
+            altBg: 'rgba(49, 168, 255, 0.14)',
+            letters: 'Ps',
+            textColor: '#31a8ff',
+            borderColor: '#31a8ff',
+            bgColor: '#001e36'
+        }
     },
     {
         id: 'vectorcraft',
         title: 'VectorCraft',
-        alt: 'Illustrator-alternativ',
-        altColor: '#ea580c',
-        altBg: 'rgba(234, 88, 12, 0.12)',
-        icon: '✒️',
-        iconBg: 'linear-gradient(135deg, #ea580c, #fb923c)',
         desc: 'Vektorgrafikk, bézier-kurver og mønsterdesign. Perfekt for å tegne og skalere rustnings- og klesmønstre.',
-        path: '/artcraft/vectorcraft/index.html'
+        path: '/artcraft/vectorcraft/index.html',
+        cfa: {
+            alt: 'CfA • Vektordesign',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'VC',
+            badgeBg: '#ea580c'
+        },
+        adobe: {
+            alt: 'Illustrator-alternativ',
+            altColor: '#ff9a00',
+            altBg: 'rgba(255, 154, 0, 0.14)',
+            letters: 'Ai',
+            textColor: '#ff9a00',
+            borderColor: '#ff9a00',
+            bgColor: '#330000'
+        }
     },
     {
         id: 'filmcraft',
         title: 'FilmCraft',
-        alt: 'Premiere Pro-alternativ',
-        altColor: '#9333ea',
-        altBg: 'rgba(147, 51, 234, 0.12)',
-        icon: '🎬',
-        iconBg: 'linear-gradient(135deg, #7e22ce, #c084fc)',
         desc: 'Tidslinjebasert videoredigering, klipping, overganger og lydspor for cosplay-musikkvideoer og con-vlogs.',
-        path: '/artcraft/filmcraft/index.html'
+        path: '/artcraft/filmcraft/index.html',
+        cfa: {
+            alt: 'CfA • Videoredigering',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'FC',
+            badgeBg: '#9333ea'
+        },
+        adobe: {
+            alt: 'Premiere Pro-alternativ',
+            altColor: '#ea77ff',
+            altBg: 'rgba(234, 119, 255, 0.14)',
+            letters: 'Pr',
+            textColor: '#ea77ff',
+            borderColor: '#ea77ff',
+            bgColor: '#330033'
+        }
     },
     {
         id: 'lightcraft',
         title: 'LightCraft',
-        alt: 'Lightroom-alternativ',
-        altColor: '#0d9488',
-        altBg: 'rgba(13, 148, 136, 0.12)',
-        icon: '💡',
-        iconBg: 'linear-gradient(135deg, #0f766e, #2dd4bf)',
         desc: 'RAW-fremkalling, fargegradering, eksponeringskontroll og lyskurver for profesjonell etterbehandling av fotoshoots.',
-        path: '/artcraft/lightcraft/index.html'
+        path: '/artcraft/lightcraft/index.html',
+        cfa: {
+            alt: 'CfA • RAW & Foto',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'LC',
+            badgeBg: '#0d9488'
+        },
+        adobe: {
+            alt: 'Lightroom-alternativ',
+            altColor: '#31a8ff',
+            altBg: 'rgba(49, 168, 255, 0.14)',
+            letters: 'Lr',
+            textColor: '#31a8ff',
+            borderColor: '#31a8ff',
+            bgColor: '#001e36'
+        }
     },
     {
         id: 'pdfcraft',
         title: 'PdfCraft',
-        alt: 'Acrobat-alternativ',
-        altColor: '#dc2626',
-        altBg: 'rgba(220, 38, 38, 0.12)',
-        icon: '📑',
-        iconBg: 'linear-gradient(135deg, #b91c1c, #f87171)',
         desc: 'Vise, redigere, dele opp og slå sammen PDF-mønstre. Skriv ut mønstre i riktig målestokk på A4 eller A3.',
-        path: '/artcraft/pdfcraft/index.html'
+        path: '/artcraft/pdfcraft/index.html',
+        cfa: {
+            alt: 'CfA • PDF & Mønster',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'PC',
+            badgeBg: '#dc2626'
+        },
+        adobe: {
+            alt: 'Acrobat-alternativ',
+            altColor: '#ff0000',
+            altBg: 'rgba(255, 0, 0, 0.14)',
+            letters: 'Ac',
+            textColor: '#ff0000',
+            borderColor: '#ff0000',
+            bgColor: '#330000'
+        }
     },
     {
         id: 'effectcraft',
         title: 'EffectCraft',
-        alt: 'After Effects-alternativ',
-        altColor: '#7c3aed',
-        altBg: 'rgba(124, 58, 237, 0.12)',
-        icon: '✨',
-        iconBg: 'linear-gradient(135deg, #6d28d9, #a78bfa)',
         desc: 'Visuelle effekter, animasjon og bevegelsesgrafikk. Legg til magiske glødeffekter, laser og elementer på videoer.',
-        path: '/artcraft/effectcraft/index.html'
+        path: '/artcraft/effectcraft/index.html',
+        cfa: {
+            alt: 'CfA • VFX & Effekter',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'EC',
+            badgeBg: '#7c3aed'
+        },
+        adobe: {
+            alt: 'After Effects-alternativ',
+            altColor: '#9999ff',
+            altBg: 'rgba(153, 153, 255, 0.14)',
+            letters: 'Ae',
+            textColor: '#9999ff',
+            borderColor: '#9999ff',
+            bgColor: '#20003b'
+        }
     },
     {
         id: 'designcraft',
         title: 'DesignCraft',
-        alt: 'InDesign-alternativ',
-        altColor: '#db2777',
-        altBg: 'rgba(219, 39, 119, 0.12)',
-        icon: '📰',
-        iconBg: 'linear-gradient(135deg, #be185d, #f472b6)',
         desc: 'Flersidig layout og sideoppsett for cosplay-bøker, portfolioer, plakater og hefter med typografi og rutenett.',
-        path: '/artcraft/designcraft/index.html'
+        path: '/artcraft/designcraft/index.html',
+        cfa: {
+            alt: 'CfA • Layout & Plakat',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'DC',
+            badgeBg: '#db2777'
+        },
+        adobe: {
+            alt: 'InDesign-alternativ',
+            altColor: '#ff3366',
+            altBg: 'rgba(255, 51, 102, 0.14)',
+            letters: 'Id',
+            textColor: '#ff3366',
+            borderColor: '#ff3366',
+            bgColor: '#3b001b'
+        }
     },
     {
         id: 'figcraft',
         title: 'FigCraft',
-        alt: 'Figma-alternativ',
-        altColor: '#059669',
-        altBg: 'rgba(5, 150, 105, 0.12)',
-        icon: '📐',
-        iconBg: 'linear-gradient(135deg, #047857, #34d399)',
         desc: 'UI/UX-design og vektor-prototyping. Samarbeid om designoppsett, komponenter og planlegging av prosjekter.',
-        path: '/artcraft/figcraft/index.html'
+        path: '/artcraft/figcraft/index.html',
+        cfa: {
+            alt: 'CfA • UI/UX & Prototyping',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'FC',
+            badgeBg: '#059669'
+        },
+        adobe: {
+            alt: 'Figma-alternativ',
+            altColor: '#0acf83',
+            altBg: 'rgba(10, 207, 131, 0.14)',
+            letters: 'Fg',
+            textColor: '#0acf83',
+            borderColor: '#0acf83',
+            bgColor: '#1e1e1e'
+        }
     },
     {
         id: 'soundcraft',
         title: 'SoundCraft',
-        alt: 'Audition-alternativ',
-        altColor: '#16a34a',
-        altBg: 'rgba(22, 163, 74, 0.12)',
-        icon: '🎙️',
-        iconBg: 'linear-gradient(135deg, #15803d, #4ade80)',
         desc: 'Flerstors lydopptak, miksing, lydeffekter og støyfjerning til sceneshow, sketsjer og video-voiceovers.',
-        path: '/artcraft/soundcraft/index.html'
+        path: '/artcraft/soundcraft/index.html',
+        cfa: {
+            alt: 'CfA • Lydstudio & Tale',
+            altColor: '#F3B716',
+            altBg: 'rgba(243, 183, 22, 0.14)',
+            badgeText: 'SC',
+            badgeBg: '#16a34a'
+        },
+        adobe: {
+            alt: 'Audition-alternativ',
+            altColor: '#00e699',
+            altBg: 'rgba(0, 230, 153, 0.14)',
+            letters: 'Au',
+            textColor: '#00e699',
+            borderColor: '#00e699',
+            bgColor: '#00332a'
+        }
     }
 ];
 
 let currentUser = null;
 let currentAppId = null;
+let isAdobeMode = localStorage.getItem('cfa_artcraft_adobe_logos') === 'true';
 
 async function initCreativeToolsPage() {
     // 1. Rigorøs autentiseringssjekk
@@ -146,6 +246,7 @@ async function initCreativeToolsPage() {
         document.documentElement.style.display = '';
     }
 
+    setupLogoToggle();
     renderAppGrid();
     setupWorkspace();
     setupLogout();
@@ -171,6 +272,70 @@ function resolveAppUrl(path) {
     return path;
 }
 
+function setupLogoToggle() {
+    const toggleInput = document.getElementById('adobe-logo-toggle');
+    const statusLabel = document.getElementById('logo-mode-status');
+    const pillCfa = document.getElementById('pill-cfa-label');
+    const pillAdobe = document.getElementById('pill-adobe-label');
+
+    function updateUiState() {
+        if (toggleInput) {
+            toggleInput.checked = isAdobeMode;
+        }
+        if (statusLabel) {
+            statusLabel.textContent = isAdobeMode
+                ? 'Adobe-ikoner aktivert (Ps, Ai, Pr, etc.)'
+                : 'Offisielle CfA-logoer (standard)';
+            statusLabel.style.color = isAdobeMode ? '#38bdf8' : 'var(--color-text-muted)';
+        }
+        if (pillCfa) {
+            pillCfa.classList.toggle('active', !isAdobeMode);
+        }
+        if (pillAdobe) {
+            pillAdobe.classList.toggle('active', isAdobeMode);
+            pillAdobe.classList.toggle('adobe-active', isAdobeMode);
+        }
+    }
+
+    updateUiState();
+
+    if (toggleInput) {
+        toggleInput.onchange = (e) => {
+            isAdobeMode = e.target.checked;
+            localStorage.setItem('cfa_artcraft_adobe_logos', isAdobeMode ? 'true' : 'false');
+            updateUiState();
+            renderAppGrid();
+            if (currentAppId) {
+                updateWorkspaceHeader(currentAppId);
+            }
+        };
+    }
+
+    if (pillCfa) {
+        pillCfa.onclick = () => {
+            if (isAdobeMode) {
+                isAdobeMode = false;
+                localStorage.setItem('cfa_artcraft_adobe_logos', 'false');
+                updateUiState();
+                renderAppGrid();
+                if (currentAppId) updateWorkspaceHeader(currentAppId);
+            }
+        };
+    }
+
+    if (pillAdobe) {
+        pillAdobe.onclick = () => {
+            if (!isAdobeMode) {
+                isAdobeMode = true;
+                localStorage.setItem('cfa_artcraft_adobe_logos', 'true');
+                updateUiState();
+                renderAppGrid();
+                if (currentAppId) updateWorkspaceHeader(currentAppId);
+            }
+        };
+    }
+}
+
 function renderAppGrid() {
     const container = document.getElementById('apps-container');
     if (!container) return;
@@ -181,13 +346,38 @@ function renderAppGrid() {
         const appUrl = resolveAppUrl(app.path);
         const card = document.createElement('div');
         card.className = 'app-card';
+
+        let iconBoxHtml = '';
+        let altTagText = '';
+        let altTagColor = '';
+        let altTagBg = '';
+
+        if (isAdobeMode) {
+            iconBoxHtml = `
+                <div class="app-icon-box adobe-style" style="background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 2.5px solid ${app.adobe.borderColor};">
+                    <span>${app.adobe.letters}</span>
+                </div>
+            `;
+            altTagText = app.adobe.alt;
+            altTagColor = app.adobe.altColor;
+            altTagBg = app.adobe.altBg;
+        } else {
+            iconBoxHtml = `
+                <div class="app-icon-box cfa-style">
+                    <img src="Media/Logo/cfa-logo.svg" alt="CfA ${app.title}" class="cfa-icon-logo">
+                    <span class="cfa-corner-badge" style="background: ${app.cfa.badgeBg};">${app.cfa.badgeText}</span>
+                </div>
+            `;
+            altTagText = app.cfa.alt;
+            altTagColor = app.cfa.altColor;
+            altTagBg = app.cfa.altBg;
+        }
+
         card.innerHTML = `
             <div>
-                <div class="app-icon-box" style="background: ${app.iconBg}; color: #ffffff;">
-                    <span>${app.icon}</span>
-                </div>
-                <span class="app-alt-tag" style="background: ${app.altBg}; color: ${app.altColor};">
-                    ${app.alt}
+                ${iconBoxHtml}
+                <span class="app-alt-tag" style="background: ${altTagBg}; color: ${altTagColor};">
+                    ${altTagText}
                 </span>
                 <h3 class="app-title">${app.title}</h3>
                 <p class="app-desc">${app.desc}</p>
@@ -213,6 +403,35 @@ function renderAppGrid() {
 
         container.appendChild(card);
     });
+}
+
+function updateWorkspaceHeader(appId) {
+    const app = ARTCRAFT_APPS.find(a => a.id === appId);
+    if (!app) return;
+
+    const iconEl = document.getElementById('ws-app-icon');
+    const nameEl = document.getElementById('ws-app-name');
+    const tagEl = document.getElementById('ws-app-tag');
+
+    if (nameEl) nameEl.textContent = app.title;
+
+    if (iconEl) {
+        if (isAdobeMode) {
+            iconEl.innerHTML = `
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
+                    ${app.adobe.letters}
+                </span>
+            `;
+        } else {
+            iconEl.innerHTML = `
+                <img src="Media/Logo/cfa-logo.svg" alt="CfA" style="width: 26px; height: 26px; object-fit: contain; vertical-align: middle;">
+            `;
+        }
+    }
+
+    if (tagEl) {
+        tagEl.textContent = isAdobeMode ? app.adobe.alt : app.cfa.alt;
+    }
 }
 
 function setupWorkspace() {
@@ -267,14 +486,10 @@ function openApp(appId) {
     const iframe = document.getElementById('artcraft-iframe');
     const loader = document.getElementById('ws-loader');
     const loaderText = document.getElementById('ws-loader-text');
-    const iconEl = document.getElementById('ws-app-icon');
-    const nameEl = document.getElementById('ws-app-name');
-    const tagEl = document.getElementById('ws-app-tag');
     const selectEl = document.getElementById('ws-switch-select');
 
-    if (iconEl) iconEl.textContent = app.icon;
-    if (nameEl) nameEl.textContent = app.title;
-    if (tagEl) tagEl.textContent = app.alt;
+    updateWorkspaceHeader(appId);
+
     if (selectEl) selectEl.value = app.id;
     if (loaderText) loaderText.textContent = `Laster inn ${app.title} (WebAssembly)...`;
 
@@ -319,21 +534,19 @@ function closeWorkspace() {
 }
 
 function setupLogout() {
-    const logoutBtn = document.getElementById('logout-btn-header');
-    if (logoutBtn) {
-        logoutBtn.onclick = async () => {
+    const btn = document.getElementById('logout-btn-header');
+    if (btn) {
+        btn.onclick = async () => {
             try {
                 await AuthAPI.logout();
             } catch (e) {}
-            localStorage.removeItem('cfa_has_session');
-            window.location.href = 'login';
+            try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+            const isHtml = window.location.pathname.endsWith('.html');
+            window.location.replace(isHtml ? 'login.html' : 'login');
         };
     }
 }
 
-// Initialiser når DOM er klar
-if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', initCreativeToolsPage);
-} else {
+document.addEventListener('DOMContentLoaded', () => {
     initCreativeToolsPage();
-}
+});
