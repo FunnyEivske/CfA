@@ -6,20 +6,22 @@ const ARTCRAFT_APPS = [
         id: 'photocraft',
         title: 'PhotoCraft',
         adobeName: 'Photoshop',
+        iconImage: 'Media/artcraft-icons/photocraft.png',
+        hybridLetters: 'Pc',
+        adobeLetters: 'Ps',
         desc: 'Komplett bilderedigering med lagstøtte, masker, markeringer, filter og retusjering av cosplay-bilder.',
         path: '/artcraft/photocraft/index.html',
         cfa: {
-            alt: 'CfA • Bilderedigering',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'PC',
+            alt: 'ArtCraft • Bilderedigering',
+            altColor: '#0284c7',
+            altBg: 'rgba(2, 132, 199, 0.12)',
+            badgeText: 'Pc',
             badgeBg: '#0284c7'
         },
         adobe: {
             alt: 'Photoshop-alternativ',
             altColor: '#31a8ff',
             altBg: 'rgba(49, 168, 255, 0.14)',
-            letters: 'Ps',
             textColor: '#31a8ff',
             borderColor: '#31a8ff',
             bgColor: '#001e36'
@@ -29,20 +31,22 @@ const ARTCRAFT_APPS = [
         id: 'vectorcraft',
         title: 'VectorCraft',
         adobeName: 'Illustrator',
+        iconImage: 'Media/artcraft-icons/vectorcraft.png',
+        hybridLetters: 'Vc',
+        adobeLetters: 'Ai',
         desc: 'Vektorgrafikk, bézier-kurver og mønsterdesign. Perfekt for å tegne og skalere rustnings- og klesmønstre.',
         path: '/artcraft/vectorcraft/index.html',
         cfa: {
-            alt: 'CfA • Vektordesign',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'VC',
+            alt: 'ArtCraft • Vektordesign',
+            altColor: '#ea580c',
+            altBg: 'rgba(234, 88, 12, 0.12)',
+            badgeText: 'Vc',
             badgeBg: '#ea580c'
         },
         adobe: {
             alt: 'Illustrator-alternativ',
             altColor: '#ff9a00',
             altBg: 'rgba(255, 154, 0, 0.14)',
-            letters: 'Ai',
             textColor: '#ff9a00',
             borderColor: '#ff9a00',
             bgColor: '#330000'
@@ -52,20 +56,22 @@ const ARTCRAFT_APPS = [
         id: 'filmcraft',
         title: 'FilmCraft',
         adobeName: 'Premiere Pro',
+        iconImage: 'Media/artcraft-icons/filmcraft.png',
+        hybridLetters: 'Fc',
+        adobeLetters: 'Pr',
         desc: 'Tidslinjebasert videoredigering, klipping, overganger og lydspor for cosplay-musikkvideoer og con-vlogs.',
         path: '/artcraft/filmcraft/index.html',
         cfa: {
-            alt: 'CfA • Videoredigering',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'FC',
+            alt: 'ArtCraft • Videoredigering',
+            altColor: '#9333ea',
+            altBg: 'rgba(147, 51, 234, 0.12)',
+            badgeText: 'Fc',
             badgeBg: '#9333ea'
         },
         adobe: {
             alt: 'Premiere Pro-alternativ',
             altColor: '#ea77ff',
             altBg: 'rgba(234, 119, 255, 0.14)',
-            letters: 'Pr',
             textColor: '#ea77ff',
             borderColor: '#ea77ff',
             bgColor: '#330033'
@@ -75,20 +81,22 @@ const ARTCRAFT_APPS = [
         id: 'lightcraft',
         title: 'LightCraft',
         adobeName: 'Lightroom',
+        iconImage: 'Media/artcraft-icons/lightcraft.png',
+        hybridLetters: 'Lc',
+        adobeLetters: 'Lr',
         desc: 'RAW-fremkalling, fargegradering, eksponeringskontroll og lyskurver for profesjonell etterbehandling av fotoshoots.',
         path: '/artcraft/lightcraft/index.html',
         cfa: {
-            alt: 'CfA • RAW & Foto',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'LC',
+            alt: 'ArtCraft • RAW & Foto',
+            altColor: '#0d9488',
+            altBg: 'rgba(13, 148, 136, 0.12)',
+            badgeText: 'Lc',
             badgeBg: '#0d9488'
         },
         adobe: {
             alt: 'Lightroom-alternativ',
             altColor: '#31a8ff',
             altBg: 'rgba(49, 168, 255, 0.14)',
-            letters: 'Lr',
             textColor: '#31a8ff',
             borderColor: '#31a8ff',
             bgColor: '#001e36'
@@ -98,20 +106,22 @@ const ARTCRAFT_APPS = [
         id: 'pdfcraft',
         title: 'PdfCraft',
         adobeName: 'Acrobat',
+        iconImage: 'Media/artcraft-icons/pdfcraft.png',
+        hybridLetters: 'Pd',
+        adobeLetters: 'Ac',
         desc: 'Vise, redigere, dele opp og slå sammen PDF-mønstre. Skriv ut mønstre i riktig målestokk på A4 eller A3.',
         path: '/artcraft/pdfcraft/index.html',
         cfa: {
-            alt: 'CfA • PDF & Mønster',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'PC',
+            alt: 'ArtCraft • PDF & Mønster',
+            altColor: '#dc2626',
+            altBg: 'rgba(220, 38, 38, 0.12)',
+            badgeText: 'Pd',
             badgeBg: '#dc2626'
         },
         adobe: {
             alt: 'Acrobat-alternativ',
             altColor: '#ff0000',
             altBg: 'rgba(255, 0, 0, 0.14)',
-            letters: 'Ac',
             textColor: '#ff0000',
             borderColor: '#ff0000',
             bgColor: '#330000'
@@ -121,20 +131,22 @@ const ARTCRAFT_APPS = [
         id: 'effectcraft',
         title: 'EffectCraft',
         adobeName: 'After Effects',
+        iconImage: 'Media/artcraft-icons/effectcraft.png',
+        hybridLetters: 'Ec',
+        adobeLetters: 'Ae',
         desc: 'Visuelle effekter, animasjon og bevegelsesgrafikk. Legg til magiske glødeffekter, laser og elementer på videoer.',
         path: '/artcraft/effectcraft/index.html',
         cfa: {
-            alt: 'CfA • VFX & Effekter',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'EC',
+            alt: 'ArtCraft • VFX & Effekter',
+            altColor: '#7c3aed',
+            altBg: 'rgba(124, 58, 237, 0.12)',
+            badgeText: 'Ec',
             badgeBg: '#7c3aed'
         },
         adobe: {
             alt: 'After Effects-alternativ',
             altColor: '#9999ff',
             altBg: 'rgba(153, 153, 255, 0.14)',
-            letters: 'Ae',
             textColor: '#9999ff',
             borderColor: '#9999ff',
             bgColor: '#20003b'
@@ -144,20 +156,22 @@ const ARTCRAFT_APPS = [
         id: 'designcraft',
         title: 'DesignCraft',
         adobeName: 'InDesign',
+        iconImage: 'Media/artcraft-icons/designcraft.png',
+        hybridLetters: 'Dc',
+        adobeLetters: 'Id',
         desc: 'Flersidig layout og sideoppsett for cosplay-bøker, portfolioer, plakater og hefter med typografi og rutenett.',
         path: '/artcraft/designcraft/index.html',
         cfa: {
-            alt: 'CfA • Layout & Plakat',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'DC',
+            alt: 'ArtCraft • Layout & Trykk',
+            altColor: '#db2777',
+            altBg: 'rgba(219, 39, 119, 0.12)',
+            badgeText: 'Dc',
             badgeBg: '#db2777'
         },
         adobe: {
             alt: 'InDesign-alternativ',
             altColor: '#ff3366',
             altBg: 'rgba(255, 51, 102, 0.14)',
-            letters: 'Id',
             textColor: '#ff3366',
             borderColor: '#ff3366',
             bgColor: '#3b001b'
@@ -167,20 +181,22 @@ const ARTCRAFT_APPS = [
         id: 'figcraft',
         title: 'FigCraft',
         adobeName: 'Figma',
+        iconImage: 'Media/artcraft-icons/figcraft.png',
+        hybridLetters: 'Fc',
+        adobeLetters: 'Fg',
         desc: 'UI/UX-design og vektor-prototyping. Samarbeid om designoppsett, komponenter og planlegging av prosjekter.',
         path: '/artcraft/figcraft/index.html',
         cfa: {
-            alt: 'CfA • UI/UX & Prototyping',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'FC',
+            alt: 'ArtCraft • UI/UX & Design',
+            altColor: '#059669',
+            altBg: 'rgba(5, 150, 105, 0.12)',
+            badgeText: 'Fc',
             badgeBg: '#059669'
         },
         adobe: {
             alt: 'Figma-alternativ',
             altColor: '#0acf83',
             altBg: 'rgba(10, 207, 131, 0.14)',
-            letters: 'Fg',
             textColor: '#0acf83',
             borderColor: '#0acf83',
             bgColor: '#1e1e1e'
@@ -190,20 +206,22 @@ const ARTCRAFT_APPS = [
         id: 'soundcraft',
         title: 'SoundCraft',
         adobeName: 'Audition',
+        iconImage: 'Media/artcraft-icons/soundcraft.png',
+        hybridLetters: 'Sc',
+        adobeLetters: 'Au',
         desc: 'Flerstors lydopptak, miksing, lydeffekter og støyfjerning til sceneshow, sketsjer og video-voiceovers.',
         path: '/artcraft/soundcraft/index.html',
         cfa: {
-            alt: 'CfA • Lydstudio & Tale',
-            altColor: '#F3B716',
-            altBg: 'rgba(243, 183, 22, 0.14)',
-            badgeText: 'SC',
+            alt: 'ArtCraft • Lydstudio & Tale',
+            altColor: '#16a34a',
+            altBg: 'rgba(22, 163, 74, 0.12)',
+            badgeText: 'Sc',
             badgeBg: '#16a34a'
         },
         adobe: {
             alt: 'Audition-alternativ',
             altColor: '#00e699',
             altBg: 'rgba(0, 230, 153, 0.14)',
-            letters: 'Au',
             textColor: '#00e699',
             borderColor: '#00e699',
             bgColor: '#00332a'
@@ -361,32 +379,31 @@ function renderAppGrid() {
             buttonLabel = `Åpne ${app.adobeName}`;
             iconBoxHtml = `
                 <div class="app-icon-box adobe-style" style="background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 2.5px solid ${app.adobe.borderColor};">
-                    <span>${app.adobe.letters}</span>
+                    <span>${app.adobeLetters}</span>
                 </div>
             `;
             altTagText = app.adobe.alt;
             altTagColor = app.adobe.altColor;
             altTagBg = app.adobe.altBg;
         } else if (currentDisplayMode === 'hybrid') {
-            // Hybrid: ArtCraft navn med Adobe ikoner
+            // Hybrid: ArtCraft navn med Adobe-stil ikoner (Pc, Vc, etc.)
             appTitle = app.title;
             buttonLabel = `Åpne ${app.title}`;
             iconBoxHtml = `
                 <div class="app-icon-box adobe-style" style="background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 2.5px solid ${app.adobe.borderColor};">
-                    <span>${app.adobe.letters}</span>
+                    <span>${app.hybridLetters}</span>
                 </div>
             `;
-            altTagText = app.adobe.alt;
+            altTagText = app.cfa.alt;
             altTagColor = app.adobe.altColor;
             altTagBg = app.adobe.altBg;
         } else {
-            // ArtCraft: ArtCraft ikoner og ArtCraft navn
+            // ArtCraft: Offisielle ArtCraft dyre/illustrerte ikoner og ArtCraft-navn
             appTitle = app.title;
             buttonLabel = `Åpne ${app.title}`;
             iconBoxHtml = `
-                <div class="app-icon-box cfa-style">
-                    <img src="Media/Logo/cfa-logo.svg" alt="CfA ${app.title}" class="cfa-icon-logo">
-                    <span class="cfa-corner-badge" style="background: ${app.cfa.badgeBg};">${app.cfa.badgeText}</span>
+                <div class="app-icon-box artcraft-style">
+                    <img src="${app.iconImage}" alt="${app.title}" class="artcraft-icon-img">
                 </div>
             `;
             altTagText = app.cfa.alt;
@@ -439,21 +456,27 @@ function updateWorkspaceHeader(appId) {
     if (nameEl) nameEl.textContent = appTitle;
 
     if (iconEl) {
-        if (currentDisplayMode === 'adobe' || currentDisplayMode === 'hybrid') {
+        if (currentDisplayMode === 'adobe') {
             iconEl.innerHTML = `
                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
-                    ${app.adobe.letters}
+                    ${app.adobeLetters}
+                </span>
+            `;
+        } else if (currentDisplayMode === 'hybrid') {
+            iconEl.innerHTML = `
+                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
+                    ${app.hybridLetters}
                 </span>
             `;
         } else {
             iconEl.innerHTML = `
-                <img src="Media/Logo/cfa-logo.svg" alt="CfA" style="width: 26px; height: 26px; object-fit: contain; vertical-align: middle;">
+                <img src="${app.iconImage}" alt="${app.title}" style="width: 28px; height: 28px; border-radius: 7px; object-fit: cover; vertical-align: middle;">
             `;
         }
     }
 
     if (tagEl) {
-        tagEl.textContent = currentDisplayMode === 'artcraft' ? app.cfa.alt : app.adobe.alt;
+        tagEl.textContent = currentDisplayMode === 'adobe' ? app.adobe.alt : app.cfa.alt;
     }
 }
 
@@ -464,7 +487,7 @@ function updateWorkspaceSelectOptions() {
     const currentVal = select.value;
     select.innerHTML = ARTCRAFT_APPS.map(app => {
         const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
-        const tag = currentDisplayMode === 'adobe' ? app.adobe.letters : app.cfa.badgeText;
+        const tag = currentDisplayMode === 'adobe' ? app.adobeLetters : (currentDisplayMode === 'hybrid' ? app.hybridLetters : app.cfa.badgeText);
         return `<option value="${app.id}">${title} (${tag})</option>`;
     }).join('');
 

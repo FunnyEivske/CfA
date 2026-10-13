@@ -117,6 +117,26 @@
             position: relative;
         }
 
+        .app-icon-box.artcraft-style {
+            background: transparent;
+            border: none;
+            box-shadow: none;
+            padding: 0;
+            overflow: visible;
+        }
+        .artcraft-icon-img {
+            width: 56px;
+            height: 56px;
+            border-radius: 14px;
+            object-fit: cover;
+            display: block;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.22);
+            transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .app-card:hover .artcraft-icon-img {
+            transform: scale(1.08);
+        }
+
         .app-icon-box.cfa-style {
             background: linear-gradient(135deg, rgba(126, 28, 56, 0.96), #4a0d1f);
             border: 1.5px solid rgba(243, 183, 22, 0.4);
@@ -460,12 +480,12 @@
                 </span>
             </div>
             <div class="mode-segmented-control" role="radiogroup" aria-label="Velg ikon- og navnestil">
-                <button type="button" id="mode-artcraft-btn" class="mode-btn active" data-mode="artcraft" title="Offisielle CfA-ikoner og ArtCraft-navn">
-                    <img src="Media/Logo/cfa-logo.svg" alt="CfA" style="width: 16px; height: 16px; object-fit: contain;">
+                <button type="button" id="mode-artcraft-btn" class="mode-btn active" data-mode="artcraft" title="Offisielle ArtCraft dyreikoner og ArtCraft-navn">
+                    <img src="Media/artcraft-icons/photocraft.png" alt="ArtCraft" style="width: 17px; height: 17px; border-radius: 4px; object-fit: cover;">
                     <span>ArtCraft ikoner & navn</span>
                 </button>
-                <button type="button" id="mode-hybrid-btn" class="mode-btn" data-mode="hybrid" title="ArtCraft-navn med Adobe-stilte 2-bokstavs ikoner og farger">
-                    <span style="font-weight: 800; color: #ff9a00; font-size: 0.85rem;">Ai</span>
+                <button type="button" id="mode-hybrid-btn" class="mode-btn" data-mode="hybrid" title="ArtCraft-navn med Adobe-stil 2-bokstavs fliser (Pc, Vc, etc.)">
+                    <span style="font-weight: 800; color: #31a8ff; font-size: 0.85rem;">Pc</span>
                     <span>ArtCraft-navn m/ Adobe-ikoner</span>
                 </button>
                 <button type="button" id="mode-adobe-btn" class="mode-btn" data-mode="adobe" title="Full Adobe-stil med både Adobe-ikoner og Adobe-navn">
