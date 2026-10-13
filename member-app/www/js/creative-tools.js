@@ -5,6 +5,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'photocraft',
         title: 'PhotoCraft',
+        adobeName: 'Photoshop',
         desc: 'Komplett bilderedigering med lagstøtte, masker, markeringer, filter og retusjering av cosplay-bilder.',
         path: '/artcraft/photocraft/index.html',
         cfa: {
@@ -27,6 +28,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'vectorcraft',
         title: 'VectorCraft',
+        adobeName: 'Illustrator',
         desc: 'Vektorgrafikk, bézier-kurver og mønsterdesign. Perfekt for å tegne og skalere rustnings- og klesmønstre.',
         path: '/artcraft/vectorcraft/index.html',
         cfa: {
@@ -49,6 +51,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'filmcraft',
         title: 'FilmCraft',
+        adobeName: 'Premiere Pro',
         desc: 'Tidslinjebasert videoredigering, klipping, overganger og lydspor for cosplay-musikkvideoer og con-vlogs.',
         path: '/artcraft/filmcraft/index.html',
         cfa: {
@@ -71,6 +74,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'lightcraft',
         title: 'LightCraft',
+        adobeName: 'Lightroom',
         desc: 'RAW-fremkalling, fargegradering, eksponeringskontroll og lyskurver for profesjonell etterbehandling av fotoshoots.',
         path: '/artcraft/lightcraft/index.html',
         cfa: {
@@ -93,6 +97,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'pdfcraft',
         title: 'PdfCraft',
+        adobeName: 'Acrobat',
         desc: 'Vise, redigere, dele opp og slå sammen PDF-mønstre. Skriv ut mønstre i riktig målestokk på A4 eller A3.',
         path: '/artcraft/pdfcraft/index.html',
         cfa: {
@@ -115,6 +120,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'effectcraft',
         title: 'EffectCraft',
+        adobeName: 'After Effects',
         desc: 'Visuelle effekter, animasjon og bevegelsesgrafikk. Legg til magiske glødeffekter, laser og elementer på videoer.',
         path: '/artcraft/effectcraft/index.html',
         cfa: {
@@ -137,6 +143,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'designcraft',
         title: 'DesignCraft',
+        adobeName: 'InDesign',
         desc: 'Flersidig layout og sideoppsett for cosplay-bøker, portfolioer, plakater og hefter med typografi og rutenett.',
         path: '/artcraft/designcraft/index.html',
         cfa: {
@@ -159,6 +166,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'figcraft',
         title: 'FigCraft',
+        adobeName: 'Figma',
         desc: 'UI/UX-design og vektor-prototyping. Samarbeid om designoppsett, komponenter og planlegging av prosjekter.',
         path: '/artcraft/figcraft/index.html',
         cfa: {
@@ -181,6 +189,7 @@ const ARTCRAFT_APPS = [
     {
         id: 'soundcraft',
         title: 'SoundCraft',
+        adobeName: 'Audition',
         desc: 'Flerstors lydopptak, miksing, lydeffekter og støyfjerning til sceneshow, sketsjer og video-voiceovers.',
         path: '/artcraft/soundcraft/index.html',
         cfa: {
@@ -204,7 +213,17 @@ const ARTCRAFT_APPS = [
 
 let currentUser = null;
 let currentAppId = null;
-let isAdobeMode = localStorage.getItem('cfa_artcraft_adobe_logos') === 'true';
+
+// Visningsmodus: 'artcraft' (standard) | 'hybrid' (ArtCraft-navn m/ Adobe-ikoner) | 'adobe' (Adobe-ikoner & navn)
+let currentDisplayMode = 'artcraft';
+try {
+    const saved = localStorage.getItem('cfa_creative_display_mode');
+    if (saved === 'artcraft' || saved === 'hybrid' || saved === 'adobe') {
+        currentDisplayMode = saved;
+    } else if (localStorage.getItem('cfa_artcraft_adobe_logos') === 'true') {
+        currentDisplayMode = 'hybrid';
+    }
+} catch (e) {}
 
 async function initCreativeToolsPage() {
     // 1. Rigorøs autentiseringssjekk
@@ -246,7 +265,7 @@ async function initCreativeToolsPage() {
         document.documentElement.style.display = '';
     }
 
-    setupLogoToggle();
+    setupModeSelector();
     renderAppGrid();
     setupWorkspace();
     setupLogout();
@@ -272,68 +291,50 @@ function resolveAppUrl(path) {
     return path;
 }
 
-function setupLogoToggle() {
-    const toggleInput = document.getElementById('adobe-logo-toggle');
+function setupModeSelector() {
     const statusLabel = document.getElementById('logo-mode-status');
-    const pillCfa = document.getElementById('pill-cfa-label');
-    const pillAdobe = document.getElementById('pill-adobe-label');
+    const buttons = document.querySelectorAll('.mode-btn');
 
-    function updateUiState() {
-        if (toggleInput) {
-            toggleInput.checked = isAdobeMode;
-        }
+    function updateUi() {
+        buttons.forEach(btn => {
+            const mode = btn.getAttribute('data-mode');
+            btn.classList.toggle('active', mode === currentDisplayMode);
+        });
+
         if (statusLabel) {
-            statusLabel.textContent = isAdobeMode
-                ? 'Adobe-ikoner aktivert (Ps, Ai, Pr, etc.)'
-                : 'Offisielle CfA-logoer (standard)';
-            statusLabel.style.color = isAdobeMode ? '#38bdf8' : 'var(--color-text-muted)';
-        }
-        if (pillCfa) {
-            pillCfa.classList.toggle('active', !isAdobeMode);
-        }
-        if (pillAdobe) {
-            pillAdobe.classList.toggle('active', isAdobeMode);
-            pillAdobe.classList.toggle('adobe-active', isAdobeMode);
-        }
-    }
-
-    updateUiState();
-
-    if (toggleInput) {
-        toggleInput.onchange = (e) => {
-            isAdobeMode = e.target.checked;
-            localStorage.setItem('cfa_artcraft_adobe_logos', isAdobeMode ? 'true' : 'false');
-            updateUiState();
-            renderAppGrid();
-            if (currentAppId) {
-                updateWorkspaceHeader(currentAppId);
+            if (currentDisplayMode === 'adobe') {
+                statusLabel.textContent = 'Adobe-ikoner og Adobe-navn aktivert';
+                statusLabel.style.color = '#0284c7';
+            } else if (currentDisplayMode === 'hybrid') {
+                statusLabel.textContent = 'ArtCraft-navn med Adobe-ikoner & farger';
+                statusLabel.style.color = '#d97706';
+            } else {
+                statusLabel.textContent = 'ArtCraft-ikoner og ArtCraft-navn (standard)';
+                statusLabel.style.color = 'var(--color-text-muted)';
             }
-        };
+        }
     }
 
-    if (pillCfa) {
-        pillCfa.onclick = () => {
-            if (isAdobeMode) {
-                isAdobeMode = false;
-                localStorage.setItem('cfa_artcraft_adobe_logos', 'false');
-                updateUiState();
+    updateUi();
+
+    buttons.forEach(btn => {
+        btn.onclick = () => {
+            const nextMode = btn.getAttribute('data-mode');
+            if (nextMode && nextMode !== currentDisplayMode) {
+                currentDisplayMode = nextMode;
+                try {
+                    localStorage.setItem('cfa_creative_display_mode', nextMode);
+                    localStorage.setItem('cfa_artcraft_adobe_logos', nextMode !== 'artcraft' ? 'true' : 'false');
+                } catch (e) {}
+                updateUi();
                 renderAppGrid();
-                if (currentAppId) updateWorkspaceHeader(currentAppId);
+                updateWorkspaceSelectOptions();
+                if (currentAppId) {
+                    updateWorkspaceHeader(currentAppId);
+                }
             }
         };
-    }
-
-    if (pillAdobe) {
-        pillAdobe.onclick = () => {
-            if (!isAdobeMode) {
-                isAdobeMode = true;
-                localStorage.setItem('cfa_artcraft_adobe_logos', 'true');
-                updateUiState();
-                renderAppGrid();
-                if (currentAppId) updateWorkspaceHeader(currentAppId);
-            }
-        };
-    }
+    });
 }
 
 function renderAppGrid() {
@@ -351,8 +352,25 @@ function renderAppGrid() {
         let altTagText = '';
         let altTagColor = '';
         let altTagBg = '';
+        let appTitle = '';
+        let buttonLabel = '';
 
-        if (isAdobeMode) {
+        if (currentDisplayMode === 'adobe') {
+            // Full Adobe: Adobe ikoner og Adobe navn
+            appTitle = app.adobeName;
+            buttonLabel = `Åpne ${app.adobeName}`;
+            iconBoxHtml = `
+                <div class="app-icon-box adobe-style" style="background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 2.5px solid ${app.adobe.borderColor};">
+                    <span>${app.adobe.letters}</span>
+                </div>
+            `;
+            altTagText = app.adobe.alt;
+            altTagColor = app.adobe.altColor;
+            altTagBg = app.adobe.altBg;
+        } else if (currentDisplayMode === 'hybrid') {
+            // Hybrid: ArtCraft navn med Adobe ikoner
+            appTitle = app.title;
+            buttonLabel = `Åpne ${app.title}`;
             iconBoxHtml = `
                 <div class="app-icon-box adobe-style" style="background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 2.5px solid ${app.adobe.borderColor};">
                     <span>${app.adobe.letters}</span>
@@ -362,6 +380,9 @@ function renderAppGrid() {
             altTagColor = app.adobe.altColor;
             altTagBg = app.adobe.altBg;
         } else {
+            // ArtCraft: ArtCraft ikoner og ArtCraft navn
+            appTitle = app.title;
+            buttonLabel = `Åpne ${app.title}`;
             iconBoxHtml = `
                 <div class="app-icon-box cfa-style">
                     <img src="Media/Logo/cfa-logo.svg" alt="CfA ${app.title}" class="cfa-icon-logo">
@@ -379,12 +400,12 @@ function renderAppGrid() {
                 <span class="app-alt-tag" style="background: ${altTagBg}; color: ${altTagColor};">
                     ${altTagText}
                 </span>
-                <h3 class="app-title">${app.title}</h3>
+                <h3 class="app-title">${appTitle}</h3>
                 <p class="app-desc">${app.desc}</p>
             </div>
             <div class="app-actions">
                 <button type="button" class="btn btn-primary btn-sm open-app-btn" style="flex: 1; padding: 0.6rem 1rem; font-weight: 600; font-size: 0.9rem;">
-                    Åpne ${app.title}
+                    ${buttonLabel}
                 </button>
                 <a href="${appUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Åpne i ny fane" style="padding: 0.6rem; color: var(--color-text-muted);">
                     <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -413,10 +434,12 @@ function updateWorkspaceHeader(appId) {
     const nameEl = document.getElementById('ws-app-name');
     const tagEl = document.getElementById('ws-app-tag');
 
-    if (nameEl) nameEl.textContent = app.title;
+    const appTitle = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
+
+    if (nameEl) nameEl.textContent = appTitle;
 
     if (iconEl) {
-        if (isAdobeMode) {
+        if (currentDisplayMode === 'adobe' || currentDisplayMode === 'hybrid') {
             iconEl.innerHTML = `
                 <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
                     ${app.adobe.letters}
@@ -430,8 +453,22 @@ function updateWorkspaceHeader(appId) {
     }
 
     if (tagEl) {
-        tagEl.textContent = isAdobeMode ? app.adobe.alt : app.cfa.alt;
+        tagEl.textContent = currentDisplayMode === 'artcraft' ? app.cfa.alt : app.adobe.alt;
     }
+}
+
+function updateWorkspaceSelectOptions() {
+    const select = document.getElementById('ws-switch-select');
+    if (!select) return;
+
+    const currentVal = select.value;
+    select.innerHTML = ARTCRAFT_APPS.map(app => {
+        const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
+        const tag = currentDisplayMode === 'adobe' ? app.adobe.letters : app.cfa.badgeText;
+        return `<option value="${app.id}">${title} (${tag})</option>`;
+    }).join('');
+
+    if (currentVal) select.value = currentVal;
 }
 
 function setupWorkspace() {
@@ -441,6 +478,8 @@ function setupWorkspace() {
     const openTabBtn = document.getElementById('ws-open-tab-btn');
     const iframe = document.getElementById('artcraft-iframe');
     const loader = document.getElementById('ws-loader');
+
+    updateWorkspaceSelectOptions();
 
     if (closeBtn) {
         closeBtn.onclick = () => closeWorkspace();
@@ -491,7 +530,8 @@ function openApp(appId) {
     updateWorkspaceHeader(appId);
 
     if (selectEl) selectEl.value = app.id;
-    if (loaderText) loaderText.textContent = `Laster inn ${app.title} (WebAssembly)...`;
+    const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
+    if (loaderText) loaderText.textContent = `Laster inn ${title} (WebAssembly)...`;
 
     if (loader) loader.style.display = 'flex';
     if (iframe) {
@@ -507,7 +547,7 @@ function openApp(appId) {
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('app', appId);
-        window.history.replaceState({ app: appId }, app.title, url.toString());
+        window.history.replaceState({ app: appId }, title, url.toString());
     } catch (e) {}
 }
 
