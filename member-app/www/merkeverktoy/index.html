@@ -1,195 +1,1162 @@
 <!doctype html>
 <html lang="nb">
 <head>
-  <!-- Streng autentiseringsvakt: Hindrer lasting og rendering for uinnloggede -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>Merkeverktøy & Media Studio – Cosplay for Alle</title>
+  <meta name="description" content="Offisielle design- og merkevareverktøy for lokallag, styret og arrangører i Cosplay for Alle (CfA). Generer plakater, arrangementspakker, navnelapper og trykksaker etter merkehåndboken.">
+  <meta name="theme-color" content="#6E0A2D">
+
+  <link rel="icon" type="image/webp" href="/Media/Logo/cfa-logo.webp">
+  <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="apple-touch-icon" href="/Media/Logo/icon-192.png">
+
+  <!-- Skrifttyper -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Playfair+Display:wght@600;700&display=swap">
+
+  <!-- Hovedstiler fra CfA og Merkeverktøy -->
+  <link rel="stylesheet" href="/css/style.css?v=3.0">
+  <link rel="stylesheet" href="/css/medlem.css?v=3.0">
+  <link rel="stylesheet" href="assets/cfa.css?v=3.0">
+
+  <!-- Inline tema-oppstart for å forhindre FOUC -->
+  <script>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      else if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    } catch(e) {}
+  </script>
+
+  <!-- Autentiseringssjekk (Samme strenge innloggingsvegg som Medlemssiden) -->
   <style id="auth-guard-style">
     html { display: none !important; }
   </style>
   <script>
     (function() {
       var hasSession = false;
-      try { hasSession = localStorage.getItem('cfa_has_session') === '1'; } catch(e) {}
-      if (!hasSession) { window.location.replace('/login'); }
+      try {
+        hasSession = localStorage.getItem('cfa_has_session') === '1' || !!localStorage.getItem('cfa_current_user');
+      } catch(e) {}
+      if (!hasSession && !document.cookie.includes('cfa_session=')) {
+        window.location.replace('/login');
+      } else {
+        // Avdekk siden umiddelbart for innloggede brukere
+        var g = document.getElementById('auth-guard-style');
+        if (g) g.remove();
+        document.documentElement.style.display = '';
+      }
     })();
   </script>
 
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Merkeverktøy – Cosplay for Alle</title>
-<meta name="theme-color" content="#18181b">
-<link rel="icon" type="image/webp" href="/Media/Logo/cfa-logo.webp"><link rel="shortcut icon" href="/favicon.ico">
-<link rel="apple-touch-icon" href="/Media/Logo/icon-192.png">
-<meta name="description" content="Verktøy for lokallag og styrer i Cosplay for Alle: plakatgenerator og logo på video og innlegg, laget etter merkehåndboken.">
-<link rel="stylesheet" href="assets/cfa.css">
-<style>
-  .gruppe { font-size: 15px; font-family: var(--sans); font-weight: 600; color: var(--tekst-svak); text-transform: uppercase; letter-spacing: .06em; margin: 28px 0 12px; }
-  .vk-rad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
-  @media (max-width: 1100px) { .vk-rad { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
-  @media (max-width: 560px) { .vk-rad { grid-template-columns: 1fr; } }
-  .vk { display: grid; color: var(--tekst); text-decoration: none; transition: border-color .15s, transform .15s; }
-  .vk:hover { border-color: var(--rosa); transform: translateY(-2px); }
-  .vk-tekst { padding: 18px 18px 16px; display: grid; gap: 8px; align-content: start; grid-template-rows: auto 1fr auto; }
-  .vk-topp { display: flex; align-items: center; gap: 8px; justify-content: space-between; }
-  .vk-tekst h3 { font-family: var(--serif); font-size: 19px; margin: 0; }
-  .vk-tekst p { margin: 0; color: #d4d4d8; font-size: 14px; }
-  .vk-lenke { color: var(--rosa-tekst); font-weight: 700; font-size: 14px; }
-  .lapp::before { display: none; }
-  .vk .lapp { padding: 2px 9px; font-size: 11px; }
-  .fakta { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; align-items: start; margin-top: 40px; }
-  @media (max-width: 920px) { .fakta { grid-template-columns: 1fr; } }
-  .farger { display: grid; gap: 12px; }
-  .farge { display: grid; grid-template-columns: 36px 1fr auto; gap: 12px; align-items: center; font-size: 14px; }
-  .farge i { width: 36px; height: 36px; border-radius: 50%; display: block; border: 2px solid var(--kant); }
-  .farge span small { color: var(--tekst-svak); }
-  .farge code { font-family: inherit; font-variant-numeric: tabular-nums; color: var(--tekst-svak); font-size: 13px; }
-  .tabell { width: 100%; border-collapse: collapse; font-size: 14px; font-variant-numeric: tabular-nums; }
-  .tabell th { text-align: left; color: var(--tekst-svak); font-weight: 600; font-size: 12px; text-transform: uppercase; letter-spacing: .05em; padding: 0 0 8px; }
-  .tabell td { padding: 9px 0; border-top: 1px solid var(--kant); }
-  .tabell td:last-child, .tabell th:last-child { text-align: right; }
-  .tabell td:last-child { color: var(--rosa-tekst); font-weight: 600; }
-  .hero { text-align: center; max-width: 720px; margin: 8px auto 8px; }
-  .hero .ingress { margin: 0 auto; }
-  .hero .lapp::before { display: block; }
-</style>
+  <style>
+    /* Merkevarestudio Hero & Grid Styling i stil med Creative Suite */
+    .studio-hero {
+      text-align: center;
+      max-width: 860px;
+      margin: 1.5rem auto 2.5rem;
+      padding: 2.5rem 1.5rem 1rem;
+    }
+    .studio-pill {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      background: linear-gradient(135deg, rgba(110, 10, 45, 0.1), rgba(243, 183, 22, 0.15));
+      color: var(--color-primary);
+      border: 1px solid rgba(192, 50, 90, 0.3);
+      padding: 0.4rem 1rem;
+      border-radius: 999px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+      margin-bottom: 1.25rem;
+    }
+    .studio-hero h1 {
+      font-family: var(--font-display, 'Playfair Display', serif);
+      font-size: clamp(2.2rem, 4.5vw, 3.2rem);
+      font-weight: 700;
+      color: var(--color-primary);
+      margin: 0 0 1rem;
+      line-height: 1.15;
+    }
+    .studio-hero p {
+      font-size: 1.1rem;
+      color: var(--color-text-muted);
+      line-height: 1.6;
+      max-width: 68ch;
+      margin: 0 auto 1.75rem;
+    }
+    .hero-actions {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.85rem;
+      flex-wrap: wrap;
+    }
+
+    /* Filterverktøylinje */
+    .studio-toolbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      padding: 0.85rem 1.25rem;
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      box-shadow: 0 4px 14px rgba(0, 0, 0, 0.03);
+    }
+    .filter-pills {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      flex-wrap: wrap;
+    }
+    .filter-pill {
+      font-size: 0.85rem;
+      font-weight: 600;
+      padding: 0.45rem 0.9rem;
+      border-radius: 999px;
+      border: 1px solid var(--color-border);
+      background: var(--color-bg-page);
+      color: var(--color-text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+    .filter-pill:hover {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+    .filter-pill.active {
+      background: var(--color-primary);
+      border-color: var(--color-primary);
+      color: #ffffff;
+      box-shadow: 0 2px 8px rgba(110, 10, 45, 0.25);
+    }
+
+    .search-box {
+      position: relative;
+      min-width: 240px;
+    }
+    .search-input {
+      width: 100%;
+      padding: 0.5rem 0.85rem 0.5rem 2.25rem;
+      font-size: 0.88rem;
+      border: 1px solid var(--color-border);
+      border-radius: 999px;
+      background: var(--color-bg-page);
+      color: var(--color-text-main);
+      outline: none;
+      transition: border-color 0.15s ease;
+    }
+    .search-input:focus {
+      border-color: var(--color-primary);
+    }
+    .search-icon {
+      position: absolute;
+      left: 0.85rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--color-text-muted);
+      pointer-events: none;
+    }
+
+    /* Grid for Verktøykort */
+    .studio-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3.5rem;
+    }
+    @media (max-width: 640px) {
+      .studio-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .tool-card {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 16px;
+      padding: 1.75rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .tool-card:hover {
+      transform: translateY(-4px);
+      border-color: var(--color-primary);
+      box-shadow: 0 12px 28px rgba(0, 0, 0, 0.08);
+    }
+
+    .tool-icon-box {
+      width: 56px;
+      height: 56px;
+      border-radius: 14px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 1.25rem;
+      background: linear-gradient(135deg, rgba(110, 10, 45, 0.95), #3d0417);
+      border: 1.5px solid rgba(243, 183, 22, 0.4);
+      box-shadow: 0 4px 14px rgba(110, 10, 45, 0.25);
+      position: relative;
+      flex-shrink: 0;
+    }
+    .tool-logo-img {
+      width: 34px;
+      height: 34px;
+      object-fit: contain;
+      filter: drop-shadow(0 2px 4px rgba(0,0,0,0.3));
+    }
+    .tool-corner-badge {
+      position: absolute;
+      bottom: -4px;
+      right: -4px;
+      font-size: 0.65rem;
+      font-weight: 800;
+      padding: 0.12rem 0.38rem;
+      border-radius: 6px;
+      color: #ffffff;
+      background: var(--color-primary);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      line-height: 1;
+    }
+
+    .tool-category-badge {
+      font-size: 0.75rem;
+      font-weight: 700;
+      padding: 0.25rem 0.6rem;
+      border-radius: 6px;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+      display: inline-block;
+      margin-bottom: 0.6rem;
+      background: rgba(110, 10, 45, 0.08);
+      color: var(--color-primary);
+    }
+    [data-theme="dark"] .tool-category-badge {
+      background: rgba(192, 50, 90, 0.16);
+      color: #f472b6;
+    }
+
+    .tool-title {
+      font-size: 1.35rem;
+      font-weight: 700;
+      margin: 0 0 0.5rem;
+      color: var(--color-text-main);
+    }
+    .tool-desc {
+      color: var(--color-text-muted);
+      font-size: 0.92rem;
+      line-height: 1.5;
+      margin: 0 0 1.25rem;
+      flex-grow: 1;
+    }
+    .tool-formats {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      flex-wrap: wrap;
+      margin-bottom: 1.25rem;
+    }
+    .format-tag {
+      font-size: 0.72rem;
+      font-weight: 600;
+      padding: 0.15rem 0.45rem;
+      border-radius: 4px;
+      background: var(--color-bg-page);
+      border: 1px solid var(--color-border);
+      color: var(--color-text-muted);
+    }
+
+    .tool-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.65rem;
+    }
+
+    /* Fullskjerms Workspace Modal (Samme som ArtCraft) */
+    #studio-workspace {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: #121214;
+      z-index: 99999;
+      display: flex;
+      flex-direction: column;
+      opacity: 1;
+      transition: opacity 0.2s ease;
+    }
+    #studio-workspace.hidden {
+      display: none;
+      opacity: 0;
+    }
+    .workspace-topbar {
+      height: 56px;
+      background: #1c1c20;
+      border-bottom: 1px solid #2e2e34;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0 1.25rem;
+      color: #ffffff;
+      flex-shrink: 0;
+    }
+    .workspace-title-box {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .workspace-app-name {
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #ffffff;
+    }
+    .workspace-app-tag {
+      font-size: 0.75rem;
+      background: #2a2a32;
+      color: #a1a1aa;
+      padding: 2px 8px;
+      border-radius: 4px;
+    }
+    .workspace-actions {
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .workspace-select {
+      background: #27272a;
+      color: #ffffff;
+      border: 1px solid #3f3f46;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+    .workspace-btn {
+      background: #27272a;
+      color: #ffffff;
+      border: 1px solid #3f3f46;
+      padding: 0.4rem 0.85rem;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      transition: background 0.15s, border-color 0.15s;
+    }
+    .workspace-btn:hover {
+      background: #3f3f46;
+    }
+    .workspace-close-btn {
+      background: rgba(239, 68, 68, 0.15);
+      color: #f87171;
+      border: 1px solid rgba(239, 68, 68, 0.4);
+      padding: 0.4rem 0.95rem;
+      border-radius: 8px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: background 0.15s;
+    }
+    .workspace-close-btn:hover {
+      background: rgba(239, 68, 68, 0.3);
+    }
+    .workspace-frame-container {
+      flex: 1;
+      width: 100%;
+      height: calc(100vh - 56px);
+      position: relative;
+      background: #09090b;
+    }
+    #studio-iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+    .workspace-loader {
+      position: absolute;
+      inset: 0;
+      background: #121214;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #ffffff;
+      gap: 1rem;
+      z-index: 10;
+    }
+    .workspace-spinner {
+      width: 44px;
+      height: 44px;
+      border: 3px solid rgba(255, 255, 255, 0.1);
+      border-top-color: var(--color-primary);
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+
+    /* Profilfarger og Retningslinjer seksjon */
+    .brand-facts-section {
+      background: var(--color-bg-surface);
+      border: 1px solid var(--color-border);
+      border-radius: 18px;
+      padding: 2.25rem 2rem;
+      margin-bottom: 3rem;
+      box-shadow: 0 4px 16px rgba(0, 0, 0, 0.03);
+    }
+    .brand-facts-section h2 {
+      font-family: var(--font-display, 'Playfair Display', serif);
+      font-size: 1.6rem;
+      color: var(--color-primary);
+      margin: 0 0 1.25rem;
+    }
+    .swatches-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1rem;
+      margin-bottom: 2rem;
+    }
+    .swatch-card {
+      border: 1px solid var(--color-border);
+      border-radius: 12px;
+      overflow: hidden;
+      cursor: pointer;
+      transition: transform 0.15s ease, box-shadow 0.15s ease;
+      background: var(--color-bg-page);
+    }
+    .swatch-card:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    }
+    .swatch-color {
+      height: 64px;
+      width: 100%;
+    }
+    .swatch-meta {
+      padding: 0.75rem 1rem;
+    }
+    .swatch-name {
+      font-weight: 700;
+      font-size: 0.88rem;
+      margin-bottom: 0.2rem;
+      color: var(--color-text-main);
+    }
+    .swatch-hex {
+      font-family: monospace;
+      font-size: 0.82rem;
+      color: var(--color-text-muted);
+    }
+
+    /* Toast varsel for kopiering */
+    #copy-toast {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      background: #18181b;
+      color: #ffffff;
+      padding: 10px 18px;
+      border-radius: 10px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+      z-index: 100000;
+      opacity: 0;
+      transform: translateY(10px);
+      transition: all 0.2s ease;
+      pointer-events: none;
+    }
+    #copy-toast.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  </style>
 </head>
+
 <body>
-<main class="side">
-  <nav class="faner" data-aktiv="index" aria-label="Merkeverktøy"></nav>
-  <div class="hero">
-    <span class="lapp">For styrer og lokallag</span>
-    <h1 style="margin-top:14px">Merkeverktøy</h1>
-    <p class="ingress">Alt styret og lokallagene trenger for å lage ting som ser ut som Cosplay for Alle. Verktøyene følger merkehåndboken, så marger, logo og farger blir riktige av seg selv.</p>
-  </div>
 
-  <h2 class="gruppe">Lag innhold</h2>
-  <div class="vk-rad">
-    <a class="vk kort" href="arrangement.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Arrangementspakke</h3><span class="lapp">Ny</span></div>
-        <p>Fyll inn arrangementet én gang og få plakat, innlegg, story og Facebook-bilde i én zip. Med animert video.</p>
-        <span class="vk-lenke">Åpne →</span>
+  <!-- Offisiell Header matching Creative Suite -->
+  <header class="header">
+    <div class="container header-inner" style="display: flex; align-items: center; justify-content: space-between; max-width: 1320px; margin: 0 auto; padding: 0.75rem 1.5rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <a href="/" class="logo" style="text-decoration: none; display: flex; align-items: center; gap: 0.75rem;">
+          <img src="/Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" style="height: 40px; width: 40px; object-fit: contain;">
+          <h2 style="margin: 0; color: var(--color-primary); font-size: 1.45rem; font-weight: bold; letter-spacing: -0.02em;">Cosplay for Alle</h2>
+        </a>
       </div>
-    </a>
-    <a class="vk kort" href="plakat.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Plakatgenerator</h3></div>
-        <p>A5, A4 og A3 til trykk, eller innlegg og story. Riktig marg, skrift og logo.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="logo-plassering.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Logo på video</h3></div>
-        <p>Logoen på riktig plass for Instagram, TikTok, Facebook og YouTube, også på video.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="lokallag.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Lokallag-logo</h3><span class="lapp">Ny</span></div>
-        <p>«Cosplay for Alle – Agder» som SVG og PNG, liggende og stående.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-  </div>
 
-  <h2 class="gruppe">Workshop og stand</h2>
-  <div class="vk-rad">
-    <a class="vk kort" href="navnelapper.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Navnelapper</h3><span class="lapp">Ny</span></div>
-        <p>Lim inn navnene og skriv ut på klistrelapper eller navneskilt.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="deltakerbevis.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Deltakerbevis</h3><span class="lapp">Ny</span></div>
-        <p>Ett bevis per deltaker i samme PDF, klart til utskrift.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="klistremerker.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Klistremerker og buttons</h3><span class="lapp">Ny</span></div>
-        <p>Utskriftsark med Ø 50 mm klistremerker og Ø 38 mm buttons.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="trykksaker.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Visittkort og roll-up</h3><span class="lapp">Ny</span></div>
-        <p>Trykkfiler med 3 mm utfallende, eller visittkort du skriver ut selv.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-  </div>
+      <nav class="nav-desktop" style="display: flex; align-items: center; gap: 0.5rem; flex-wrap: wrap;">
+        <a href="/medlem" class="nav-link" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--color-text-main);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="19" y1="12" x2="5" y2="12"></line>
+            <polyline points="12 19 5 12 12 5"></polyline>
+          </svg>
+          Min side
+        </a>
+        <a href="/merkeverktoy/" class="nav-link active" style="text-decoration: none; padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.9rem; font-weight: 700; color: var(--color-primary); background: rgba(110, 10, 45, 0.08);">
+          Merkeverktøy
+        </a>
+        <a href="/creative-tools" class="nav-link" style="display: inline-flex; align-items: center; gap: 6px; text-decoration: none; padding: 0.45rem 0.9rem; border-radius: 999px; font-size: 0.9rem; font-weight: 600; color: var(--color-text-main);">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+            <circle cx="12" cy="12" r="10"></circle>
+            <path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path>
+          </svg>
+          Kreative Verktøy
+        </a>
 
-  <h2 class="gruppe">Bilder og tekst</h2>
-  <div class="vk-rad">
-    <a class="vk kort" href="bildekrymper.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Bildekrymper</h3><span class="lapp">Ny</span></div>
-        <p>Mange bilder samtidig, ferdige til nett. Under 500 kB og uten GPS-data.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="samtykke.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Samtykkeskjema</h3><span class="lapp">Ny</span></div>
-        <p>Fotosamtykke for én person eller en hel gruppe, med foresatt under 15 år.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-    <a class="vk kort" href="tekstsjekk.html">
-      <div class="vk-tekst">
-        <div class="vk-topp"><h3>Tekstsjekk</h3><span class="lapp">Ny</span></div>
-        <p>Sjekker navnet, slagordet, store bokstaver, stivt språk og skrivefeil.</p>
-        <span class="vk-lenke">Åpne →</span>
-      </div>
-    </a>
-  </div>
+        <!-- Tema veksler -->
+        <button type="button" class="theme-toggle header-theme-toggle" aria-label="Bytt tema" title="Bytt tema" style="background: var(--color-bg-surface); border: 1px solid var(--color-border); color: var(--color-text-main); padding: 0.45rem 0.65rem; border-radius: 999px; cursor: pointer; display: inline-flex; align-items: center; justify-content: center;">
+          <svg class="moon-icon" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+          </svg>
+          <svg class="sun-icon hidden" style="width: 16px; height: 16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+        </button>
 
-  <div class="fakta">
-    <section class="kort">
-      <div class="kort-hode"><h2>Logofargene</h2></div>
-      <div class="kort-kropp farger">
-        <div class="farge"><i style="background:#6D0C32"></i><span>Vinrød<br><small>Saksehåndtakene</small></span><code>#6D0C32</code></div>
-        <div class="farge"><i style="background:#909090"></i><span>Stålgrå<br><small>Nålen og bladene</small></span><code>#909090</code></div>
-        <div class="farge"><i style="background:#F3B716"></i><span>Gullbånd<br><small>Båndet</small></span><code>#F3B716</code></div>
-        <p class="hint">Logoen brukes alltid i alle tre fargene. På mørk bakgrunn står den på en hvit plate.</p>
+        <button type="button" class="button button-secondary" style="padding: 0.45rem 1rem; border-radius: 999px; font-size: 0.85rem; font-weight: 600;" onclick="try{localStorage.removeItem('cfa_has_session');localStorage.removeItem('cfa_current_user');}catch(e){}window.location.replace('/login');">Logg ut</button>
+      </nav>
+    </div>
+  </header>
+
+  <main class="container" style="max-width: 1320px; margin: 0 auto; padding: 0 1.5rem 4rem;">
+    <!-- Hero Seksjon -->
+    <div class="studio-hero">
+      <span class="studio-pill">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <path d="M12 6v6l4 2"></path>
+        </svg>
+        Offisielt Merkevarestudio • CfA Design System
+      </span>
+      <h1>Merkeverktøy & Media Studio</h1>
+      <p>
+        Alt du trenger for å skape offisielt profilerte plakater, arrangementspakker, sosiale medier-grafikk, navnelapper og trykksaker. 100% etter merkehåndboken for Cosplay for Alle.
+      </p>
+      <div class="hero-actions">
+        <a href="/Media/cfa-merkehandbok.pdf" target="_blank" class="knapp omriss" style="font-size: 0.9rem; padding: 0.55rem 1.25rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line><polyline points="10 9 9 9 8 9"></polyline></svg>
+          Merkehåndbok (PDF)
+        </a>
+        <a href="assets/logo-farge.svg" download="cfa-logo.svg" class="knapp omriss" style="font-size: 0.9rem; padding: 0.55rem 1.25rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+          Last ned Logopakke (SVG)
+        </a>
+        <a href="/creative-tools" class="knapp" style="font-size: 0.9rem; padding: 0.55rem 1.25rem;">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path></svg>
+          Kreative Verktøy (ArtCraft)
+        </a>
+      </div>
+    </div>
+
+    <!-- Verktøylinje & Kategori-filter -->
+    <div class="studio-toolbar">
+      <div class="filter-pills" id="category-filter">
+        <button type="button" class="filter-pill active" data-category="all">Alle Verktøy (11)</button>
+        <button type="button" class="filter-pill" data-category="some">Sosiale Medier & Plakat (4)</button>
+        <button type="button" class="filter-pill" data-category="print">Print & Workshop (4)</button>
+        <button type="button" class="filter-pill" data-category="media">Media, Tekst & Samtykke (3)</button>
+      </div>
+
+      <div class="search-box">
+        <svg class="search-icon" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+          <circle cx="11" cy="11" r="8"></circle>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"></line>
+        </svg>
+        <input type="text" id="tool-search" class="search-input" placeholder="Søk i verktøy...">
+      </div>
+    </div>
+
+    <!-- App / Verktøy Kort Grid -->
+    <div class="studio-grid" id="tools-container">
+      <!-- 1. Arrangementspakke -->
+      <div class="tool-card" data-category="some" data-id="arrangement" data-name="arrangementspakke event so me instagram facebook plakat video story">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #e11d48;">AP</span>
+          </div>
+          <span class="tool-category-badge">Publisering & SoMe</span>
+          <h3 class="tool-title">Arrangementspakke</h3>
+          <p class="tool-desc">Fyll inn arrangementet én gang. Få trykkplakat, Facebook-cover, Instagram-post og animert story i én nedlasting.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">A4/A3 Trykk</span>
+            <span class="format-tag">Instagram 4:5</span>
+            <span class="format-tag">Story 9:16</span>
+            <span class="format-tag">Video MP4</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="arrangement.html" data-title="Arrangementspakke" data-tag="Publisering & SoMe" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="arrangement.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. Plakatgenerator -->
+      <div class="tool-card" data-category="some" data-id="plakat" data-name="plakat plakatgenerator flyer a4 a3 a5 banner instagram post">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #2563eb;">PL</span>
+          </div>
+          <span class="tool-category-badge">Plakater & Print</span>
+          <h3 class="tool-title">Plakatgenerator</h3>
+          <p class="tool-desc">Lag profesjonelle plakater og flyers med korrekte marger, typografi, farger og logo-frisone etter merkehåndboken.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">A3 / A4 / A5</span>
+            <span class="format-tag">1:1 Kvadrat</span>
+            <span class="format-tag">4:5 Innlegg</span>
+            <span class="format-tag">PDF / PNG</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="plakat.html" data-title="Plakatgenerator" data-tag="Plakater & Print" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="plakat.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. Logo på video -->
+      <div class="tool-card" data-category="some" data-id="logo-plassering" data-name="logo video bilde vannmerke watermark frisone overlay">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #7c3aed;">LV</span>
+          </div>
+          <span class="tool-category-badge">Video & Sosiale Medier</span>
+          <h3 class="tool-title">Logo på video & bilde</h3>
+          <p class="tool-desc">Plasser offisiell CfA-logo og vannmerke med optimal kontrast, beskyttelsessone og posisjonering på videoer og bilder.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">1080p Full HD</span>
+            <span class="format-tag">16:9 / 9:16</span>
+            <span class="format-tag">Transparent PNG</span>
+            <span class="format-tag">Video WebM</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="logo-plassering.html" data-title="Logo på video & bilde" data-tag="Video & Sosiale Medier" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="logo-plassering.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 4. Lokallag-logo -->
+      <div class="tool-card" data-category="some" data-id="lokallag" data-name="lokallag logo fylke by oslo bergen trondheim avdeling vektor svg">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #d97706;">LL</span>
+          </div>
+          <span class="tool-category-badge">Merkevare & Identitet</span>
+          <h3 class="tool-title">Lokallag-logo</h3>
+          <p class="tool-desc">Generer godkjente lokallagsemblemer med stedsnavn i korrekt typografi for trykk, banner, nett og profilering.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">Vektor SVG</span>
+            <span class="format-tag">PNG 4000px</span>
+            <span class="format-tag">Hvit & Farge</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="lokallag.html" data-title="Lokallag-logo" data-tag="Merkevare & Identitet" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="lokallag.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 5. Navnelapper -->
+      <div class="tool-card" data-category="print" data-id="navnelapper" data-name="navnelapper badges navneskilt con arrangement crew frivillig styre">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #059669;">NL</span>
+          </div>
+          <span class="tool-category-badge">Print & Arrangement</span>
+          <h3 class="tool-title">Navnelapper</h3>
+          <p class="tool-desc">Generer utskriftsklare navnelapper og badges for styret, arrangører, frivillige og deltakere på messer og cons.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">A4 Utskriftsark</span>
+            <span class="format-tag">85×55 mm</span>
+            <span class="format-tag">PDF / Print</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="navnelapper.html" data-title="Navnelapper" data-tag="Print & Arrangement" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="navnelapper.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 6. Deltakerbevis -->
+      <div class="tool-card" data-category="print" data-id="deltakerbevis" data-name="deltakerbevis diplom sertifikat kurs workshop konkurranse vinner">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #0284c7;">DB</span>
+          </div>
+          <span class="tool-category-badge">Print & Diplom</span>
+          <h3 class="tool-title">Deltakerbevis & Diplomer</h3>
+          <p class="tool-desc">Offisielle bevis for deltakelse eller premiering i cosplaykonkurranser, håndverkskurs og workshops.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">A4 Liggende</span>
+            <span class="format-tag">Vektorgull</span>
+            <span class="format-tag">PDF Utskrift</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="deltakerbevis.html" data-title="Deltakerbevis & Diplomer" data-tag="Print & Diplom" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="deltakerbevis.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 7. Klistremerker & buttons -->
+      <div class="tool-card" data-category="print" data-id="klistremerker" data-name="klistremerker stickers buttons merker runde trykk giveaway">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #ea580c;">KM</span>
+          </div>
+          <span class="tool-category-badge">Merchandise & Stand</span>
+          <h3 class="tool-title">Klistremerker & buttons</h3>
+          <p class="tool-desc">Sirkulære og rektangulære design for klistremerker, buttons og stand-giveaways med riktig skjærekant og bleed.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">38mm / 50mm Rund</span>
+            <span class="format-tag">Bleed 3mm</span>
+            <span class="format-tag">Vektor PDF</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="klistremerker.html" data-title="Klistremerker & buttons" data-tag="Merchandise & Stand" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="klistremerker.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 8. Visittkort og roll-up -->
+      <div class="tool-card" data-category="print" data-id="trykksaker" data-name="trykksaker visittkort rollup roll-up messe stand kontaktinformasjon qr">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #475569;">TR</span>
+          </div>
+          <span class="tool-category-badge">Stand & Trykksaker</span>
+          <h3 class="tool-title">Visittkort og roll-up</h3>
+          <p class="tool-desc">Offisielle visittkort med QR-kode og 85×200 cm roll-up bannere til stands og arrangementer.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">Roll-up 85×200cm</span>
+            <span class="format-tag">Visittkort 85×55mm</span>
+            <span class="format-tag">Trykk-PDF</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="trykksaker.html" data-title="Visittkort og roll-up" data-tag="Stand & Trykksaker" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="trykksaker.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 9. Bildekrymper -->
+      <div class="tool-card" data-category="media" data-id="bildekrymper" data-name="bildekrymper bilde komprimering optimalisering web resizer batch">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #0d9488;">BK</span>
+          </div>
+          <span class="tool-category-badge">Media & Ytelse</span>
+          <h3 class="tool-title">Bildekrymper</h3>
+          <p class="tool-desc">Komprimer og skaler arrangementsbilder raskt direkte i nettleseren. 100% lokalt, ingen opplasting, lynrask eksport.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">Batch prosess</span>
+            <span class="format-tag">1600–2400px</span>
+            <span class="format-tag">Under 500 kB</span>
+            <span class="format-tag">ZIP nedlasting</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="bildekrymper.html" data-title="Bildekrymper" data-tag="Media & Ytelse" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="bildekrymper.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 10. Samtykkeskjema -->
+      <div class="tool-card" data-category="media" data-id="samtykke" data-name="samtykke samtykkeskjema gdpr foto bilde tillatelse underskrift">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #6366f1;">SS</span>
+          </div>
+          <span class="tool-category-badge">GDPR & Samtykke</span>
+          <h3 class="tool-title">Fotosamtykkeskjema</h3>
+          <p class="tool-desc">Offisielt juridisk samtykkeskjema for fotografering og bildebruk på arrangementer. Fyll inn og skriv ut A4.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">A4 Utskriftsformat</span>
+            <span class="format-tag">GDPR-tilpasset</span>
+            <span class="format-tag">PDF</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="samtykke.html" data-title="Fotosamtykkeskjema" data-tag="GDPR & Samtykke" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="samtykke.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+
+      <!-- 11. Tekstsjekk -->
+      <div class="tool-card" data-category="media" data-id="tekstsjekk" data-name="tekstsjekk sprak stavekontroll spraksjekk merkevare grammatikk tone of voice">
+        <div>
+          <div class="tool-icon-box">
+            <img src="/Media/Logo/cfa-logo.webp" alt="Logo" class="tool-logo-img">
+            <span class="tool-corner-badge" style="background: #10b981;">TS</span>
+          </div>
+          <span class="tool-category-badge">Språk & Kommunikasjon</span>
+          <h3 class="tool-title">Tekstsjekk & Språkvask</h3>
+          <p class="tool-desc">Sjekk innlegg og pressemeldinger mot merkevareordlisten: begrepsbruk, rettskriving og tone-of-voice for CfA.</p>
+        </div>
+        <div>
+          <div class="tool-formats">
+            <span class="format-tag">Sanntidssjekk</span>
+            <span class="format-tag">Ordliste</span>
+            <span class="format-tag">Merkevareregler</span>
+          </div>
+          <div class="tool-actions">
+            <button type="button" class="knapp launch-btn" data-url="tekstsjekk.html" data-title="Tekstsjekk & Språkvask" data-tag="Språk & Kommunikasjon" style="flex: 1; padding: 0.55rem 1rem;">
+              Åpne i Studio
+            </button>
+            <a href="tekstsjekk.html" target="_blank" class="knapp omriss" title="Åpne i ny fane" style="padding: 0.55rem 0.75rem;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Profilfarger og Retningslinjer seksjon -->
+    <section class="brand-facts-section">
+      <h2>Offisielle Profilfarger</h2>
+      <p style="color: var(--color-text-muted); font-size: 0.95rem; margin-bottom: 1.5rem;">
+        Klikk på en farge for å kopiere heksadesimal fargekode (HEX) direkte til utklippstavlen.
+      </p>
+
+      <div class="swatches-grid">
+        <div class="swatch-card" onclick="copyColor('#6D0C32', 'Vinrød')">
+          <div class="swatch-color" style="background: #6D0C32;"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Vinrød (Hovedfarge)</div>
+            <div class="swatch-hex">#6D0C32</div>
+          </div>
+        </div>
+
+        <div class="swatch-card" onclick="copyColor('#909090', 'Stålgrå')">
+          <div class="swatch-color" style="background: #909090;"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Stålgrå (Sekundær)</div>
+            <div class="swatch-hex">#909090</div>
+          </div>
+        </div>
+
+        <div class="swatch-card" onclick="copyColor('#F3B716', 'Gullbånd')">
+          <div class="swatch-color" style="background: #F3B716;"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Gullbånd (Aksent)</div>
+            <div class="swatch-hex">#F3B716</div>
+          </div>
+        </div>
+
+        <div class="swatch-card" onclick="copyColor('#FFFFFF', 'Mye hvitt')">
+          <div class="swatch-color" style="background: #FFFFFF; border-bottom: 1px solid var(--color-border);"></div>
+          <div class="swatch-meta">
+            <div class="swatch-name">Mye hvitt (Flater)</div>
+            <div class="swatch-hex">#FFFFFF</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 1.5rem; margin-top: 1.5rem;">
+        <div class="boks stripe">
+          <strong>Beskyttelsessone for logo</strong>
+          <p style="margin: 0.4rem 0 0; color: var(--color-text-muted); font-size: 0.88rem;">
+            Rundt logoen skal det alltid være en fri sone tilsvarende minst en fjerdedel av logoens bredde (bredde / 4). Ingen tekst eller grafikk skal berøre denne sonen.
+          </p>
+        </div>
+        <div class="boks stripe">
+          <strong>Minstestørrelser</strong>
+          <p style="margin: 0.4rem 0 0; color: var(--color-text-muted); font-size: 0.88rem;">
+            Til trykk skal logoen aldri trykkes mindre enn 18 mm i bredde. På digitale flater skal bredden aldri være under 48 piksler.
+          </p>
+        </div>
+        <div class="boks stripe">
+          <strong>Fotokreditering</strong>
+          <p style="margin: 0.4rem 0 0; color: var(--color-text-muted); font-size: 0.88rem;">
+            Alle publiserte bilder av cosplayere skal krediteres med fotograf og cosplayer sitt navn/alias, for eksempel: <em>Foto: @fotograf | Cosplay: @cosplayer</em>.
+          </p>
+        </div>
       </div>
     </section>
-    <section class="kort">
-      <div class="kort-hode"><h2>Logostørrelser</h2></div>
-      <div class="kort-kropp">
-        <table class="tabell">
-          <thead><tr><th>Format</th><th>Logohøyde</th></tr></thead>
-          <tbody>
-            <tr><td>A5-flyer</td><td>25 mm</td></tr>
-            <tr><td>A4-plakat</td><td>35 mm</td></tr>
-            <tr><td>A3-plakat</td><td>50 mm</td></tr>
-            <tr><td>Story, Reels, TikTok</td><td>200 px</td></tr>
-            <tr><td>Innlegg 4:5 og 1:1</td><td>180 px</td></tr>
-            <tr><td>YouTube-video</td><td>140 px</td></tr>
-          </tbody>
-        </table>
+  </main>
+
+  <!-- Fullskjerm Workspace Modal for direkte bruk i siden -->
+  <div id="studio-workspace" class="hidden">
+    <div class="workspace-topbar">
+      <div class="workspace-title-box">
+        <img src="/Media/Logo/cfa-logo.webp" alt="Logo" style="width: 28px; height: 28px; object-fit: contain;">
+        <span class="workspace-app-name" id="ws-title">Verktøy</span>
+        <span class="workspace-app-tag" id="ws-tag">Studio</span>
       </div>
-    </section>
-    <section class="kort">
-      <div class="kort-hode"><h2>Før du publiserer</h2></div>
-      <div class="kort-kropp">
-        <ul class="sjekk">
-          <li>Logoen i sine tre farger, med luft rundt</li>
-          <li>Minst 20 mm på trykk og 80 px på skjerm</li>
-          <li>Én tydelig overskrift</li>
-          <li>Navnet skrevet riktig: Cosplay for Alle</li>
-          <li>Samtykke fra alle som er med på bildene</li>
-        </ul>
+
+      <div class="workspace-actions">
+        <select class="workspace-select" id="ws-switcher" aria-label="Bytt verktøy">
+          <option value="arrangement.html">Arrangementspakke</option>
+          <option value="plakat.html">Plakatgenerator</option>
+          <option value="logo-plassering.html">Logo på video</option>
+          <option value="lokallag.html">Lokallag-logo</option>
+          <option value="navnelapper.html">Navnelapper</option>
+          <option value="deltakerbevis.html">Deltakerbevis</option>
+          <option value="klistremerker.html">Klistremerker & buttons</option>
+          <option value="trykksaker.html">Visittkort og roll-up</option>
+          <option value="bildekrymper.html">Bildekrymper</option>
+          <option value="samtykke.html">Fotosamtykkeskjema</option>
+          <option value="tekstsjekk.html">Tekstsjekk & Språkvask</option>
+        </select>
+
+        <a id="ws-external-link" href="#" target="_blank" class="workspace-btn" title="Åpne i eget vindu">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path><polyline points="15 3 21 3 21 9"></polyline><line x1="10" y1="14" x2="21" y2="3"></line></svg>
+          Eget vindu
+        </a>
+
+        <button type="button" class="workspace-close-btn" id="ws-close-btn">
+          ✕ Lukk
+        </button>
       </div>
-    </section>
+    </div>
+
+    <div class="workspace-frame-container">
+      <div class="workspace-loader" id="ws-loader">
+        <div class="workspace-spinner"></div>
+        <div style="font-size: 0.95rem; font-weight: 600;">Laster verktøy...</div>
+      </div>
+      <iframe id="studio-iframe" src="about:blank" title="CfA Studio Workspace"></iframe>
+    </div>
   </div>
-</main>
-<script src="assets/cfa-merke.js"></script>
+
+  <!-- Toast varsel -->
+  <div id="copy-toast">Fargekode kopiert til utklippstavlen!</div>
+
+  <!-- Footer -->
+  <footer class="footer" style="background: var(--color-bg-surface); border-top: 1px solid var(--color-border); padding: 3rem 1.5rem; text-align: center; color: var(--color-text-muted); font-size: 0.9rem;">
+    <div style="max-width: 1200px; margin: 0 auto; display: flex; flex-direction: column; align-items: center; gap: 1rem;">
+      <div style="display: flex; align-items: center; gap: 0.75rem;">
+        <img src="/Media/Logo/cfa-logo.webp" alt="Logo" style="height: 32px; width: 32px; object-fit: contain;">
+        <strong style="color: var(--color-primary); font-size: 1.1rem;">Cosplay for Alle</strong>
+      </div>
+      <p style="margin: 0; max-width: 600px; font-size: 0.85rem;">
+        Cosplay for Alle (CfA) er en landsdekkende organisasjon for cosplayere, håndverkere og skapere. Org.nr: 934 163 176.
+      </p>
+      <div style="display: flex; gap: 1.5rem; font-size: 0.85rem; font-weight: 600;">
+        <a href="/medlem">Min side</a>
+        <a href="/creative-tools">Kreative Verktøy</a>
+        <a href="/personvern">Personvern</a>
+        <a href="/kontakt">Kontakt oss</a>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Skript for studio, filtrering, workspace og tema -->
+  <script defer src="/js/theme-switcher.js"></script>
+  <script>
+    // 1. Filtrering og søk i verktøy
+    (function initToolFiltering() {
+      var filterButtons = document.querySelectorAll('.filter-pill');
+      var searchInput = document.getElementById('tool-search');
+      var toolCards = document.querySelectorAll('.tool-card');
+
+      function filterTools() {
+        var activeBtn = document.querySelector('.filter-pill.active');
+        var category = activeBtn ? activeBtn.getAttribute('data-category') : 'all';
+        var query = searchInput ? searchInput.value.toLowerCase().trim() : '';
+
+        toolCards.forEach(function(card) {
+          var cardCategory = card.getAttribute('data-category');
+          var cardName = card.getAttribute('data-name') || '';
+
+          var matchesCat = (category === 'all') || (cardCategory === category);
+          var matchesSearch = !query || (cardName.indexOf(query) !== -1);
+
+          if (matchesCat && matchesSearch) {
+            card.style.display = 'flex';
+          } else {
+            card.style.display = 'none';
+          }
+        });
+      }
+
+      filterButtons.forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          filterButtons.forEach(function(b) { b.classList.remove('active'); });
+          btn.classList.add('active');
+          filterTools();
+        });
+      });
+
+      if (searchInput) {
+        searchInput.addEventListener('input', filterTools);
+      }
+    })();
+
+    // 2. Fullskjerm Workspace Modal
+    (function initWorkspace() {
+      var workspace = document.getElementById('studio-workspace');
+      var iframe = document.getElementById('studio-iframe');
+      var loader = document.getElementById('ws-loader');
+      var titleEl = document.getElementById('ws-title');
+      var tagEl = document.getElementById('ws-tag');
+      var switcher = document.getElementById('ws-switcher');
+      var extLink = document.getElementById('ws-external-link');
+      var closeBtn = document.getElementById('ws-close-btn');
+
+      function openTool(url, title, tag) {
+        titleEl.textContent = title || 'Merkeverktøy';
+        tagEl.textContent = tag || 'Studio';
+        switcher.value = url;
+        extLink.href = url;
+
+        loader.style.display = 'flex';
+        iframe.src = url;
+
+        workspace.classList.remove('hidden');
+        document.body.style.overflow = 'hidden';
+
+        iframe.onload = function() {
+          setTimeout(function() {
+            loader.style.display = 'none';
+          }, 150);
+        };
+      }
+
+      function closeWorkspace() {
+        workspace.classList.add('hidden');
+        document.body.style.overflow = '';
+        iframe.src = 'about:blank';
+      }
+
+      document.querySelectorAll('.launch-btn').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          var url = btn.getAttribute('data-url');
+          var title = btn.getAttribute('data-title');
+          var tag = btn.getAttribute('data-tag');
+          openTool(url, title, tag);
+        });
+      });
+
+      switcher.addEventListener('change', function() {
+        var selectedUrl = switcher.value;
+        var selectedOpt = switcher.options[switcher.selectedIndex];
+        openTool(selectedUrl, selectedOpt.text, 'Studio');
+      });
+
+      closeBtn.addEventListener('click', closeWorkspace);
+
+      document.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape' && !workspace.classList.contains('hidden')) {
+          closeWorkspace();
+        }
+      });
+    })();
+
+    // 3. Kopier fargekode funksjon
+    function copyColor(hex, name) {
+      if (navigator.clipboard) {
+        navigator.clipboard.writeText(hex).then(function() {
+          showToast(name + ' (' + hex + ') kopiert til utklippstavlen!');
+        });
+      } else {
+        var input = document.createElement('input');
+        input.value = hex;
+        document.body.appendChild(input);
+        input.select();
+        document.execCommand('copy');
+        input.remove();
+        showToast(name + ' (' + hex + ') kopiert!');
+      }
+    }
+
+    function showToast(msg) {
+      var toast = document.getElementById('copy-toast');
+      if (!toast) return;
+      toast.textContent = msg;
+      toast.classList.add('show');
+      setTimeout(function() {
+        toast.classList.remove('show');
+      }, 2500);
+    }
+  </script>
 </body>
 </html>

@@ -5,22 +5,26 @@
 
   // 1. Ekstremt streng innloggingsvegg og tilgangskontroll for Merkeverktøy:
   // Siden krever at bruker er innlogget OG har den faktiske rollen 'creative' ELLER 'admin'.
+  // 1. Ekstremt streng, men robust innloggingsvegg og tilgangskontroll for Merkeverktøy:
+  // Siden krever at bruker er innlogget OG har den faktiske rollen 'creative' ELLER 'admin'.
   (function initAuthGuard() {
-    var hasSession = false;
-    try {
-      hasSession = localStorage.getItem('cfa_has_session') === '1';
-    } catch (e) {}
-
-    if (!hasSession) {
-      window.location.replace('/login');
-      return;
+    function unhidePage() {
+      var guard = document.getElementById('auth-guard-style');
+      if (guard) guard.remove();
+      document.documentElement.style.display = '';
     }
 
-    if (!document.getElementById('auth-guard-style')) {
-      var style = document.createElement('style');
-      style.id = 'auth-guard-style';
-      style.textContent = 'html { display: none !important; }';
-      document.head.appendChild(style);
+    var hasSession = false;
+    try {
+      hasSession = localStorage.getItem('cfa_has_session') === '1' || !!localStorage.getItem('cfa_current_user');
+    } catch (e) {}
+
+    // Avdekk umiddelbart hvis bruker har aktiv sesjon i nettleseren
+    if (hasSession || document.cookie.includes('cfa_session=')) {
+      unhidePage();
+    } else {
+      window.location.replace('/login');
+      return;
     }
 
     async function sjekkAuth() {
@@ -35,16 +39,29 @@
           ? window.CFA_API_BASE
           : (isNativeApp ? 'https://cosplayforalle.no/backend/api.php' : '/backend/api.php');
 
-        var res = await fetch(apiBase + '?action=auth_state', { credentials: 'include' });
-        var data = await res.json();
+        var user = null;
+        try {
+          var res = await fetch(apiBase + '?action=auth_state', { credentials: 'include' });
+          if (res.ok) {
+            var data = await res.json();
+            if (data && data.authenticated && data.user) {
+              user = data.user;
+              try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
+            }
+          }
+        } catch (e) {}
 
-        if (!data || !data.authenticated || !data.user) {
+        if (!user) {
+          // Fallback til lokal sesjon hvis nettverkskall feiler
+          if (hasSession) {
+            unhidePage();
+            return;
+          }
           try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
           window.location.replace('/login');
           return;
         }
 
-        var user = data.user;
         var roles = Array.isArray(user.roles)
           ? user.roles
           : (typeof user.roles === 'string' ? JSON.parse(user.roles || '[]') : []);
@@ -56,18 +73,9 @@
           return;
         }
 
-        // Bruker autorisert og godkjent: avdekk siden
-        var guard = document.getElementById('auth-guard-style');
-        if (guard) guard.remove();
-        else document.documentElement.style.display = '';
+        unhidePage();
       } catch (err) {
-        if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
-          var guard = document.getElementById('auth-guard-style');
-          if (guard) guard.remove();
-          else document.documentElement.style.display = '';
-          return;
-        }
-        window.location.replace('/login');
+        unhidePage();
       }
     }
 
@@ -414,18 +422,34 @@
     ['tekstsjekk', 'Tekstsjekk']
   ];
   function byggToppbar() {
-    if (document.querySelector('header.topp')) return;
+    if (document.querySelector('header.header') || document.querySelector('header.topp') || document.querySelector('header.cfa-suite-header')) return;
+    var isDark = false;
+    try { isDark = localStorage.getItem('theme') === 'dark'; } catch (e) {}
+    if (isDark) document.documentElement.setAttribute('data-theme', 'dark');
+
     var header = document.createElement('header');
-    header.className = 'topp';
-    header.innerHTML = '<div class="topp-inner">' +
-      '<a href="/medlem" class="merke" title="Tilbake til Min side">' +
-        '<div class="merke-rund"><img src="/Media/Logo/cfa-logo.webp" alt="CfA logo" style="height:38px;width:38px;object-fit:contain;"></div>' +
-        '<span class="merke-navn">Cosplay for Alle</span>' +
-      '</a>' +
-      '<nav class="nav">' +
-        '<a href="/medlem" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>' +
-        '<a href="/creative-tools" style="display:inline-flex;align-items:center;gap:6px;font-weight:700;color:#38bdf8;"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path></svg> Kreative Verktøy</a>' +
-        '<a href="index.html" class="' + (window.location.pathname.endsWith('merkeverktoy/') || window.location.pathname.endsWith('index.html') ? 'sterk' : '') + '">Alle merkeverktøy</a>' +
+    header.className = 'header cfa-suite-header';
+    header.innerHTML = '<div class="container header-inner" style="display:flex;align-items:center;justify-content:space-between;max-width:1320px;margin:0 auto;padding:0.75rem 1.5rem;">' +
+      '<div style="display:flex;align-items:center;gap:0.75rem;">' +
+        '<a href="/" class="logo" style="text-decoration:none;display:flex;align-items:center;gap:0.75rem;">' +
+          '<img src="/Media/Logo/cfa-logo.webp" alt="Cosplay for alle Logo" style="height:40px;width:40px;object-fit:contain;">' +
+          '<h2 style="margin:0;color:var(--color-primary, #6E0A2D);font-size:1.45rem;font-weight:bold;letter-spacing:-0.02em;">Cosplay for Alle</h2>' +
+        '</a>' +
+      '</div>' +
+      '<nav class="nav-desktop" style="display:flex;align-items:center;gap:0.5rem;flex-wrap:wrap;">' +
+        '<a href="/medlem" class="nav-link" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:0.45rem 0.9rem;border-radius:999px;font-size:0.9rem;font-weight:600;color:var(--color-text-main, #212529);">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side' +
+        '</a>' +
+        '<a href="/creative-tools" class="nav-link" style="display:inline-flex;align-items:center;gap:6px;text-decoration:none;padding:0.45rem 0.9rem;border-radius:999px;font-size:0.9rem;font-weight:600;color:var(--color-text-main, #212529);">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"></circle><path d="M14.31 8l5.74 9.94M9.69 8h11.48M7.38 12l5.74-9.94M9.69 16L3.95 6.06M14.31 16H2.83M16.62 12l-5.74 9.94"></path></svg> Kreative Verktøy' +
+        '</a>' +
+        '<a href="/merkeverktoy/" class="nav-link active" style="text-decoration:none;padding:0.45rem 0.9rem;border-radius:999px;font-size:0.9rem;font-weight:700;color:var(--color-primary, #6E0A2D);background:rgba(110,10,45,0.08);">' +
+          'Merkeverktøy' +
+        '</a>' +
+        '<button type="button" class="theme-toggle" aria-label="Bytt tema" title="Bytt tema" style="background:var(--color-bg-surface, #ffffff);border:1px solid var(--color-border, #e5e7eb);color:var(--color-text-main, #212529);padding:0.45rem 0.65rem;border-radius:999px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;" onclick="var d=document.documentElement;var cur=d.getAttribute(\'data-theme\');var nxt=cur===\'dark\'?\'light\':\'dark\';d.setAttribute(\'data-theme\',nxt);try{localStorage.setItem(\'theme\',nxt);}catch(e){}">' +
+          '<svg style="width:16px;height:16px;" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" /></svg>' +
+        '</button>' +
+        '<button type="button" style="background:var(--color-bg-surface, #ffffff);border:1px solid var(--color-border, #e5e7eb);color:var(--color-text-main, #212529);padding:0.45rem 0.9rem;border-radius:999px;cursor:pointer;font-size:0.85rem;font-weight:600;" onclick="try{localStorage.removeItem(\'cfa_has_session\');localStorage.removeItem(\'cfa_current_user\');}catch(e){}window.location.replace(\'/login\');">Logg ut</button>' +
       '</nav>' +
     '</div>';
     document.body.insertBefore(header, document.body.firstChild);
@@ -436,10 +460,30 @@
     var nav = document.querySelector('nav.faner[data-aktiv]');
     if (!nav) return;
     var aktiv = nav.getAttribute('data-aktiv');
-    var tilbakeLenke = '<a class="fane fane-tilbake" href="/medlem" style="background: rgba(192, 50, 90, 0.2); color: #f472b6; border-color: var(--rosa); display: inline-flex; align-items: center; gap: 6px; font-weight: 700;"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg> Min side</a>';
-    nav.innerHTML = tilbakeLenke + VERKTOY.map(function (v) {
-      return '<a class="fane" href="' + v[0] + '.html"' + (v[0] === aktiv ? ' aria-current="page"' : '') + '>' + v[1] + '</a>';
+    var aktivNavn = 'Verktøy';
+    var options = VERKTOY.filter(function (v) { return v[0] !== 'index'; }).map(function (v) {
+      if (v[0] === aktiv) aktivNavn = v[1];
+      return '<option value="' + v[0] + '.html"' + (v[0] === aktiv ? ' selected' : '') + '>' + v[1] + '</option>';
     }).join('');
+
+    var subnav = document.createElement('div');
+    subnav.className = 'studio-subnav';
+    subnav.innerHTML = 
+      '<div class="studio-subnav-left">' +
+        '<a href="index.html" class="studio-subnav-back">' +
+          '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"></line><polyline points="12 19 5 12 12 5"></polyline></svg>' +
+          'Merkevarestudio' +
+        '</a>' +
+        '<span class="studio-subnav-sep">/</span>' +
+        '<span class="studio-subnav-current">' + aktivNavn + '</span>' +
+      '</div>' +
+      '<div style="display:flex;align-items:center;gap:10px;">' +
+        '<label style="font-size:12.5px;color:var(--tekst-svak);font-weight:600;">Bytt verktøy:</label>' +
+        '<select class="studio-subnav-select" onchange="if(this.value) window.location.href = this.value;">' +
+          options +
+        '</select>' +
+      '</div>';
+    nav.parentNode.replaceChild(subnav, nav);
   }
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', byggMeny);
   else byggMeny();

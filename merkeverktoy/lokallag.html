@@ -1,25 +1,41 @@
 <!doctype html>
 <html lang="nb">
 <head>
-  <!-- Streng autentiseringsvakt: Hindrer lasting og rendering for uinnloggede -->
+  <!-- Streng autentiseringsvakt: Hindrer lasting for uinnloggede, men avdekker umiddelbart for innloggede -->
   <style id="auth-guard-style">
     html { display: none !important; }
   </style>
   <script>
     (function() {
       var hasSession = false;
-      try { hasSession = localStorage.getItem('cfa_has_session') === '1'; } catch(e) {}
-      if (!hasSession) { window.location.replace('/login'); }
+      try { hasSession = localStorage.getItem('cfa_has_session') === '1' || !!localStorage.getItem('cfa_current_user'); } catch(e) {}
+      if (!hasSession && !document.cookie.includes('cfa_session=')) {
+        window.location.replace('/login');
+      } else {
+        var g = document.getElementById('auth-guard-style');
+        if (g) g.remove();
+        document.documentElement.style.display = '';
+      }
     })();
+  </script>
+
+  <!-- Tema oppstart -->
+  <script>
+    try {
+      var t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.setAttribute('data-theme', 'dark');
+      else if (t === 'light') document.documentElement.setAttribute('data-theme', 'light');
+    } catch(e) {}
   </script>
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Lokallag-logo – Cosplay for Alle</title>
-<meta name="theme-color" content="#18181b">
+<meta name="theme-color" content="#6E0A2D">
 <link rel="icon" type="image/webp" href="/Media/Logo/cfa-logo.webp"><link rel="shortcut icon" href="/favicon.ico">
 <link rel="apple-touch-icon" href="/Media/Logo/icon-192.png">
-<link rel="stylesheet" href="assets/cfa.css">
+<link rel="stylesheet" href="assets/cfa.css?v=3.0">
+<script defer src="/js/theme-switcher.js"></script>
 <style>
   .sjakk { background-color: #fff; background-image: linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%), linear-gradient(45deg, #ececec 25%, transparent 25%, transparent 75%, #ececec 75%); background-size: 20px 20px; background-position: 0 0, 10px 10px; }
   #lerret { box-shadow: none; border-radius: 0; }
