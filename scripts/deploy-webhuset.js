@@ -115,6 +115,12 @@ for (const mf of mediaFiles) {
   }
 }
 
+// Upload ArtCraft Icons
+if (fs.existsSync(path.join(rootDir, 'Media/artcraft-icons'))) {
+  console.log('🎨 Uploading ArtCraft Icons...');
+  uploadDirRecursive('Media/artcraft-icons', 'Media/artcraft-icons');
+}
+
 // 6. Upload HTML Pages
 const htmlFiles = [
   'index.html',

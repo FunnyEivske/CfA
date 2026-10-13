@@ -19,7 +19,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#0284c7'
         },
         adobe: {
-            alt: 'Photoshop-alternativ',
+            alt: 'Bilderedigering',
             altColor: '#31a8ff',
             altBg: 'rgba(49, 168, 255, 0.14)',
             textColor: '#31a8ff',
@@ -44,7 +44,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#ea580c'
         },
         adobe: {
-            alt: 'Illustrator-alternativ',
+            alt: 'Vektordesign',
             altColor: '#ff9a00',
             altBg: 'rgba(255, 154, 0, 0.14)',
             textColor: '#ff9a00',
@@ -69,7 +69,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#9333ea'
         },
         adobe: {
-            alt: 'Premiere Pro-alternativ',
+            alt: 'Videoredigering',
             altColor: '#ea77ff',
             altBg: 'rgba(234, 119, 255, 0.14)',
             textColor: '#ea77ff',
@@ -94,7 +94,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#0d9488'
         },
         adobe: {
-            alt: 'Lightroom-alternativ',
+            alt: 'RAW & Foto',
             altColor: '#31a8ff',
             altBg: 'rgba(49, 168, 255, 0.14)',
             textColor: '#31a8ff',
@@ -119,7 +119,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#dc2626'
         },
         adobe: {
-            alt: 'Acrobat-alternativ',
+            alt: 'PDF & Mønster',
             altColor: '#ff0000',
             altBg: 'rgba(255, 0, 0, 0.14)',
             textColor: '#ff0000',
@@ -144,7 +144,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#7c3aed'
         },
         adobe: {
-            alt: 'After Effects-alternativ',
+            alt: 'VFX & Effekter',
             altColor: '#9999ff',
             altBg: 'rgba(153, 153, 255, 0.14)',
             textColor: '#9999ff',
@@ -169,7 +169,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#db2777'
         },
         adobe: {
-            alt: 'InDesign-alternativ',
+            alt: 'Layout & Trykk',
             altColor: '#ff3366',
             altBg: 'rgba(255, 51, 102, 0.14)',
             textColor: '#ff3366',
@@ -194,7 +194,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#059669'
         },
         adobe: {
-            alt: 'Figma-alternativ',
+            alt: 'UI/UX & Design',
             altColor: '#0acf83',
             altBg: 'rgba(10, 207, 131, 0.14)',
             textColor: '#0acf83',
@@ -219,7 +219,7 @@ const ARTCRAFT_APPS = [
             badgeBg: '#16a34a'
         },
         adobe: {
-            alt: 'Audition-alternativ',
+            alt: 'Lydstudio & Tale',
             altColor: '#00e699',
             altBg: 'rgba(0, 230, 153, 0.14)',
             textColor: '#00e699',
@@ -299,6 +299,18 @@ async function initCreativeToolsPage() {
     }
 }
 
+function resolveMediaUrl(path) {
+    if (!path) return '';
+    if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
+        return path;
+    }
+    if (window.location.protocol === 'capacitor:' || window.location.protocol === 'file:') {
+        return path.replace(/^\//, '');
+    }
+    // På web: rot-relativ URL slik at det alltid fungerer uavhengig av subrute
+    return '/' + path.replace(/^\//, '');
+}
+
 function resolveAppUrl(path) {
     if (window.CFA_API_BASE && (window.location.protocol === 'capacitor:' || window.location.protocol === 'file:')) {
         try {
@@ -310,34 +322,58 @@ function resolveAppUrl(path) {
 }
 
 function setupModeSelector() {
-    const statusLabel = document.getElementById('logo-mode-status');
-    const buttons = document.querySelectorAll('.mode-btn');
+    const triggerBtn = document.getElementById('settings-menu-btn');
+    const dropdown = document.getElementById('settings-menu-dropdown');
+    const modePill = document.getElementById('current-mode-pill');
+    const items = document.querySelectorAll('.settings-item, .mode-btn');
 
     function updateUi() {
-        buttons.forEach(btn => {
-            const mode = btn.getAttribute('data-mode');
-            btn.classList.toggle('active', mode === currentDisplayMode);
+        items.forEach(el => {
+            const mode = el.getAttribute('data-mode');
+            el.classList.toggle('active', mode === currentDisplayMode);
         });
 
-        if (statusLabel) {
+        if (modePill) {
             if (currentDisplayMode === 'adobe') {
-                statusLabel.textContent = 'Adobe-ikoner og Adobe-navn aktivert';
-                statusLabel.style.color = '#0284c7';
+                modePill.textContent = 'Adobe';
+                modePill.style.color = '#38bdf8';
+                modePill.style.borderColor = 'rgba(56, 189, 248, 0.4)';
+                modePill.style.background = 'rgba(56, 189, 248, 0.1)';
             } else if (currentDisplayMode === 'hybrid') {
-                statusLabel.textContent = 'ArtCraft-navn med Adobe-ikoner & farger';
-                statusLabel.style.color = '#d97706';
+                modePill.textContent = 'Hybrid';
+                modePill.style.color = '#fbbf24';
+                modePill.style.borderColor = 'rgba(251, 191, 36, 0.4)';
+                modePill.style.background = 'rgba(251, 191, 36, 0.1)';
             } else {
-                statusLabel.textContent = 'ArtCraft-ikoner og ArtCraft-navn (standard)';
-                statusLabel.style.color = 'var(--color-text-muted)';
+                modePill.textContent = 'ArtCraft';
+                modePill.style.color = 'var(--color-primary)';
+                modePill.style.borderColor = 'rgba(126, 28, 56, 0.4)';
+                modePill.style.background = 'rgba(126, 28, 56, 0.1)';
             }
         }
     }
 
     updateUi();
 
-    buttons.forEach(btn => {
-        btn.onclick = () => {
-            const nextMode = btn.getAttribute('data-mode');
+    if (triggerBtn && dropdown) {
+        triggerBtn.onclick = (e) => {
+            e.stopPropagation();
+            const isHidden = dropdown.classList.contains('hidden');
+            dropdown.classList.toggle('hidden', !isHidden);
+            triggerBtn.setAttribute('aria-expanded', isHidden ? 'true' : 'false');
+        };
+
+        document.addEventListener('click', (e) => {
+            if (!dropdown.contains(e.target) && !triggerBtn.contains(e.target)) {
+                dropdown.classList.add('hidden');
+                triggerBtn.setAttribute('aria-expanded', 'false');
+            }
+        });
+    }
+
+    items.forEach(el => {
+        el.onclick = () => {
+            const nextMode = el.getAttribute('data-mode');
             if (nextMode && nextMode !== currentDisplayMode) {
                 currentDisplayMode = nextMode;
                 try {
@@ -350,6 +386,10 @@ function setupModeSelector() {
                 if (currentAppId) {
                     updateWorkspaceHeader(currentAppId);
                 }
+            }
+            if (dropdown) {
+                dropdown.classList.add('hidden');
+                if (triggerBtn) triggerBtn.setAttribute('aria-expanded', 'false');
             }
         };
     });
@@ -374,7 +414,7 @@ function renderAppGrid() {
         let buttonLabel = '';
 
         if (currentDisplayMode === 'adobe') {
-            // Full Adobe: Adobe ikoner og Adobe navn
+            // Full Adobe: Adobe ikoner og Adobe navn (uten '-alternativ')
             appTitle = app.adobeName;
             buttonLabel = `Åpne ${app.adobeName}`;
             iconBoxHtml = `
@@ -383,7 +423,7 @@ function renderAppGrid() {
                 </div>
             `;
             altTagText = app.adobe.alt;
-            altTagColor = app.adobe.altColor;
+            altTagColor = app.adobe.textColor;
             altTagBg = app.adobe.altBg;
         } else if (currentDisplayMode === 'hybrid') {
             // Hybrid: ArtCraft navn med Adobe-stil ikoner (Pc, Vc, etc.)
@@ -395,15 +435,16 @@ function renderAppGrid() {
                 </div>
             `;
             altTagText = app.cfa.alt;
-            altTagColor = app.adobe.altColor;
+            altTagColor = app.adobe.textColor;
             altTagBg = app.adobe.altBg;
         } else {
             // ArtCraft: Offisielle ArtCraft dyre/illustrerte ikoner og ArtCraft-navn
             appTitle = app.title;
             buttonLabel = `Åpne ${app.title}`;
+            const mediaUrl = resolveMediaUrl(app.iconImage);
             iconBoxHtml = `
                 <div class="app-icon-box artcraft-style">
-                    <img src="${app.iconImage}" alt="${app.title}" class="artcraft-icon-img">
+                    <img src="${mediaUrl}" alt="${app.title}" class="artcraft-icon-img" onerror="this.onerror=null; this.src='${app.iconImage}';">
                 </div>
             `;
             altTagText = app.cfa.alt;

@@ -79,6 +79,7 @@ copyFile(path.join(rootDir, 'locales', 'en.json'), path.join(appWwwDir, 'locales
 copyDirRecursive(path.join(rootDir, 'Media', 'Logo'), path.join(appWwwDir, 'Media', 'Logo'));
 copyDirRecursive(path.join(rootDir, 'Media', 'Icons'), path.join(appWwwDir, 'Media', 'Icons'));
 copyDirRecursive(path.join(rootDir, 'Media', 'Bilder'), path.join(appWwwDir, 'Media', 'Bilder'));
+copyDirRecursive(path.join(rootDir, 'Media', 'artcraft-icons'), path.join(appWwwDir, 'Media', 'artcraft-icons'));
 
 // 6. Helper to inject API base into HTML for native app
 const API_CONFIG_SNIPPET = `<script>window.CFA_API_BASE = 'https://cosplayforalle.no/backend/api.php';</script>`;
