@@ -1380,7 +1380,18 @@ switch ($action) {
 
         $appInfo = $releases['apps'][$app] ?? null;
         $dlInfo = $appInfo['downloads'][$os] ?? null;
-        $githubUrl = $dlInfo['url'] ?? $dlInfo['github_url'] ?? "https://github.com/storytold/{$app}/releases/latest";
+
+        // Finn den ekte eksterne GitHub-nedlastingslenken for fallback (aldri omdiriger til seg selv)
+        $githubUrl = null;
+        if (!empty($dlInfo['github_url']) && preg_match('#^https?://#i', $dlInfo['github_url'])) {
+            $githubUrl = $dlInfo['github_url'];
+        } else if (!empty($dlInfo['url']) && preg_match('#^https?://#i', $dlInfo['url'])) {
+            $githubUrl = $dlInfo['url'];
+        }
+        if (!$githubUrl) {
+            $githubUrl = "https://github.com/storytold/{$app}/releases/latest";
+        }
+
         $fileName = $dlInfo['name'] ?? null;
 
         // Sjekk om installasjonsfilen finnes lokalt på serveren under artcraft/downloads/<app>/

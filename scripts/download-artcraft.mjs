@@ -67,7 +67,7 @@ export function filterAssets(assets = [], appName = '') {
     web: webAsset ? { name: webAsset.name, url: webAsset.browser_download_url, size: webAsset.size } : null,
     windows: primaryWin ? {
       name: primaryWin.name,
-      url: serverEndpoint('windows'),
+      url: primaryWin.browser_download_url,
       local_url: localUrl('windows', primaryWin.name),
       server_endpoint: serverEndpoint('windows'),
       github_url: primaryWin.browser_download_url,
@@ -77,7 +77,7 @@ export function filterAssets(assets = [], appName = '') {
     } : null,
     macos: primaryMac ? {
       name: primaryMac.name,
-      url: serverEndpoint('macos'),
+      url: primaryMac.browser_download_url,
       local_url: localUrl('macos', primaryMac.name),
       server_endpoint: serverEndpoint('macos'),
       github_url: primaryMac.browser_download_url,
@@ -87,7 +87,7 @@ export function filterAssets(assets = [], appName = '') {
     } : null,
     linux: primaryLinux ? {
       name: primaryLinux.name,
-      url: serverEndpoint('linux'),
+      url: primaryLinux.browser_download_url,
       local_url: localUrl('linux', primaryLinux.name),
       server_endpoint: serverEndpoint('linux'),
       github_url: primaryLinux.browser_download_url,
