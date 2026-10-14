@@ -93,6 +93,11 @@ function syncHtmlPage(pageName) {
   if (!content.includes('window.CFA_API_BASE')) {
     content = content.replace('<head>', `<head>\n    ${API_CONFIG_SNIPPET}`);
   }
+  if (pageName === 'creative-tools.html') {
+    content = content.replace('<base href="/">', '');
+    content = content.replace(/src="\/js\//g, 'src="js/');
+    content = content.replace(/src="\/Media\//g, 'src="Media/');
+  }
   fs.writeFileSync(destPath, content, 'utf8');
 }
 
@@ -190,6 +195,12 @@ const appIndexHtml = `<!DOCTYPE html>
 
 // 8. Sync Merkeverktoy into member app
 copyDirRecursive(path.join(rootDir, 'merkeverktoy'), path.join(appWwwDir, 'merkeverktoy'));
+
+// 9. Sync ArtCraft releases metadata into member app
+if (fs.existsSync(path.join(rootDir, 'artcraft', 'releases.json'))) {
+  fs.mkdirSync(path.join(appWwwDir, 'artcraft'), { recursive: true });
+  copyFile(path.join(rootDir, 'artcraft', 'releases.json'), path.join(appWwwDir, 'artcraft', 'releases.json'));
+}
 
 console.log('✓ Member App web assets synchronized to member-app/www/');
 

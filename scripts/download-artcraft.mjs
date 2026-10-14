@@ -1,6 +1,7 @@
 // scripts/download-artcraft.mjs
 // Plattformuavhengig Node.js-skript for automatisk nedlasting og utpakking
-// av de 9 ArtCraft WebAssembly-appene fra storytold-releases på GitHub.
+// av de 9 ArtCraft WebAssembly-appene fra storytold-releases på GitHub,
+// samt generering av public/artcraft/releases.json med direkte Desktop-nedlastingslenker.
 
 import fs from 'fs';
 import path from 'path';
@@ -11,7 +12,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-const APPS = [
+export const APPS = [
   { name: 'photocraft', title: 'PhotoCraft', desc: 'Bilderedigering, lag og retusjering' },
   { name: 'vectorcraft', title: 'VectorCraft', desc: 'Vektorgrafikk og mønsterdesign' },
   { name: 'filmcraft', title: 'FilmCraft', desc: 'Tidslinjebasert videoredigering' },
@@ -24,7 +25,7 @@ const APPS = [
 ];
 
 const GITHUB_HEADERS = {
-  'User-Agent': 'CfA-ArtCraft-Downloader/1.0',
+  'User-Agent': 'CfA-ArtCraft-Downloader/2.0',
   'Accept': 'application/vnd.github.v3+json'
 };
 if (process.env.GITHUB_TOKEN) {
@@ -32,6 +33,57 @@ if (process.env.GITHUB_TOKEN) {
 }
 
 const forceDownload = process.argv.includes('--force');
+
+export function filterAssets(assets = []) {
+  const isWeb = a => a.name.toLowerCase().includes('web') && a.name.endsWith('.zip');
+  const isWin = a => (a.name.endsWith('.msi') || a.name.endsWith('.exe') || /windows|win64|pc-windows-msvc/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
+  const isMac = a => (a.name.endsWith('.dmg') || a.name.endsWith('.pkg') || /macos|darwin|apple/i.test(a.name)) && !a.name.includes('-cli-') && !a.name.endsWith('.sha256');
+  const isLinux = a => (a.name.endsWith('.AppImage') || a.name.endsWith('.deb') || /linux|unknown-linux-gnu/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
+
+  const webAsset = assets.find(isWeb);
+  const winAssets = assets.filter(isWin);
+  const macAssets = assets.filter(isMac);
+  const linuxAssets = assets.filter(isLinux);
+
+  const primaryWin = winAssets.find(a => a.name.endsWith('.msi') && /x64/i.test(a.name))
+    || winAssets.find(a => a.name.endsWith('.msi'))
+    || winAssets.find(a => a.name.endsWith('.exe'))
+    || winAssets[0];
+
+  const primaryMac = macAssets.find(a => a.name.endsWith('.dmg') && /universal/i.test(a.name))
+    || macAssets.find(a => a.name.endsWith('.dmg'))
+    || macAssets[0];
+
+  const primaryLinux = linuxAssets.find(a => a.name.endsWith('.AppImage') && /x86_64/i.test(a.name))
+    || linuxAssets.find(a => a.name.endsWith('.AppImage'))
+    || linuxAssets.find(a => a.name.endsWith('.deb') && /x86_64/i.test(a.name))
+    || linuxAssets[0];
+
+  return {
+    web: webAsset ? { name: webAsset.name, url: webAsset.browser_download_url, size: webAsset.size } : null,
+    windows: primaryWin ? {
+      name: primaryWin.name,
+      url: primaryWin.browser_download_url,
+      size: primaryWin.size,
+      format: primaryWin.name.endsWith('.msi') ? 'MSI' : (primaryWin.name.endsWith('.exe') ? 'EXE' : 'ZIP'),
+      all: winAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+    } : null,
+    macos: primaryMac ? {
+      name: primaryMac.name,
+      url: primaryMac.browser_download_url,
+      size: primaryMac.size,
+      format: primaryMac.name.endsWith('.dmg') ? 'DMG' : (primaryMac.name.endsWith('.pkg') ? 'PKG' : 'ZIP'),
+      all: macAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+    } : null,
+    linux: primaryLinux ? {
+      name: primaryLinux.name,
+      url: primaryLinux.browser_download_url,
+      size: primaryLinux.size,
+      format: primaryLinux.name.endsWith('.AppImage') ? 'AppImage' : (primaryLinux.name.endsWith('.deb') ? 'DEB' : 'TAR'),
+      all: linuxAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+    } : null
+  };
+}
 
 async function downloadAndExtractApp(app) {
   const artcraftDest = path.join(rootDir, 'artcraft', app.name);
@@ -49,27 +101,36 @@ async function downloadAndExtractApp(app) {
   }
   const release = await res.json();
   const tagName = release.tag_name || 'latest';
-
-  // 2. Finn web zip-filen (inneholder -web- og slutter på .zip)
+  const publishedAt = release.published_at || new Date().toISOString();
   const assets = release.assets || [];
-  const webAsset = assets.find(a => a.name.includes('-web-') && a.name.endsWith('.zip'));
 
+  const downloads = filterAssets(assets);
+
+  const releaseMeta = {
+    name: app.name,
+    title: app.title,
+    tag_name: tagName,
+    published_at: publishedAt,
+    downloads: downloads
+  };
+
+  const webAsset = downloads.web;
   if (!webAsset) {
-    console.warn(`⚠️ Fant ingen '-web-*.zip'-pakke for ${app.title} under ${tagName}. Hopper over.`);
-    return;
+    console.warn(`⚠️ Fant ingen '-web-*.zip'-pakke for ${app.title} under ${tagName}. Hopper over utpakking.`);
+    return releaseMeta;
   }
 
-  // 3. Sjekk om appen allerede er lastet ned og oppdatert
+  // Sjekk om appen allerede er lastet ned og oppdatert
   if (!forceDownload && fs.existsSync(indexHtml) && fs.existsSync(versionFile)) {
     const currentVer = fs.readFileSync(versionFile, 'utf8').trim();
     if (currentVer === tagName) {
-      console.log(`✅ ${app.title} er allerede oppdatert (${tagName}).`);
-      return;
+      console.log(`✅ ${app.title} web-versjon er allerede oppdatert (${tagName}).`);
+      return releaseMeta;
     }
   }
 
   console.log(`⬇️ Laster ned ${webAsset.name} (${(webAsset.size / 1024 / 1024).toFixed(2)} MB)...`);
-  const downloadRes = await fetch(webAsset.browser_download_url, {
+  const downloadRes = await fetch(webAsset.url, {
     headers: { 'User-Agent': GITHUB_HEADERS['User-Agent'] }
   });
   if (!downloadRes.ok) {
@@ -83,7 +144,6 @@ async function downloadAndExtractApp(app) {
   const zip = new AdmZip(zipBuffer);
   const entries = zip.getEntries();
 
-  // Detekter om arkivet har en rotmappe (f.eks. photocraft-web-0.8.2/)
   let topFolder = '';
   if (entries.length > 0) {
     const firstPath = entries[0].entryName.replace(/\\/g, '/');
@@ -127,18 +187,18 @@ async function downloadAndExtractApp(app) {
   fs.writeFileSync(pubVersion, tagName, 'utf8');
 
   console.log(`✨ Fullført ${app.title} (${tagName})!`);
+  return releaseMeta;
 }
 
 async function main() {
   console.log('==================================================');
-  console.log('🎨 CfA ArtCraft WebAssembly Downloader');
+  console.log('🎨 CfA ArtCraft WebAssembly & Desktop Downloader');
   console.log('==================================================');
 
-  // Sørg for at rot- og public-kataloger eksisterer
+  // Sørg for at kataloger eksisterer
   fs.mkdirSync(path.join(rootDir, 'artcraft'), { recursive: true });
   fs.mkdirSync(path.join(rootDir, 'public', 'artcraft'), { recursive: true });
 
-  // Opprett .htaccess for artcraft-katalogen for COOP/COEP WebAssembly-støtte
   const htaccessContent = `# ArtCraft WebAssembly Hosting Config
 Options -Indexes
 DirectoryIndex index.html
@@ -156,17 +216,44 @@ AddType application/wasm .wasm
   fs.writeFileSync(path.join(rootDir, 'artcraft', '.htaccess'), htaccessContent, 'utf8');
   fs.writeFileSync(path.join(rootDir, 'public', 'artcraft', '.htaccess'), htaccessContent, 'utf8');
 
+  const allReleases = {};
   let successCount = 0;
+
   for (const app of APPS) {
     try {
-      await downloadAndExtractApp(app);
-      successCount++;
+      const meta = await downloadAndExtractApp(app);
+      if (meta) {
+        allReleases[app.name] = meta;
+        successCount++;
+      }
     } catch (err) {
-      console.error(`❌ Feil ved nedlasting av ${app.title}:`, err.message);
+      console.error(`❌ Feil ved håndtering av ${app.title}:`, err.message);
     }
   }
 
+  // Skriv komplett releases.json til public/artcraft/ og artcraft/
+  const releasesPayload = {
+    updated_at: new Date().toISOString(),
+    apps: allReleases
+  };
+
+  const releasesJsonStr = JSON.stringify(releasesPayload, null, 2);
+  const pubReleasesPath = path.join(rootDir, 'public', 'artcraft', 'releases.json');
+  const artReleasesPath = path.join(rootDir, 'artcraft', 'releases.json');
+  fs.writeFileSync(pubReleasesPath, releasesJsonStr, 'utf8');
+  fs.writeFileSync(artReleasesPath, releasesJsonStr, 'utf8');
+
+  // Hvis member-app/www eksisterer, synk releases dit også
+  const memberAppReleases = path.join(rootDir, 'member-app', 'www', 'artcraft', 'releases.json');
+  if (fs.existsSync(path.join(rootDir, 'member-app', 'www'))) {
+    fs.mkdirSync(path.dirname(memberAppReleases), { recursive: true });
+    fs.writeFileSync(memberAppReleases, releasesJsonStr, 'utf8');
+  }
+
   console.log('\n==================================================');
+  console.log(`📄 releases.json lagret til:`);
+  console.log(`   - public/artcraft/releases.json`);
+  console.log(`   - artcraft/releases.json`);
   console.log(`🎉 ArtCraft-synkronisering fullført: ${successCount}/${APPS.length} apper klare.`);
   console.log('==================================================\n');
 }

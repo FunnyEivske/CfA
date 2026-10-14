@@ -325,6 +325,19 @@ function handleMockRequest(action, data) {
         case 'send_test_push':
             return { success: true };
 
+        case 'get_artcraft_releases':
+            return { success: true, data: db.artcraft_releases || null };
+
+        case 'save_artcraft_releases': {
+            const relData = data && data.releases ? data.releases : data;
+            db.artcraft_releases = relData;
+            saveMockDB(db);
+            return { success: true, data: relData };
+        }
+
+        case 'trigger_artcraft_rebuild':
+            return { success: true, configured: false, message: 'Mock rebuild triggered' };
+
         case 'get_workshop_status': {
             return {
                 status: db.workshop_status || 'auto',
@@ -641,6 +654,26 @@ export const PushAPI = {
     saveSubscription: (subscription) => request('save_push_subscription', 'POST', subscription),
     unsubscribe: (endpoint) => request('unsubscribe_push', 'POST', { endpoint }),
     sendTestPush: () => request('send_test_push', 'POST')
+};
+
+export const ArtCraftAPI = {
+    getReleases: async () => {
+        try {
+            const res = await request('get_artcraft_releases');
+            if (res && res.data) return res.data;
+        } catch (e) {}
+        try {
+            const staticRes = await fetch('/artcraft/releases.json');
+            if (staticRes.ok) return await staticRes.json();
+        } catch (e) {}
+        try {
+            const staticRes2 = await fetch('artcraft/releases.json');
+            if (staticRes2.ok) return await staticRes2.json();
+        } catch (e) {}
+        return null;
+    },
+    saveReleases: (releases) => request('save_artcraft_releases', 'POST', { releases }),
+    triggerRebuild: () => request('trigger_artcraft_rebuild', 'POST')
 };
 
 /**

@@ -3,7 +3,7 @@
 
 <head>
     <script>window.CFA_API_BASE = 'https://cosplayforalle.no/backend/api.php';</script>
-    <base href="/">
+    
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kreative Verktøy (ArtCraft) – Cosplay for Alle</title>
@@ -389,13 +389,287 @@
             color: var(--color-text-muted);
             font-size: 0.92rem;
             line-height: 1.5;
-            margin: 0 0 1.5rem;
+            margin: 0 0 1.25rem;
             flex-grow: 1;
         }
-        .app-actions {
+
+        /* Versjonsmerke og toppmetadata på kort */
+        .app-top-meta {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .app-version-badge {
+            font-size: 0.72rem;
+            font-weight: 700;
+            padding: 0.2rem 0.55rem;
+            border-radius: 9999px;
+            background: rgba(255, 255, 255, 0.06);
+            color: var(--color-text-muted);
+            border: 1px solid var(--color-border);
+            letter-spacing: 0.02em;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        /* Kort oppsett: to hovedvalg (1. Nettleser, 2. Desktop) */
+        .card-choice-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+            margin-top: auto;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+        .choice-section-label {
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: var(--color-text-muted);
+            margin-bottom: 0.35rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+        .web-actions-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .desktop-download-box {
+            background: rgba(0, 0, 0, 0.03);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 0.85rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+            transition: border-color 0.2s ease, background 0.2s ease;
+        }
+        [data-theme="dark"] .desktop-download-box {
+            background: rgba(255, 255, 255, 0.03);
+        }
+        .btn-desktop-primary {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.55rem;
+            width: 100%;
+            padding: 0.55rem 0.85rem;
+            background: var(--color-bg-surface);
+            color: var(--color-text-main);
+            border: 1.5px solid var(--color-border);
+            border-radius: 8px;
+            font-size: 0.84rem;
+            font-weight: 700;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+        }
+        .btn-desktop-primary:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+            transform: translateY(-1px);
+            box-shadow: 0 4px 10px rgba(0,0,0,0.08);
+        }
+        .btn-desktop-primary.highlighted-os {
+            background: linear-gradient(135deg, rgba(126, 28, 56, 0.08), rgba(14, 165, 233, 0.08));
+            border-color: rgba(126, 28, 56, 0.4);
+        }
+        .btn-desktop-primary.highlighted-os:hover {
+            border-color: var(--color-primary);
+            background: linear-gradient(135deg, rgba(126, 28, 56, 0.14), rgba(14, 165, 233, 0.14));
+        }
+        .other-os-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 0.75rem;
+            color: var(--color-text-muted);
+            gap: 0.35rem;
+            flex-wrap: wrap;
+        }
+        .other-os-pills {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+        }
+        .other-os-link {
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+            padding: 0.18rem 0.45rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--color-border);
+            color: var(--color-text-main);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.73rem;
+            transition: all 0.15s ease;
+        }
+        .other-os-link:hover {
+            border-color: var(--color-primary);
+            color: var(--color-primary);
+        }
+
+        /* Admin Kontrollpanel */
+        .admin-artcraft-panel {
+            background: var(--color-bg-surface);
+            border: 1.5px solid rgba(243, 183, 22, 0.4);
+            border-radius: 18px;
+            padding: 1.75rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.06);
+            position: relative;
+            overflow: hidden;
+            animation: fadeInAdmin 0.25s ease;
+        }
+        @keyframes fadeInAdmin {
+            from { opacity: 0; transform: translateY(-8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .admin-artcraft-panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, #f59e0b, #ec4899, #0ea5e9);
+        }
+        .admin-panel-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1.25rem;
+        }
+        .admin-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+            color: #d97706;
+            background: rgba(245, 158, 11, 0.12);
+            border: 1px solid rgba(245, 158, 11, 0.3);
+            border-radius: 9999px;
+            padding: 0.2rem 0.65rem;
+            margin-bottom: 0.35rem;
+        }
+        [data-theme="dark"] .admin-badge {
+            color: #fbbf24;
+            background: rgba(251, 191, 36, 0.15);
+            border-color: rgba(251, 191, 36, 0.35);
+        }
+        .admin-panel-title {
+            font-size: 1.35rem;
+            font-weight: 800;
+            margin: 0;
+            color: var(--color-text-main);
+        }
+        .admin-panel-desc {
+            font-size: 0.9rem;
+            color: var(--color-text-muted);
+            margin: 0.25rem 0 0;
+            max-width: 650px;
+            line-height: 1.5;
+        }
+        .admin-panel-actions {
             display: flex;
             align-items: center;
             gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+        .admin-status-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--color-border);
+        }
+        .admin-status-box {
+            background: rgba(0, 0, 0, 0.02);
+            border: 1px solid var(--color-border);
+            border-radius: 12px;
+            padding: 0.9rem 1.1rem;
+        }
+        [data-theme="dark"] .admin-status-box {
+            background: rgba(255, 255, 255, 0.02);
+        }
+        .admin-status-label {
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--color-text-muted);
+            margin-bottom: 0.3rem;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+        .admin-status-val {
+            font-size: 0.92rem;
+            font-weight: 700;
+            color: var(--color-text-main);
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+        .admin-update-alert {
+            background: rgba(245, 158, 11, 0.1);
+            border: 1px solid rgba(245, 158, 11, 0.35);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.25rem;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        .admin-command-snippet {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 1rem;
+            background: #18181b;
+            color: #f4f4f5;
+            padding: 0.65rem 1rem;
+            border-radius: 10px;
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+            font-size: 0.88rem;
+            border: 1px solid #27272a;
+            flex-wrap: wrap;
+        }
+        .admin-copy-btn {
+            background: rgba(255, 255, 255, 0.1);
+            color: #ffffff;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            padding: 0.3rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: inherit;
+        }
+        .admin-copy-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+        .spin-rotate {
+            animation: spin 0.9s linear infinite;
         }
 
         /* Fullskjerms iframe workspace */
@@ -594,6 +868,83 @@
             </div>
         </div>
 
+        <!-- Admin Kontrollpanel (kun synlig for brukere med administrator-rolle) -->
+        <div id="admin-artcraft-panel" class="admin-artcraft-panel hidden" style="display: none;">
+            <div class="admin-panel-header">
+                <div>
+                    <span class="admin-badge">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"></path></svg>
+                        Administratorpanel
+                    </span>
+                    <h2 class="admin-panel-title">ArtCraft Versjons- & Oppdateringskontroll</h2>
+                    <p class="admin-panel-desc">
+                        Sjekk etter nye utgivelser fra GitHub Releases, hold WebAssembly-appene oppdaterte og lever direkte installasjonsfiler for Windows (.msi/.exe), macOS (.dmg) og Linux (.AppImage/.deb).
+                    </p>
+                </div>
+                <div class="admin-panel-actions">
+                    <button type="button" id="admin-sync-releases-btn" class="btn btn-primary" style="display: inline-flex; align-items: center; gap: 0.55rem; font-weight: 700; padding: 0.65rem 1.1rem;">
+                        <svg id="admin-sync-spinner" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                            <path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"></path>
+                        </svg>
+                        <span id="admin-sync-btn-text">Synkroniser nyeste versjoner fra GitHub</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Statusrader -->
+            <div class="admin-status-grid">
+                <div class="admin-status-box">
+                    <div class="admin-status-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        Siste GitHub-sjekk
+                    </div>
+                    <div id="admin-last-sync-time" class="admin-status-val">Laster status...</div>
+                </div>
+                <div class="admin-status-box">
+                    <div class="admin-status-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></svg>
+                        WebAssembly Status
+                    </div>
+                    <div id="admin-wasm-status-summary" class="admin-status-val">Analyserer apper...</div>
+                </div>
+                <div class="admin-status-box">
+                    <div class="admin-status-label">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="3" width="20" height="14" rx="2" ry="2"></rect><line x1="8" y1="21" x2="16" y2="21"></line><line x1="12" y1="17" x2="12" y2="21"></line></svg>
+                        Desktop-pakker tilgjengelig
+                    </div>
+                    <div id="admin-desktop-summary" class="admin-status-val">Windows, Mac & Linux</div>
+                </div>
+            </div>
+
+            <!-- Varsel hvis nyere versjon er oppdaget på GitHub enn det som er installert i web-mappen -->
+            <div id="admin-update-alert-box" class="admin-update-alert hidden" style="display: none;">
+                <div>
+                    <h4 style="margin: 0 0 0.25rem; color: #b45309; font-size: 1rem; font-weight: 800; display: flex; align-items: center; gap: 0.5rem;">
+                        <span>⚠️</span> <span id="admin-update-alert-title">Ny web-versjon tilgjengelig på GitHub</span>
+                    </h4>
+                    <p id="admin-update-alert-desc" style="margin: 0; font-size: 0.88rem; color: var(--color-text-main); line-height: 1.5;">
+                        Det finnes nyere versjoner på GitHub enn det som for øyeblikket er pakket ut i web-mappen.
+                    </p>
+                </div>
+                <div style="display: flex; align-items: center; gap: 0.75rem; flex-wrap: wrap;">
+                    <button type="button" id="admin-trigger-rebuild-btn" class="btn btn-secondary btn-sm" style="font-weight: 700;">
+                        Oppdater Web-apper (Trigger Rebuild)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Hurtigkommando for terminal -->
+            <div>
+                <p style="font-size: 0.8rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-text-muted); margin: 0 0 0.4rem;">
+                    Oppdater og pakk ut lokalt i prosjektet via Node.js:
+                </p>
+                <div class="admin-command-snippet">
+                    <code>npm run fetch-artcraft</code>
+                    <button type="button" id="admin-copy-cmd-btn" class="admin-copy-btn">Kopier kommando</button>
+                </div>
+            </div>
+        </div>
+
         <!-- Seksjonslinje med kompakt innstillinger-meny -->
         <div class="creative-grid-bar">
             <div>
@@ -619,7 +970,7 @@
                     </div>
                     <div class="settings-dropdown-body">
                         <button type="button" class="settings-item active" data-mode="artcraft" role="menuitem">
-                            <img src="/Media/artcraft-icons/photocraft.png" alt="ArtCraft" class="settings-item-thumb" onerror="this.onerror=null; this.src='Media/artcraft-icons/photocraft.png';">
+                            <img src="Media/artcraft-icons/photocraft.png" alt="ArtCraft" class="settings-item-thumb" onerror="this.onerror=null; this.src='Media/artcraft-icons/photocraft.png';">
                             <div class="settings-item-info">
                                 <span class="settings-item-name">ArtCraft-ikoner & navn</span>
                                 <span class="settings-item-desc">Offisielle illustrerte ikoner (standard)</span>
@@ -678,6 +1029,15 @@
                     <option value="soundcraft">SoundCraft (Lydredigering)</option>
                 </select>
 
+                <a id="ws-topbar-download-btn" href="#" target="_blank" rel="noopener noreferrer" class="workspace-btn" title="Last ned skrivebordsapp">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path>
+                        <polyline points="7 10 12 15 17 10"></polyline>
+                        <line x1="12" y1="15" x2="12" y2="3"></line>
+                    </svg>
+                    <span>Last ned app</span>
+                </a>
+
                 <button type="button" id="ws-open-tab-btn" class="workspace-btn" title="Åpne i ny fane">
                     <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
@@ -697,13 +1057,25 @@
             <div id="ws-loader" class="workspace-loader">
                 <div class="workspace-spinner"></div>
                 <p id="ws-loader-text" style="font-weight: 500; font-size: 1rem;">Laster inn WebAssembly-applikasjonen...</p>
+
+                <!-- Direkte fallback for enheter/nettlesere der WebAssembly feiler eller tar for lang tid -->
+                <div id="ws-loader-fallback" style="display: none; margin-top: 1.25rem; text-align: center; max-width: 440px; padding: 1.25rem; border-radius: 14px; background: rgba(255,255,255,0.06); border: 1px solid rgba(255,255,255,0.12); box-shadow: 0 8px 24px rgba(0,0,0,0.3);">
+                    <p style="font-size: 0.9rem; color: #e4e4e7; margin: 0 0 0.85rem; line-height: 1.5;">
+                        Feiler eller henger WebAssembly i nettleseren din? Du kan laste ned den fullverdige skrivebordsutgaven direkte:
+                    </p>
+                    <a id="ws-fallback-dl-btn" href="#" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm" style="display: inline-flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 700; padding: 0.6rem 1.2rem;">
+                        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                        <span id="ws-fallback-dl-text">Last ned for Desktop</span>
+                    </a>
+                </div>
             </div>
             <iframe id="artcraft-iframe" src="about:blank" allow="cross-origin-isolated; autoplay; fullscreen; clipboard-read; clipboard-write;" title="ArtCraft Application"></iframe>
         </div>
     </div>
 
     <script type="module" src="js/creative-tools.js"></script>
-    <script src="js/theme-switcher.js"></script>
+    <script defer src="js/theme-switcher.js"></script>
 </body>
 
 </html>
+

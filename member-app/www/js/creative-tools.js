@@ -1,5 +1,7 @@
 // js/creative-tools.js - Kontroller for Kreative Verktøy (ArtCraft)
-import { AuthAPI, userHasRole } from './api-client.js';
+// Støtter WebAssembly-kjøring, skrivebordsnedlasting (Windows, macOS, Linux)
+// samt GitHub Release-synkronisering og versjonskontroll for Administratorer.
+import { AuthAPI, userHasRole, ArtCraftAPI } from './api-client.js';
 
 const ARTCRAFT_APPS = [
     {
@@ -231,6 +233,8 @@ const ARTCRAFT_APPS = [
 
 let currentUser = null;
 let currentAppId = null;
+let releasesData = null; // Inneholder apps, tag_name, downloads, updated_at
+let wasmTimeoutTimer = null;
 
 // Visningsmodus: 'artcraft' (standard) | 'hybrid' (ArtCraft-navn m/ Adobe-ikoner) | 'adobe' (Adobe-ikoner & navn)
 let currentDisplayMode = 'artcraft';
@@ -242,6 +246,82 @@ try {
         currentDisplayMode = 'hybrid';
     }
 } catch (e) {}
+
+// Detekter brukerens operativsystem i nettleseren
+function detectUserOS() {
+    const ua = navigator.userAgent || '';
+    const platform = navigator.platform || (navigator.userAgentData && navigator.userAgentData.platform) || '';
+    if (/Win/i.test(platform) || /Windows/i.test(ua)) return 'windows';
+    if (/Mac/i.test(platform) || /Macintosh/i.test(ua)) return 'macos';
+    if (/Linux/i.test(platform) || /Linux/i.test(ua)) return 'linux';
+    return 'windows';
+}
+const userOS = detectUserOS();
+
+// OS ikoner (inline SVG)
+const OS_ICONS = {
+    windows: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M0 3.449L9.75 2.1v9.451H0m10.949-9.602L24 0v11.4H10.949M0 12.6h9.75v9.451L0 20.699M10.949 12.6H24V24l-12.949-1.949"/></svg>`,
+    macos: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M15.97 6.47c.65-.79 1.1-1.88.98-2.97-1 .04-2.13.67-2.79 1.45-.58.68-1.1 1.77-.96 2.84 1.11.09 2.18-.58 2.77-1.32z"/></svg>`,
+    linux: `<svg width="15" height="15" viewBox="0 0 24 24" fill="currentColor"><path d="M12.001 2c-3.14 0-5.7 2.46-5.7 5.5 0 1.28.45 2.47 1.22 3.42C5.98 12.06 5 13.92 5 16c0 1.66.65 3.17 1.72 4.3.4.42.98.53 1.48.29.5-.24.78-.77.7-1.32-.47-.79-.75-1.71-.75-2.7 0-2.4 1.77-4.39 4.07-4.75.25-.04.47-.2.58-.43.11-.23.09-.5-.05-.71-.85-1.28-1.32-2.77-1.32-4.38C10.43 4.13 11.14 3.5 12 3.5s1.57.63 1.57 2.5c0 1.61-.47 3.1-1.32 4.38-.14.21-.16.48-.05.71.11.23.33.39.58.43 2.3.36 4.07 2.35 4.07 4.75 0 .99-.28 1.91-.75 2.7-.08.55.2 1.08.7 1.32.5.24 1.08.13 1.48-.29C20.35 19.17 21 17.66 21 16c0-2.08-.98-3.94-2.52-5.08.77-.95 1.22-2.14 1.22-3.42 0-3.04-2.56-5.5-5.7-5.5z"/></svg>`
+};
+
+const OS_NAMES = {
+    windows: 'Windows',
+    macos: 'macOS',
+    linux: 'Linux'
+};
+
+// Filtreringsregler for GitHub Releases-assets ifølge krav 2
+function filterGitHubAssets(assets = []) {
+    const isWeb = a => a.name.toLowerCase().includes('web') && a.name.endsWith('.zip');
+    const isWin = a => (a.name.endsWith('.msi') || a.name.endsWith('.exe') || /windows|win64|pc-windows-msvc/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
+    const isMac = a => (a.name.endsWith('.dmg') || a.name.endsWith('.pkg') || /macos|darwin|apple/i.test(a.name)) && !a.name.includes('-cli-') && !a.name.endsWith('.sha256');
+    const isLinux = a => (a.name.endsWith('.AppImage') || a.name.endsWith('.deb') || /linux|unknown-linux-gnu/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
+
+    const webAsset = assets.find(isWeb);
+    const winAssets = assets.filter(isWin);
+    const macAssets = assets.filter(isMac);
+    const linuxAssets = assets.filter(isLinux);
+
+    const primaryWin = winAssets.find(a => a.name.endsWith('.msi') && /x64/i.test(a.name))
+        || winAssets.find(a => a.name.endsWith('.msi'))
+        || winAssets.find(a => a.name.endsWith('.exe'))
+        || winAssets[0];
+
+    const primaryMac = macAssets.find(a => a.name.endsWith('.dmg') && /universal/i.test(a.name))
+        || macAssets.find(a => a.name.endsWith('.dmg'))
+        || macAssets[0];
+
+    const primaryLinux = linuxAssets.find(a => a.name.endsWith('.AppImage') && /x86_64/i.test(a.name))
+        || linuxAssets.find(a => a.name.endsWith('.AppImage'))
+        || linuxAssets.find(a => a.name.endsWith('.deb') && /x86_64/i.test(a.name))
+        || linuxAssets[0];
+
+    return {
+        web: webAsset ? { name: webAsset.name, url: webAsset.browser_download_url, size: webAsset.size } : null,
+        windows: primaryWin ? {
+            name: primaryWin.name,
+            url: primaryWin.browser_download_url,
+            size: primaryWin.size,
+            format: primaryWin.name.endsWith('.msi') ? 'MSI' : (primaryWin.name.endsWith('.exe') ? 'EXE' : 'ZIP'),
+            all: winAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+        } : null,
+        macos: primaryMac ? {
+            name: primaryMac.name,
+            url: primaryMac.browser_download_url,
+            size: primaryMac.size,
+            format: primaryMac.name.endsWith('.dmg') ? 'DMG' : (primaryMac.name.endsWith('.pkg') ? 'PKG' : 'ZIP'),
+            all: macAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+        } : null,
+        linux: primaryLinux ? {
+            name: primaryLinux.name,
+            url: primaryLinux.browser_download_url,
+            size: primaryLinux.size,
+            format: primaryLinux.name.endsWith('.AppImage') ? 'AppImage' : (primaryLinux.name.endsWith('.deb') ? 'DEB' : 'TAR'),
+            all: linuxAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
+        } : null
+    };
+}
 
 async function initCreativeToolsPage() {
     // 1. Rigorøs autentiseringssjekk
@@ -283,12 +363,16 @@ async function initCreativeToolsPage() {
         document.documentElement.style.display = '';
     }
 
+    // 4. Hent nyeste lagrede release-metadata (fra database eller releases.json fallback)
+    await loadReleasesData();
+
     setupModeSelector();
     renderAppGrid();
     setupWorkspace();
+    setupAdminPanel();
     setupLogout();
 
-    // 4. Sjekk om URL har en spesifikk app i query eller hash (f.eks. ?app=photocraft eller #photocraft)
+    // 5. Sjekk om URL har en spesifikk app i query eller hash (f.eks. ?app=photocraft eller #photocraft)
     const urlParams = new URLSearchParams(window.location.search);
     const queryApp = urlParams.get('app');
     const hashApp = window.location.hash ? window.location.hash.substring(1) : null;
@@ -299,6 +383,26 @@ async function initCreativeToolsPage() {
     }
 }
 
+async function loadReleasesData() {
+    try {
+        const res = await ArtCraftAPI.getReleases();
+        if (res && res.apps) {
+            releasesData = res;
+            return;
+        }
+    } catch (e) {
+        console.warn("Kunne ikke hente releases fra backend:", e);
+    }
+
+    // Fallback: forsøk direkte fetch av statisk artcraft/releases.json
+    try {
+        const fetchRes = await fetch('/artcraft/releases.json');
+        if (fetchRes.ok) {
+            releasesData = await fetchRes.json();
+        }
+    } catch (e) {}
+}
+
 function resolveMediaUrl(path) {
     if (!path) return '';
     if (path.startsWith('http://') || path.startsWith('https://') || path.startsWith('data:')) {
@@ -307,7 +411,6 @@ function resolveMediaUrl(path) {
     if (window.location.protocol === 'capacitor:' || window.location.protocol === 'file:') {
         return path.replace(/^\//, '');
     }
-    // På web: rot-relativ URL slik at det alltid fungerer uavhengig av subrute
     return '/' + path.replace(/^\//, '');
 }
 
@@ -395,6 +498,11 @@ function setupModeSelector() {
     });
 }
 
+function getAppRelease(appId) {
+    if (!releasesData || !releasesData.apps) return null;
+    return releasesData.apps[appId] || null;
+}
+
 function renderAppGrid() {
     const container = document.getElementById('apps-container');
     if (!container) return;
@@ -406,6 +514,10 @@ function renderAppGrid() {
         const card = document.createElement('div');
         card.className = 'app-card';
 
+        const release = getAppRelease(app.id);
+        const tagName = release && release.tag_name ? release.tag_name : 'v0.8.0';
+        const downloads = release && release.downloads ? release.downloads : {};
+
         let iconBoxHtml = '';
         let altTagText = '';
         let altTagColor = '';
@@ -414,7 +526,6 @@ function renderAppGrid() {
         let buttonLabel = '';
 
         if (currentDisplayMode === 'adobe') {
-            // Full Adobe: Adobe ikoner og Adobe navn (uten '-alternativ')
             appTitle = app.adobeName;
             buttonLabel = `Åpne ${app.adobeName}`;
             iconBoxHtml = `
@@ -426,7 +537,6 @@ function renderAppGrid() {
             altTagColor = app.adobe.textColor;
             altTagBg = app.adobe.altBg;
         } else if (currentDisplayMode === 'hybrid') {
-            // Hybrid: ArtCraft navn med Adobe-stil ikoner (Pc, Vc, etc.)
             appTitle = app.title;
             buttonLabel = `Åpne ${app.title}`;
             iconBoxHtml = `
@@ -438,7 +548,6 @@ function renderAppGrid() {
             altTagColor = app.adobe.textColor;
             altTagBg = app.adobe.altBg;
         } else {
-            // ArtCraft: Offisielle ArtCraft dyre/illustrerte ikoner og ArtCraft-navn
             appTitle = app.title;
             buttonLabel = `Åpne ${app.title}`;
             const mediaUrl = resolveMediaUrl(app.iconImage);
@@ -452,26 +561,94 @@ function renderAppGrid() {
             altTagBg = app.cfa.altBg;
         }
 
+        // Klargjør desktop-nedlastingsknapper for de 3 operativsystemene
+        const winDl = downloads.windows || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'MSI' };
+        const macDl = downloads.macos || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'DMG' };
+        const linuxDl = downloads.linux || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'AppImage' };
+
+        // Bestem hvilket OS som fremheves
+        let primaryDl = { os: 'windows', label: 'Windows', icon: OS_ICONS.windows, ...winDl };
+        let otherDlList = [
+            { os: 'macos', label: 'macOS', icon: OS_ICONS.macos, ...macDl },
+            { os: 'linux', label: 'Linux', icon: OS_ICONS.linux, ...linuxDl }
+        ];
+
+        if (userOS === 'macos') {
+            primaryDl = { os: 'macos', label: 'macOS', icon: OS_ICONS.macos, ...macDl };
+            otherDlList = [
+                { os: 'windows', label: 'Windows', icon: OS_ICONS.windows, ...winDl },
+                { os: 'linux', label: 'Linux', icon: OS_ICONS.linux, ...linuxDl }
+            ];
+        } else if (userOS === 'linux') {
+            primaryDl = { os: 'linux', label: 'Linux', icon: OS_ICONS.linux, ...linuxDl };
+            otherDlList = [
+                { os: 'windows', label: 'Windows', icon: OS_ICONS.windows, ...winDl },
+                { os: 'macos', label: 'macOS', icon: OS_ICONS.macos, ...macDl }
+            ];
+        }
+
         card.innerHTML = `
             <div>
                 ${iconBoxHtml}
-                <span class="app-alt-tag" style="background: ${altTagBg}; color: ${altTagColor};">
-                    ${altTagText}
-                </span>
+                <div class="app-top-meta">
+                    <span class="app-alt-tag" style="background: ${altTagBg}; color: ${altTagColor};">
+                        ${altTagText}
+                    </span>
+                    <span class="app-version-badge" title="Nåværende versjon: ${tagName}">
+                        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"></path><line x1="7" y1="7" x2="7.01" y2="7"></line></svg>
+                        ${tagName}
+                    </span>
+                </div>
                 <h3 class="app-title">${appTitle}</h3>
                 <p class="app-desc">${app.desc}</p>
             </div>
-            <div class="app-actions">
-                <button type="button" class="btn btn-primary btn-sm open-app-btn" style="flex: 1; padding: 0.6rem 1rem; font-weight: 600; font-size: 0.9rem;">
-                    ${buttonLabel}
-                </button>
-                <a href="${appUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Åpne i ny fane" style="padding: 0.6rem; color: var(--color-text-muted);">
-                    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
-                        <polyline points="15 3 21 3 21 9"></polyline>
-                        <line x1="10" y1="14" x2="21" y2="3"></line>
-                    </svg>
-                </a>
+
+            <!-- To hovedvalg: 1. Åpne i nettleser, 2. Last ned for Desktop -->
+            <div class="card-choice-group">
+                <div>
+                    <div class="choice-section-label">
+                        <span>1. Nettleser (WebAssembly)</span>
+                    </div>
+                    <div class="web-actions-row">
+                        <button type="button" class="btn btn-primary btn-sm open-app-btn" style="flex: 1; padding: 0.6rem 0.9rem; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                            <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
+                            ${buttonLabel}
+                        </button>
+                        <a href="${appUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Åpne i ny fane" style="padding: 0.6rem; color: var(--color-text-muted);">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
+                                <polyline points="15 3 21 3 21 9"></polyline>
+                                <line x1="10" y1="14" x2="21" y2="3"></line>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+
+                <div class="desktop-download-box">
+                    <div class="choice-section-label">
+                        <span>2. Last ned for Desktop</span>
+                        <span style="font-weight: 600; text-transform: none; opacity: 0.8;">${primaryDl.label} detektert</span>
+                    </div>
+
+                    <!-- Fremhevet knapp for detektert operativsystem -->
+                    <a href="${primaryDl.url}" target="_blank" rel="noopener noreferrer" class="btn-desktop-primary highlighted-os" title="Last ned ${primaryDl.name || app.title}">
+                        ${primaryDl.icon}
+                        <span>Last ned for ${primaryDl.label} (${primaryDl.format || 'Installatør'})</span>
+                    </a>
+
+                    <!-- Tilgjengelighet for øvrige to operativsystemer -->
+                    <div class="other-os-row">
+                        <span>Andre systemer:</span>
+                        <div class="other-os-pills">
+                            <a href="${otherDlList[0].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[0].name || otherDlList[0].label}">
+                                ${otherDlList[0].icon} ${otherDlList[0].label} (${otherDlList[0].format})
+                            </a>
+                            <a href="${otherDlList[1].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[1].name || otherDlList[1].label}">
+                                ${otherDlList[1].icon} ${otherDlList[1].label} (${otherDlList[1].format})
+                            </a>
+                        </div>
+                    </div>
+                </div>
             </div>
         `;
 
@@ -519,6 +696,26 @@ function updateWorkspaceHeader(appId) {
     if (tagEl) {
         tagEl.textContent = currentDisplayMode === 'adobe' ? app.adobe.alt : app.cfa.alt;
     }
+
+    // Oppdater direkte desktop-nedlastingsknapper i arbeidsområdet
+    const release = getAppRelease(app.id);
+    const downloads = release && release.downloads ? release.downloads : {};
+    const primaryDl = downloads[userOS] || downloads.windows || { url: `https://github.com/storytold/${app.id}/releases/latest` };
+
+    const topbarDlBtn = document.getElementById('ws-topbar-download-btn');
+    if (topbarDlBtn) {
+        topbarDlBtn.href = primaryDl.url;
+        topbarDlBtn.title = `Last ned ${app.title} for ${OS_NAMES[userOS]}`;
+    }
+
+    const fallbackDlBtn = document.getElementById('ws-fallback-dl-btn');
+    const fallbackDlText = document.getElementById('ws-fallback-dl-text');
+    if (fallbackDlBtn) {
+        fallbackDlBtn.href = primaryDl.url;
+    }
+    if (fallbackDlText) {
+        fallbackDlText.textContent = `Last ned for ${OS_NAMES[userOS]} (${primaryDl.format || 'Desktop'})`;
+    }
 }
 
 function updateWorkspaceSelectOptions() {
@@ -542,6 +739,7 @@ function setupWorkspace() {
     const openTabBtn = document.getElementById('ws-open-tab-btn');
     const iframe = document.getElementById('artcraft-iframe');
     const loader = document.getElementById('ws-loader');
+    const fallbackBox = document.getElementById('ws-loader-fallback');
 
     updateWorkspaceSelectOptions();
 
@@ -567,7 +765,16 @@ function setupWorkspace() {
 
     if (iframe && loader) {
         iframe.onload = () => {
+            if (wasmTimeoutTimer) {
+                clearTimeout(wasmTimeoutTimer);
+                wasmTimeoutTimer = null;
+            }
             loader.style.display = 'none';
+            if (fallbackBox) fallbackBox.style.display = 'none';
+        };
+
+        iframe.onerror = () => {
+            if (fallbackBox) fallbackBox.style.display = 'block';
         };
     }
 
@@ -590,6 +797,7 @@ function openApp(appId) {
     const loader = document.getElementById('ws-loader');
     const loaderText = document.getElementById('ws-loader-text');
     const selectEl = document.getElementById('ws-switch-select');
+    const fallbackBox = document.getElementById('ws-loader-fallback');
 
     updateWorkspaceHeader(appId);
 
@@ -597,7 +805,15 @@ function openApp(appId) {
     const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
     if (loaderText) loaderText.textContent = `Laster inn ${title} (WebAssembly)...`;
 
+    if (fallbackBox) fallbackBox.style.display = 'none';
     if (loader) loader.style.display = 'flex';
+
+    if (wasmTimeoutTimer) clearTimeout(wasmTimeoutTimer);
+    // Hvis WebAssembly bruker mer enn 7 sekunder på å starte, vis direkte Desktop-nedlastingsknapp
+    wasmTimeoutTimer = setTimeout(() => {
+        if (fallbackBox) fallbackBox.style.display = 'block';
+    }, 7000);
+
     if (iframe) {
         iframe.src = resolveAppUrl(app.path);
     }
@@ -607,7 +823,6 @@ function openApp(appId) {
         document.body.style.overflow = 'hidden';
     }
 
-    // Oppdater URL uten å laste om siden
     try {
         const url = new URL(window.location.href);
         url.searchParams.set('app', appId);
@@ -618,6 +833,12 @@ function openApp(appId) {
 function closeWorkspace() {
     const workspace = document.getElementById('artcraft-workspace');
     const iframe = document.getElementById('artcraft-iframe');
+    const fallbackBox = document.getElementById('ws-loader-fallback');
+
+    if (wasmTimeoutTimer) {
+        clearTimeout(wasmTimeoutTimer);
+        wasmTimeoutTimer = null;
+    }
 
     if (workspace) {
         workspace.classList.add('hidden');
@@ -628,6 +849,8 @@ function closeWorkspace() {
         iframe.src = 'about:blank';
     }
 
+    if (fallbackBox) fallbackBox.style.display = 'none';
+
     currentAppId = null;
 
     try {
@@ -635,6 +858,205 @@ function closeWorkspace() {
         url.searchParams.delete('app');
         window.history.replaceState({}, document.title, url.pathname);
     } catch (e) {}
+}
+
+// -------------------------------------------------------------
+// Admin-funksjonalitet: "Se etter og hent nyeste oppdateringer"
+// -------------------------------------------------------------
+function setupAdminPanel() {
+    const panel = document.getElementById('admin-artcraft-panel');
+    if (!panel) return;
+
+    // Streng sikkerhet: KUN synlig og operativ for brukere med 'admin' i roles
+    const isAdmin = userHasRole(currentUser, 'admin');
+    if (!isAdmin) {
+        panel.style.display = 'none';
+        return;
+    }
+
+    panel.style.display = 'block';
+    panel.classList.remove('hidden');
+
+    const syncBtn = document.getElementById('admin-sync-releases-btn');
+    const syncSpinner = document.getElementById('admin-sync-spinner');
+    const syncBtnText = document.getElementById('admin-sync-btn-text');
+    const lastSyncTimeEl = document.getElementById('admin-last-sync-time');
+    const wasmStatusSummaryEl = document.getElementById('admin-wasm-status-summary');
+    const alertBox = document.getElementById('admin-update-alert-box');
+    const alertTitle = document.getElementById('admin-update-alert-title');
+    const alertDesc = document.getElementById('admin-update-alert-desc');
+    const copyCmdBtn = document.getElementById('admin-copy-cmd-btn');
+    const triggerRebuildBtn = document.getElementById('admin-trigger-rebuild-btn');
+
+    function updateAdminStatusUi() {
+        if (!releasesData) {
+            if (lastSyncTimeEl) lastSyncTimeEl.textContent = 'Ikke synkronisert';
+            if (wasmStatusSummaryEl) wasmStatusSummaryEl.textContent = 'Ukjent status';
+            return;
+        }
+
+        if (lastSyncTimeEl && releasesData.updated_at) {
+            try {
+                const date = new Date(releasesData.updated_at);
+                lastSyncTimeEl.textContent = date.toLocaleString('no-NO', {
+                    day: '2-digit',
+                    month: 'short',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+            } catch (e) {
+                lastSyncTimeEl.textContent = releasesData.updated_at;
+            }
+        }
+
+        // Sjekk om nyere versjoner finnes på GitHub kontra lokale web-apper
+        let outdatedApps = [];
+        ARTCRAFT_APPS.forEach(app => {
+            const rel = releasesData.apps ? releasesData.apps[app.id] : null;
+            if (rel && rel.tag_name) {
+                // Sjekk om det er registrert en installert versjon
+                const installedVer = rel.installed_wasm_version || rel.tag_name;
+                if (rel.installed_wasm_version && rel.installed_wasm_version !== rel.tag_name) {
+                    outdatedApps.push({
+                        title: app.title,
+                        github: rel.tag_name,
+                        installed: rel.installed_wasm_version
+                    });
+                }
+            }
+        });
+
+        if (outdatedApps.length > 0) {
+            if (wasmStatusSummaryEl) {
+                wasmStatusSummaryEl.innerHTML = `<span style="color: #f59e0b;">⚠️ ${outdatedApps.length} oppdatering(er)</span>`;
+            }
+            if (alertBox) {
+                alertBox.style.display = 'flex';
+                alertBox.classList.remove('hidden');
+                if (alertTitle) {
+                    alertTitle.textContent = `Ny web-versjon tilgjengelig for ${outdatedApps.map(a => a.title).join(', ')}`;
+                }
+                if (alertDesc) {
+                    alertDesc.textContent = outdatedApps.map(a => `${a.title}: ${a.github} tilgjengelig på GitHub (installert: ${a.installed})`).join(' • ');
+                }
+            }
+        } else {
+            if (wasmStatusSummaryEl) {
+                wasmStatusSummaryEl.innerHTML = `<span style="color: #10b981;">✅ Alle 9 apper oppdatert</span>`;
+            }
+            if (alertBox) {
+                alertBox.style.display = 'none';
+                alertBox.classList.add('hidden');
+            }
+        }
+    }
+
+    updateAdminStatusUi();
+
+    // 1. Synkroniser nyeste versjoner fra GitHub (Krav 3.1)
+    if (syncBtn) {
+        syncBtn.onclick = async () => {
+            syncBtn.disabled = true;
+            if (syncSpinner) syncSpinner.classList.add('spin-rotate');
+            if (syncBtnText) syncBtnText.textContent = 'Henter data fra GitHub API...';
+
+            const synchedApps = {};
+            let successCount = 0;
+
+            try {
+                // Gjør oppslag for alle 9 apper
+                for (const app of ARTCRAFT_APPS) {
+                    try {
+                        const url = `https://api.github.com/repos/storytold/${app.id}/releases/latest`;
+                        const res = await fetch(url, {
+                            headers: { 'Accept': 'application/vnd.github.v3+json' }
+                        });
+                        if (res.ok) {
+                            const data = await res.json();
+                            const downloads = filterGitHubAssets(data.assets || []);
+                            
+                            // Bevar tidligere installert web-versjon for nøyaktig sammenligning
+                            const prevRel = getAppRelease(app.id);
+                            const installedWasm = prevRel && prevRel.installed_wasm_version ? prevRel.installed_wasm_version : (prevRel ? prevRel.tag_name : data.tag_name);
+
+                            synchedApps[app.id] = {
+                                name: app.id,
+                                title: app.title,
+                                tag_name: data.tag_name || 'latest',
+                                published_at: data.published_at,
+                                installed_wasm_version: installedWasm,
+                                downloads: downloads
+                            };
+                            successCount++;
+                        }
+                    } catch (e) {
+                        console.warn(`Feil ved oppslag for ${app.title}:`, e);
+                    }
+                }
+
+                if (successCount > 0) {
+                    const newPayload = {
+                        updated_at: new Date().toISOString(),
+                        apps: synchedApps
+                    };
+
+                    // Lagre til prosjektets backend database/lagring så alle medlemmer får de nyeste lenkene umiddelbart
+                    await ArtCraftAPI.saveReleases(newPayload);
+                    releasesData = newPayload;
+
+                    updateAdminStatusUi();
+                    renderAppGrid();
+                    alert(`✅ Synkronisering fullført! Hentet nyeste utgivelser for ${successCount}/${ARTCRAFT_APPS.length} apper. Alle medlemmer har nå direkte tilgang til de nyeste skrivebordspakkene.`);
+                } else {
+                    alert('⚠️ Kunne ikke hente nye versjoner fra GitHub (mulig rate-limit på API).');
+                }
+            } catch (err) {
+                console.error("Feil ved synkronisering:", err);
+                alert("Feil ved synkronisering: " + err.message);
+            } finally {
+                syncBtn.disabled = false;
+                if (syncSpinner) syncSpinner.classList.remove('spin-rotate');
+                if (syncBtnText) syncBtnText.textContent = 'Synkroniser nyeste versjoner fra GitHub';
+            }
+        };
+    }
+
+    // 2. Kopier kommando til utklippstavle
+    if (copyCmdBtn) {
+        copyCmdBtn.onclick = () => {
+            navigator.clipboard.writeText('npm run fetch-artcraft').then(() => {
+                copyCmdBtn.textContent = 'Kopiert!';
+                setTimeout(() => {
+                    copyCmdBtn.textContent = 'Kopier kommando';
+                }, 2000);
+            }).catch(() => {
+                copyCmdBtn.textContent = 'Kopiert!';
+            });
+        };
+    }
+
+    // 3. Trigger Rebuild (Krav 3.2)
+    if (triggerRebuildBtn) {
+        triggerRebuildBtn.onclick = async () => {
+            triggerRebuildBtn.disabled = true;
+            triggerRebuildBtn.textContent = 'Sender forespørsel...';
+            try {
+                const res = await ArtCraftAPI.triggerRebuild();
+                if (res && res.success) {
+                    alert('🚀 Rebuild / Deploy Hook er utløst på serveren! Nye WebAssembly-apper blir bygget og distribuert nå.');
+                } else if (res && res.configured === false) {
+                    alert(`ℹ️ ${res.message}\n\nKopier og kjør kommandoen: "npm run fetch-artcraft" på utviklingsmaskinen eller serveren for å laste ned og pakke ut de nyeste web-pakkene.`);
+                } else {
+                    alert(`⚠️ Kunne ikke utløse automatisk rebuild: ${res?.message || 'Ingen respons'}`);
+                }
+            } catch (e) {
+                alert(`Feil ved utløsing av rebuild: ${e.message}`);
+            } finally {
+                triggerRebuildBtn.disabled = false;
+                triggerRebuildBtn.textContent = 'Oppdater Web-apper (Trigger Rebuild)';
+            }
+        };
+    }
 }
 
 function setupLogout() {

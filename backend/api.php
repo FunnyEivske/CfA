@@ -117,6 +117,13 @@ try {
 try {
     $pdo->exec("ALTER TABLE users ADD COLUMN roles TEXT DEFAULT NULL");
 } catch (Exception $e) {}
+try {
+    $pdo->exec("CREATE TABLE IF NOT EXISTS site_settings (
+        setting_key VARCHAR(100) PRIMARY KEY,
+        setting_value LONGTEXT NOT NULL,
+        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
+    )");
+} catch (Exception $e) {}
 
 function normalizeUser(&$user) {
     if (!$user) return;
@@ -1266,6 +1273,87 @@ switch ($action) {
         if ($_SESSION['role'] !== 'admin') jsonResponse(['error' => 'Forbidden'], 403);
         $res = WebPushServer::broadcastPush($pdo, 'Testvarsel fra Cosplay for alle', 'Gratulerer! Web Push fungerer perfekt på enheten din.', '/medlem');
         jsonResponse(['success' => true, 'result' => $res]);
+        break;
+
+    case 'get_artcraft_releases':
+        requireAuth();
+        if (!userHasRole('creative') && !userHasRole('admin')) {
+            jsonResponse(['error' => 'Forbidden: Krever rollen Kreativ eller Administrator.'], 403);
+        }
+        $releases = null;
+        try {
+            $stmt = $pdo->prepare('SELECT setting_value FROM site_settings WHERE setting_key = ?');
+            $stmt->execute(['artcraft_releases']);
+            $val = $stmt->fetchColumn();
+            if ($val) {
+                $releases = json_decode($val, true);
+            }
+        } catch (Exception $e) {}
+
+        if (!$releases) {
+            $jsonFile = __DIR__ . '/../artcraft/releases.json';
+            $pubJson = __DIR__ . '/../public/artcraft/releases.json';
+            if (file_exists($jsonFile)) {
+                $releases = json_decode(file_get_contents($jsonFile), true);
+            } elseif (file_exists($pubJson)) {
+                $releases = json_decode(file_get_contents($pubJson), true);
+            }
+        }
+        jsonResponse(['success' => true, 'data' => $releases]);
+        break;
+
+    case 'save_artcraft_releases':
+        requireAuth();
+        if (!userHasRole('admin')) {
+            jsonResponse(['error' => 'Forbidden: Kun administratorer kan lagre eller synkronisere ArtCraft-versjoner.'], 403);
+        }
+        $raw = file_get_contents('php://input');
+        $data = json_decode($raw, true) ?? [];
+        $releases = $data['releases'] ?? $data;
+        if (empty($releases)) {
+            jsonResponse(['error' => 'Mangler releases-data'], 400);
+        }
+
+        $jsonStr = json_encode($releases, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
+
+        try {
+            $stmt = $pdo->prepare('INSERT INTO site_settings (setting_key, setting_value) VALUES (?, ?) ON DUPLICATE KEY UPDATE setting_value = ?');
+            $stmt->execute(['artcraft_releases', $jsonStr, $jsonStr]);
+        } catch (Exception $e) {}
+
+        // Forsøk også å oppdatere filene lokalt på serveren hvis tilgang finnes
+        @file_put_contents(__DIR__ . '/../artcraft/releases.json', $jsonStr);
+        @file_put_contents(__DIR__ . '/../public/artcraft/releases.json', $jsonStr);
+
+        jsonResponse(['success' => true, 'data' => $releases]);
+        break;
+
+    case 'trigger_artcraft_rebuild':
+        requireAuth();
+        if (!userHasRole('admin')) {
+            jsonResponse(['error' => 'Forbidden: Kun administratorer kan trigge gjenoppbygging.'], 403);
+        }
+        $hookUrl = getenv('DEPLOY_HOOK_URL') ?: (getenv('VERCEL_DEPLOY_HOOK') ?: getenv('NETLIFY_BUILD_HOOK'));
+        if (!$hookUrl) {
+            jsonResponse([
+                'success' => false,
+                'configured' => false,
+                'message' => 'Ingen automatisk Deploy Hook URL er konfigurert i miljøvariablene. Kjør "npm run fetch-artcraft" lokalt eller på serveren for å bygge og laste ned nyeste pakker.'
+            ]);
+        }
+        $ch = curl_init($hookUrl);
+        curl_setopt($ch, CURLOPT_POST, 1);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 10);
+        $res = curl_exec($ch);
+        $code = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        jsonResponse([
+            'success' => ($code >= 200 && $code < 300),
+            'configured' => true,
+            'status_code' => $code,
+            'response' => $res
+        ]);
         break;
 
     default:
