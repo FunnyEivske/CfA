@@ -223,7 +223,12 @@ async function downloadAndExtractApp(app) {
     }
     if (!relPath) continue;
 
-    const fileBuffer = entry.getData();
+    let fileBuffer = entry.getData();
+    if (relPath === 'index.html' || relPath.endsWith('/index.html')) {
+      let htmlStr = fileBuffer.toString('utf8');
+      htmlStr = htmlStr.replace(/\s*integrity="[^"]*"/g, '');
+      fileBuffer = Buffer.from(htmlStr, 'utf8');
+    }
 
     // 1. Skriv til artcraft/<app>/
     const target1 = path.join(artcraftDest, relPath);
