@@ -49,6 +49,9 @@ deploy.ps1
 *.zip
 scratch/
 public/
+artcraft/downloads/
+public/artcraft/downloads/
+
 
 # Mobile & Capacitor build artifacts
 member-app/android/.gradle/

@@ -33,8 +33,9 @@ if (process.env.GITHUB_TOKEN) {
 }
 
 const forceDownload = process.argv.includes('--force');
+const withInstallers = process.argv.includes('--installers') || process.argv.includes('--all');
 
-export function filterAssets(assets = []) {
+export function filterAssets(assets = [], appName = '') {
   const isWeb = a => a.name.toLowerCase().includes('web') && a.name.endsWith('.zip');
   const isWin = a => (a.name.endsWith('.msi') || a.name.endsWith('.exe') || /windows|win64|pc-windows-msvc/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
   const isMac = a => (a.name.endsWith('.dmg') || a.name.endsWith('.pkg') || /macos|darwin|apple/i.test(a.name)) && !a.name.includes('-cli-') && !a.name.endsWith('.sha256');
@@ -59,25 +60,37 @@ export function filterAssets(assets = []) {
     || linuxAssets.find(a => a.name.endsWith('.deb') && /x86_64/i.test(a.name))
     || linuxAssets[0];
 
+  const serverEndpoint = (os) => `/backend/api.php?action=download_artcraft_installer&app=${appName}&os=${os}`;
+  const localUrl = (os, filename) => `/artcraft/downloads/${appName}/${filename}`;
+
   return {
     web: webAsset ? { name: webAsset.name, url: webAsset.browser_download_url, size: webAsset.size } : null,
     windows: primaryWin ? {
       name: primaryWin.name,
-      url: primaryWin.browser_download_url,
+      url: serverEndpoint('windows'),
+      local_url: localUrl('windows', primaryWin.name),
+      server_endpoint: serverEndpoint('windows'),
+      github_url: primaryWin.browser_download_url,
       size: primaryWin.size,
       format: primaryWin.name.endsWith('.msi') ? 'MSI' : (primaryWin.name.endsWith('.exe') ? 'EXE' : 'ZIP'),
       all: winAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
     } : null,
     macos: primaryMac ? {
       name: primaryMac.name,
-      url: primaryMac.browser_download_url,
+      url: serverEndpoint('macos'),
+      local_url: localUrl('macos', primaryMac.name),
+      server_endpoint: serverEndpoint('macos'),
+      github_url: primaryMac.browser_download_url,
       size: primaryMac.size,
       format: primaryMac.name.endsWith('.dmg') ? 'DMG' : (primaryMac.name.endsWith('.pkg') ? 'PKG' : 'ZIP'),
       all: macAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
     } : null,
     linux: primaryLinux ? {
       name: primaryLinux.name,
-      url: primaryLinux.browser_download_url,
+      url: serverEndpoint('linux'),
+      local_url: localUrl('linux', primaryLinux.name),
+      server_endpoint: serverEndpoint('linux'),
+      github_url: primaryLinux.browser_download_url,
       size: primaryLinux.size,
       format: primaryLinux.name.endsWith('.AppImage') ? 'AppImage' : (primaryLinux.name.endsWith('.deb') ? 'DEB' : 'TAR'),
       all: linuxAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
@@ -104,7 +117,49 @@ async function downloadAndExtractApp(app) {
   const publishedAt = release.published_at || new Date().toISOString();
   const assets = release.assets || [];
 
-  const downloads = filterAssets(assets);
+  const downloads = filterAssets(assets, app.name);
+
+  // Hvis --installers er angitt, last ned ekte desktop-installatører til artcraft/downloads/<app>/
+  if (withInstallers) {
+    const downloadsDir = path.join(rootDir, 'artcraft', 'downloads', app.name);
+    const pubDownloadsDir = path.join(rootDir, 'public', 'artcraft', 'downloads', app.name);
+    fs.mkdirSync(downloadsDir, { recursive: true });
+    fs.mkdirSync(pubDownloadsDir, { recursive: true });
+
+    const toDownload = [
+      { os: 'windows', asset: downloads.windows },
+      { os: 'macos', asset: downloads.macos },
+      { os: 'linux', asset: downloads.linux }
+    ];
+
+    for (const item of toDownload) {
+      if (!item.asset || !item.asset.github_url) continue;
+      const targetFile = path.join(downloadsDir, item.asset.name);
+      const pubTargetFile = path.join(pubDownloadsDir, item.asset.name);
+
+      if (fs.existsSync(targetFile) && !forceDownload) {
+        console.log(`  ✓ Installatør for ${item.os} (${item.asset.name}) finnes allerede lokalt.`);
+        continue;
+      }
+
+      console.log(`  ⬇️ Laster ned ${item.os}-installatør for ${app.title} (${item.asset.name})...`);
+      try {
+        const dlRes = await fetch(item.asset.github_url, {
+          headers: { 'User-Agent': GITHUB_HEADERS['User-Agent'] }
+        });
+        if (dlRes.ok) {
+          const buffer = Buffer.from(await dlRes.arrayBuffer());
+          fs.writeFileSync(targetFile, buffer);
+          fs.writeFileSync(pubTargetFile, buffer);
+          console.log(`  ✨ Lagret ${item.asset.name} til artcraft/downloads/${app.name}/`);
+        } else {
+          console.warn(`  ⚠️ Feil ved nedlasting av ${item.asset.name}: ${dlRes.status}`);
+        }
+      } catch (dlErr) {
+        console.warn(`  ⚠️ Kunne ikke laste ned ${item.asset.name}: ${dlErr.message}`);
+      }
+    }
+  }
 
   const releaseMeta = {
     name: app.name,

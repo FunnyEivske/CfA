@@ -1356,6 +1356,89 @@ switch ($action) {
         ]);
         break;
 
+    case 'download_artcraft_installer':
+        $app = preg_replace('/[^a-z0-9_-]/i', '', $_GET['app'] ?? '');
+        $os = strtolower(preg_replace('/[^a-z0-9_-]/i', '', $_GET['os'] ?? 'windows'));
+        if (empty($app)) {
+            jsonResponse(['error' => 'Mangler app-parameter'], 400);
+        }
+
+        // Hent releases-data fra fil eller database for å finne filnavn og GitHub-fallback
+        $releases = [];
+        $releasesFile = __DIR__ . '/../artcraft/releases.json';
+        if (file_exists($releasesFile)) {
+            $releases = json_decode(file_get_contents($releasesFile), true) ?? [];
+        }
+        if (empty($releases['apps'])) {
+            try {
+                $stmt = $pdo->prepare('SELECT setting_value FROM site_settings WHERE setting_key = ? LIMIT 1');
+                $stmt->execute(['artcraft_releases']);
+                $val = $stmt->fetchColumn();
+                if ($val) $releases = json_decode($val, true) ?? [];
+            } catch (Exception $e) {}
+        }
+
+        $appInfo = $releases['apps'][$app] ?? null;
+        $dlInfo = $appInfo['downloads'][$os] ?? null;
+        $githubUrl = $dlInfo['url'] ?? $dlInfo['github_url'] ?? "https://github.com/storytold/{$app}/releases/latest";
+        $fileName = $dlInfo['name'] ?? null;
+
+        // Sjekk om installasjonsfilen finnes lokalt på serveren under artcraft/downloads/<app>/
+        $downloadsDir = __DIR__ . '/../artcraft/downloads/' . $app;
+        $localFilePath = null;
+
+        if ($fileName && file_exists($downloadsDir . '/' . $fileName)) {
+            $localFilePath = $downloadsDir . '/' . $fileName;
+        } else if (file_exists($downloadsDir)) {
+            // Hvis nøyaktig filnavn ikke matcher, let etter en matchende installatør for dette OS-et
+            $files = scandir($downloadsDir);
+            foreach ($files as $f) {
+                if ($f === '.' || $f === '..') continue;
+                $lower = strtolower($f);
+                if ($os === 'windows' && (str_ends_with($lower, '.msi') || str_ends_with($lower, '.exe'))) {
+                    $localFilePath = $downloadsDir . '/' . $f;
+                    $fileName = $f;
+                    break;
+                } else if ($os === 'macos' && (str_ends_with($lower, '.dmg') || str_ends_with($lower, '.pkg'))) {
+                    $localFilePath = $downloadsDir . '/' . $f;
+                    $fileName = $f;
+                    break;
+                } else if ($os === 'linux' && (str_ends_with($lower, '.appimage') || str_ends_with($lower, '.deb'))) {
+                    $localFilePath = $downloadsDir . '/' . $f;
+                    $fileName = $f;
+                    break;
+                }
+            }
+        }
+
+        // Hvis filen finnes lokalt på serveren, server den direkte med korrekte headers
+        if ($localFilePath && file_exists($localFilePath) && is_readable($localFilePath)) {
+            $fsize = filesize($localFilePath);
+            $mime = 'application/octet-stream';
+            if (str_ends_with($fileName, '.msi')) $mime = 'application/x-msi';
+            else if (str_ends_with($fileName, '.exe')) $mime = 'application/x-msdownload';
+            else if (str_ends_with($fileName, '.dmg')) $mime = 'application/x-apple-diskimage';
+
+            header('Content-Description: File Transfer');
+            header('Content-Type: ' . $mime);
+            header('Content-Disposition: attachment; filename="' . basename($fileName) . '"');
+            header('Expires: 0');
+            header('Cache-Control: must-revalidate');
+            header('Pragma: public');
+            if ($fsize) {
+                header('Content-Length: ' . $fsize);
+            }
+            while (ob_get_level()) {
+                ob_end_clean();
+            }
+            readfile($localFilePath);
+            exit;
+        }
+
+        // Hvis filen ikke er lastet opp lokalt ennå, send en 302 omdirigering til GitHub Release
+        header('Location: ' . $githubUrl, true, 302);
+        exit;
+
     default:
         jsonResponse(['error' => 'Invalid endpoint action'], 404);
 }

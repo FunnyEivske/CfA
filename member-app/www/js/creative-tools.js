@@ -272,7 +272,7 @@ const OS_NAMES = {
 };
 
 // Filtreringsregler for GitHub Releases-assets ifølge krav 2
-function filterGitHubAssets(assets = []) {
+function filterGitHubAssets(assets = [], appName = '') {
     const isWeb = a => a.name.toLowerCase().includes('web') && a.name.endsWith('.zip');
     const isWin = a => (a.name.endsWith('.msi') || a.name.endsWith('.exe') || /windows|win64|pc-windows-msvc/i.test(a.name)) && !a.name.endsWith('.sha256') && !a.name.endsWith('.zsync');
     const isMac = a => (a.name.endsWith('.dmg') || a.name.endsWith('.pkg') || /macos|darwin|apple/i.test(a.name)) && !a.name.includes('-cli-') && !a.name.endsWith('.sha256');
@@ -297,25 +297,37 @@ function filterGitHubAssets(assets = []) {
         || linuxAssets.find(a => a.name.endsWith('.deb') && /x86_64/i.test(a.name))
         || linuxAssets[0];
 
+    const serverEndpoint = (os) => `/backend/api.php?action=download_artcraft_installer&app=${appName}&os=${os}`;
+    const localUrl = (os, filename) => `/artcraft/downloads/${appName}/${filename}`;
+
     return {
         web: webAsset ? { name: webAsset.name, url: webAsset.browser_download_url, size: webAsset.size } : null,
         windows: primaryWin ? {
             name: primaryWin.name,
-            url: primaryWin.browser_download_url,
+            url: serverEndpoint('windows'),
+            local_url: localUrl('windows', primaryWin.name),
+            server_endpoint: serverEndpoint('windows'),
+            github_url: primaryWin.browser_download_url,
             size: primaryWin.size,
             format: primaryWin.name.endsWith('.msi') ? 'MSI' : (primaryWin.name.endsWith('.exe') ? 'EXE' : 'ZIP'),
             all: winAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
         } : null,
         macos: primaryMac ? {
             name: primaryMac.name,
-            url: primaryMac.browser_download_url,
+            url: serverEndpoint('macos'),
+            local_url: localUrl('macos', primaryMac.name),
+            server_endpoint: serverEndpoint('macos'),
+            github_url: primaryMac.browser_download_url,
             size: primaryMac.size,
             format: primaryMac.name.endsWith('.dmg') ? 'DMG' : (primaryMac.name.endsWith('.pkg') ? 'PKG' : 'ZIP'),
             all: macAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
         } : null,
         linux: primaryLinux ? {
             name: primaryLinux.name,
-            url: primaryLinux.browser_download_url,
+            url: serverEndpoint('linux'),
+            local_url: localUrl('linux', primaryLinux.name),
+            server_endpoint: serverEndpoint('linux'),
+            github_url: primaryLinux.browser_download_url,
             size: primaryLinux.size,
             format: primaryLinux.name.endsWith('.AppImage') ? 'AppImage' : (primaryLinux.name.endsWith('.deb') ? 'DEB' : 'TAR'),
             all: linuxAssets.map(a => ({ name: a.name, url: a.browser_download_url, size: a.size }))
@@ -561,10 +573,36 @@ function renderAppGrid() {
             altTagBg = app.cfa.altBg;
         }
 
-        // Klargjør desktop-nedlastingsknapper for de 3 operativsystemene
-        const winDl = downloads.windows || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'MSI' };
-        const macDl = downloads.macos || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'DMG' };
-        const linuxDl = downloads.linux || { url: `https://github.com/storytold/${app.id}/releases/latest`, format: 'AppImage' };
+        // Klargjør desktop-nedlastingsknapper for de 3 operativsystemene via lokalt serverendepunkt
+        const resolveInstallerUrl = (os, dlObj) => {
+            let endpoint = `/backend/api.php?action=download_artcraft_installer&app=${app.id}&os=${os}`;
+            if (window.CFA_API_BASE && (window.location.protocol === 'capacitor:' || window.location.protocol === 'file:')) {
+                try {
+                    const apiBase = new URL(window.CFA_API_BASE);
+                    endpoint = `${apiBase.origin}${endpoint}`;
+                } catch (e) {}
+            }
+            return endpoint;
+        };
+
+        const winDl = {
+            format: downloads.windows?.format || 'MSI',
+            name: downloads.windows?.name || `${app.title}-Setup.msi`,
+            url: resolveInstallerUrl('windows', downloads.windows),
+            githubUrl: downloads.windows?.github_url || `https://github.com/storytold/${app.id}/releases/latest`
+        };
+        const macDl = {
+            format: downloads.macos?.format || 'DMG',
+            name: downloads.macos?.name || `${app.title}.dmg`,
+            url: resolveInstallerUrl('macos', downloads.macos),
+            githubUrl: downloads.macos?.github_url || `https://github.com/storytold/${app.id}/releases/latest`
+        };
+        const linuxDl = {
+            format: downloads.linux?.format || 'AppImage',
+            name: downloads.linux?.name || `${app.title}.AppImage`,
+            url: resolveInstallerUrl('linux', downloads.linux),
+            githubUrl: downloads.linux?.github_url || `https://github.com/storytold/${app.id}/releases/latest`
+        };
 
         // Bestem hvilket OS som fremheves
         let primaryDl = { os: 'windows', label: 'Windows', icon: OS_ICONS.windows, ...winDl };
@@ -630,8 +668,8 @@ function renderAppGrid() {
                         <span style="font-weight: 600; text-transform: none; opacity: 0.8;">${primaryDl.label} detektert</span>
                     </div>
 
-                    <!-- Fremhevet knapp for detektert operativsystem -->
-                    <a href="${primaryDl.url}" target="_blank" rel="noopener noreferrer" class="btn-desktop-primary highlighted-os" title="Last ned ${primaryDl.name || app.title}">
+                    <!-- Fremhevet knapp for detektert operativsystem (Lokal servernedlasting) -->
+                    <a href="${primaryDl.url}" target="_blank" rel="noopener noreferrer" class="btn-desktop-primary highlighted-os" title="Last ned ${primaryDl.name || app.title} fra CfA-server">
                         ${primaryDl.icon}
                         <span>Last ned for ${primaryDl.label} (${primaryDl.format || 'Installatør'})</span>
                     </a>
@@ -640,13 +678,24 @@ function renderAppGrid() {
                     <div class="other-os-row">
                         <span>Andre systemer:</span>
                         <div class="other-os-pills">
-                            <a href="${otherDlList[0].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[0].name || otherDlList[0].label}">
+                            <a href="${otherDlList[0].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[0].name || otherDlList[0].label} fra CfA-server">
                                 ${otherDlList[0].icon} ${otherDlList[0].label} (${otherDlList[0].format})
                             </a>
-                            <a href="${otherDlList[1].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[1].name || otherDlList[1].label}">
+                            <a href="${otherDlList[1].url}" target="_blank" rel="noopener noreferrer" class="other-os-link" title="Last ned ${otherDlList[1].name || otherDlList[1].label} fra CfA-server">
                                 ${otherDlList[1].icon} ${otherDlList[1].label} (${otherDlList[1].format})
                             </a>
                         </div>
+                    </div>
+
+                    <!-- Kildehenvisning til lokal hosting og GitHub -->
+                    <div class="dl-source-note" style="margin-top: 0.65rem; padding-top: 0.5rem; border-top: 1px solid rgba(255, 255, 255, 0.08); font-size: 0.76rem; color: var(--color-text-muted); display: flex; align-items: center; justify-content: space-between; gap: 0.5rem; flex-wrap: wrap;">
+                        <span style="display: inline-flex; align-items: center; gap: 4px;">
+                            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></svg>
+                            Hostet lokalt på CfA-server
+                        </span>
+                        <a href="https://github.com/storytold/${app.id}/releases" target="_blank" rel="noopener noreferrer" style="color: var(--color-text-muted); text-decoration: underline; display: inline-flex; align-items: center; gap: 3px;" title="Se kildekode og releases hos Storytold på GitHub">
+                            Storytold GitHub ↗
+                        </a>
                     </div>
                 </div>
             </div>
@@ -973,7 +1022,7 @@ function setupAdminPanel() {
                         });
                         if (res.ok) {
                             const data = await res.json();
-                            const downloads = filterGitHubAssets(data.assets || []);
+                            const downloads = filterGitHubAssets(data.assets || [], app.id);
                             
                             // Bevar tidligere installert web-versjon for nøyaktig sammenligning
                             const prevRel = getAppRelease(app.id);

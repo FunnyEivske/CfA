@@ -1,5 +1,5 @@
 {
-  "updated_at": "2026-10-14T07:19:22.388Z",
+  "updated_at": "2026-10-14T09:01:32.395Z",
   "apps": {
     "photocraft": {
       "name": "photocraft",
@@ -14,7 +14,10 @@
         },
         "windows": {
           "name": "photocraft-0.8.2-windows-x64.msi",
-          "url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=windows",
+          "local_url": "/artcraft/downloads/photocraft/photocraft-0.8.2-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=windows",
+          "github_url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-windows-x64.msi",
           "size": 67420160,
           "format": "MSI",
           "all": [
@@ -52,7 +55,10 @@
         },
         "macos": {
           "name": "photocraft-0.8.2-macos-universal.dmg",
-          "url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=macos",
+          "local_url": "/artcraft/downloads/photocraft/photocraft-0.8.2-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=macos",
+          "github_url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-macos-universal.dmg",
           "size": 87987312,
           "format": "DMG",
           "all": [
@@ -65,7 +71,10 @@
         },
         "linux": {
           "name": "photocraft-0.8.2-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=linux",
+          "local_url": "/artcraft/downloads/photocraft/photocraft-0.8.2-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=photocraft&os=linux",
+          "github_url": "https://github.com/storytold/photocraft/releases/download/v0.8.2/photocraft-0.8.2-linux-x86_64.AppImage",
           "size": 75782648,
           "format": "AppImage",
           "all": [
@@ -151,7 +160,10 @@
         },
         "windows": {
           "name": "vectorcraft-0.10.0-windows-x64.msi",
-          "url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=windows",
+          "local_url": "/artcraft/downloads/vectorcraft/vectorcraft-0.10.0-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=windows",
+          "github_url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-windows-x64.msi",
           "size": 97226752,
           "format": "MSI",
           "all": [
@@ -189,7 +201,10 @@
         },
         "macos": {
           "name": "vectorcraft-0.10.0-macos-universal.dmg",
-          "url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=macos",
+          "local_url": "/artcraft/downloads/vectorcraft/vectorcraft-0.10.0-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=macos",
+          "github_url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-macos-universal.dmg",
           "size": 128679872,
           "format": "DMG",
           "all": [
@@ -202,7 +217,10 @@
         },
         "linux": {
           "name": "vectorcraft-0.10.0-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=linux",
+          "local_url": "/artcraft/downloads/vectorcraft/vectorcraft-0.10.0-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=vectorcraft&os=linux",
+          "github_url": "https://github.com/storytold/vectorcraft/releases/download/v0.10.0/vectorcraft-0.10.0-linux-x86_64.AppImage",
           "size": 110766584,
           "format": "AppImage",
           "all": [
@@ -278,7 +296,10 @@
         },
         "windows": {
           "name": "filmcraft-0.7.2-windows-x64.msi",
-          "url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=windows",
+          "local_url": "/artcraft/downloads/filmcraft/filmcraft-0.7.2-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=windows",
+          "github_url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-windows-x64.msi",
           "size": 57008128,
           "format": "MSI",
           "all": [
@@ -316,7 +337,10 @@
         },
         "macos": {
           "name": "filmcraft-0.7.2-macos-universal.dmg",
-          "url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=macos",
+          "local_url": "/artcraft/downloads/filmcraft/filmcraft-0.7.2-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=macos",
+          "github_url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-macos-universal.dmg",
           "size": 73270207,
           "format": "DMG",
           "all": [
@@ -329,7 +353,10 @@
         },
         "linux": {
           "name": "filmcraft-0.7.2-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=linux",
+          "local_url": "/artcraft/downloads/filmcraft/filmcraft-0.7.2-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=filmcraft&os=linux",
+          "github_url": "https://github.com/storytold/filmcraft/releases/download/v0.7.2/filmcraft-0.7.2-linux-x86_64.AppImage",
           "size": 65686008,
           "format": "AppImage",
           "all": [
@@ -415,7 +442,10 @@
         },
         "windows": {
           "name": "lightcraft-0.7.1-windows-x64.msi",
-          "url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=windows",
+          "local_url": "/artcraft/downloads/lightcraft/lightcraft-0.7.1-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=windows",
+          "github_url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-windows-x64.msi",
           "size": 86724608,
           "format": "MSI",
           "all": [
@@ -453,7 +483,10 @@
         },
         "macos": {
           "name": "lightcraft-0.7.1-macos-universal.dmg",
-          "url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=macos",
+          "local_url": "/artcraft/downloads/lightcraft/lightcraft-0.7.1-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=macos",
+          "github_url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-macos-universal.dmg",
           "size": 107601789,
           "format": "DMG",
           "all": [
@@ -466,7 +499,10 @@
         },
         "linux": {
           "name": "lightcraft-0.7.1-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=linux",
+          "local_url": "/artcraft/downloads/lightcraft/lightcraft-0.7.1-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=lightcraft&os=linux",
+          "github_url": "https://github.com/storytold/lightcraft/releases/download/v0.7.1/lightcraft-0.7.1-linux-x86_64.AppImage",
           "size": 98630136,
           "format": "AppImage",
           "all": [
@@ -542,7 +578,10 @@
         },
         "windows": {
           "name": "pdfcraft-0.7.1-windows-x64.msi",
-          "url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=windows",
+          "local_url": "/artcraft/downloads/pdfcraft/pdfcraft-0.7.1-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=windows",
+          "github_url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-windows-x64.msi",
           "size": 70696960,
           "format": "MSI",
           "all": [
@@ -580,7 +619,10 @@
         },
         "macos": {
           "name": "pdfcraft-0.7.1-macos-universal.dmg",
-          "url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=macos",
+          "local_url": "/artcraft/downloads/pdfcraft/pdfcraft-0.7.1-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=macos",
+          "github_url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-macos-universal.dmg",
           "size": 93706058,
           "format": "DMG",
           "all": [
@@ -593,7 +635,10 @@
         },
         "linux": {
           "name": "pdfcraft-0.7.1-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=linux",
+          "local_url": "/artcraft/downloads/pdfcraft/pdfcraft-0.7.1-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=pdfcraft&os=linux",
+          "github_url": "https://github.com/storytold/pdfcraft/releases/download/v0.7.1/pdfcraft-0.7.1-linux-x86_64.AppImage",
           "size": 80689656,
           "format": "AppImage",
           "all": [
@@ -689,7 +734,10 @@
         },
         "windows": {
           "name": "effectcraft-0.9.2-windows-x64.msi",
-          "url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=windows",
+          "local_url": "/artcraft/downloads/effectcraft/effectcraft-0.9.2-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=windows",
+          "github_url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-windows-x64.msi",
           "size": 49852416,
           "format": "MSI",
           "all": [
@@ -727,7 +775,10 @@
         },
         "macos": {
           "name": "effectcraft-0.9.2-macos-universal.dmg",
-          "url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=macos",
+          "local_url": "/artcraft/downloads/effectcraft/effectcraft-0.9.2-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=macos",
+          "github_url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-macos-universal.dmg",
           "size": 63303395,
           "format": "DMG",
           "all": [
@@ -740,7 +791,10 @@
         },
         "linux": {
           "name": "effectcraft-0.9.2-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=linux",
+          "local_url": "/artcraft/downloads/effectcraft/effectcraft-0.9.2-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=effectcraft&os=linux",
+          "github_url": "https://github.com/storytold/effectcraft/releases/download/v0.9.2/effectcraft-0.9.2-linux-x86_64.AppImage",
           "size": 58034680,
           "format": "AppImage",
           "all": [
@@ -826,7 +880,10 @@
         },
         "windows": {
           "name": "designcraft-0.7.1-windows-x64.msi",
-          "url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=windows",
+          "local_url": "/artcraft/downloads/designcraft/designcraft-0.7.1-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=windows",
+          "github_url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-windows-x64.msi",
           "size": 55574528,
           "format": "MSI",
           "all": [
@@ -864,7 +921,10 @@
         },
         "macos": {
           "name": "designcraft-0.7.1-macos-universal.dmg",
-          "url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=macos",
+          "local_url": "/artcraft/downloads/designcraft/designcraft-0.7.1-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=macos",
+          "github_url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-macos-universal.dmg",
           "size": 77568597,
           "format": "DMG",
           "all": [
@@ -877,7 +937,10 @@
         },
         "linux": {
           "name": "designcraft-0.7.1-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=linux",
+          "local_url": "/artcraft/downloads/designcraft/designcraft-0.7.1-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=designcraft&os=linux",
+          "github_url": "https://github.com/storytold/designcraft/releases/download/v0.7.1/designcraft-0.7.1-linux-x86_64.AppImage",
           "size": 66845176,
           "format": "AppImage",
           "all": [
@@ -963,7 +1026,10 @@
         },
         "windows": {
           "name": "figcraft-0.5.1-windows-x64.msi",
-          "url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=windows",
+          "local_url": "/artcraft/downloads/figcraft/figcraft-0.5.1-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=windows",
+          "github_url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-windows-x64.msi",
           "size": 68141056,
           "format": "MSI",
           "all": [
@@ -1001,7 +1067,10 @@
         },
         "macos": {
           "name": "figcraft-0.5.1-macos-universal.dmg",
-          "url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=macos",
+          "local_url": "/artcraft/downloads/figcraft/figcraft-0.5.1-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=macos",
+          "github_url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-macos-universal.dmg",
           "size": 92210194,
           "format": "DMG",
           "all": [
@@ -1014,7 +1083,10 @@
         },
         "linux": {
           "name": "figcraft-0.5.1-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=linux",
+          "local_url": "/artcraft/downloads/figcraft/figcraft-0.5.1-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=figcraft&os=linux",
+          "github_url": "https://github.com/storytold/figcraft/releases/download/v0.5.1/figcraft-0.5.1-linux-x86_64.AppImage",
           "size": 80243192,
           "format": "AppImage",
           "all": [
@@ -1100,7 +1172,10 @@
         },
         "windows": {
           "name": "soundcraft-0.6.1-windows-x64.msi",
-          "url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-windows-x64.msi",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=windows",
+          "local_url": "/artcraft/downloads/soundcraft/soundcraft-0.6.1-windows-x64.msi",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=windows",
+          "github_url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-windows-x64.msi",
           "size": 10870784,
           "format": "MSI",
           "all": [
@@ -1138,7 +1213,10 @@
         },
         "macos": {
           "name": "soundcraft-0.6.1-macos-universal.dmg",
-          "url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-macos-universal.dmg",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=macos",
+          "local_url": "/artcraft/downloads/soundcraft/soundcraft-0.6.1-macos-universal.dmg",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=macos",
+          "github_url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-macos-universal.dmg",
           "size": 22100760,
           "format": "DMG",
           "all": [
@@ -1151,7 +1229,10 @@
         },
         "linux": {
           "name": "soundcraft-0.6.1-linux-x86_64.AppImage",
-          "url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-linux-x86_64.AppImage",
+          "url": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=linux",
+          "local_url": "/artcraft/downloads/soundcraft/soundcraft-0.6.1-linux-x86_64.AppImage",
+          "server_endpoint": "/backend/api.php?action=download_artcraft_installer&app=soundcraft&os=linux",
+          "github_url": "https://github.com/storytold/soundcraft/releases/download/v0.6.1/soundcraft-0.6.1-linux-x86_64.AppImage",
           "size": 15223288,
           "format": "AppImage",
           "all": [
