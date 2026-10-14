@@ -648,12 +648,10 @@ function renderAppGrid() {
                         <span>1. Nettleser (WebAssembly)</span>
                     </div>
                     <div class="web-actions-row">
-                        <button type="button" class="btn btn-primary btn-sm open-app-btn" style="flex: 1; padding: 0.6rem 0.9rem; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.45rem;">
+                        <a href="${appUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-primary btn-sm open-app-btn" style="flex: 1; padding: 0.65rem 1rem; font-weight: 700; font-size: 0.88rem; display: inline-flex; align-items: center; justify-content: center; gap: 0.5rem; text-decoration: none;" title="Åpne ${appTitle} i ny fane">
                             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"></polygon></svg>
-                            ${buttonLabel}
-                        </button>
-                        <a href="${appUrl}" target="_blank" rel="noopener noreferrer" class="btn btn-ghost btn-sm" title="Åpne i ny fane" style="padding: 0.6rem; color: var(--color-text-muted);">
-                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <span>${buttonLabel}</span>
+                            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="opacity: 0.8; margin-left: 2px;">
                                 <path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"></path>
                                 <polyline points="15 3 21 3 21 9"></polyline>
                                 <line x1="10" y1="14" x2="21" y2="3"></line>
@@ -703,211 +701,28 @@ function renderAppGrid() {
 
         const btn = card.querySelector('.open-app-btn');
         if (btn) {
-            btn.onclick = () => openApp(app.id);
+            btn.onclick = (e) => {
+                e.preventDefault();
+                openApp(app.id);
+            };
         }
 
         container.appendChild(card);
     });
 }
 
-function updateWorkspaceHeader(appId) {
-    const app = ARTCRAFT_APPS.find(a => a.id === appId);
-    if (!app) return;
-
-    const iconEl = document.getElementById('ws-app-icon');
-    const nameEl = document.getElementById('ws-app-name');
-    const tagEl = document.getElementById('ws-app-tag');
-
-    const appTitle = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
-
-    if (nameEl) nameEl.textContent = appTitle;
-
-    if (iconEl) {
-        if (currentDisplayMode === 'adobe') {
-            iconEl.innerHTML = `
-                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
-                    ${app.adobeLetters}
-                </span>
-            `;
-        } else if (currentDisplayMode === 'hybrid') {
-            iconEl.innerHTML = `
-                <span style="display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 28px; border-radius: 6px; background: ${app.adobe.bgColor}; color: ${app.adobe.textColor}; border: 1.5px solid ${app.adobe.borderColor}; font-weight: 800; font-size: 0.85rem; font-family: sans-serif;">
-                    ${app.hybridLetters}
-                </span>
-            `;
-        } else {
-            iconEl.innerHTML = `
-                <img src="${app.iconImage}" alt="${app.title}" style="width: 28px; height: 28px; border-radius: 7px; object-fit: cover; vertical-align: middle;">
-            `;
-        }
-    }
-
-    if (tagEl) {
-        tagEl.textContent = currentDisplayMode === 'adobe' ? app.adobe.alt : app.cfa.alt;
-    }
-
-    // Oppdater direkte desktop-nedlastingsknapper i arbeidsområdet
-    const release = getAppRelease(app.id);
-    const downloads = release && release.downloads ? release.downloads : {};
-    const primaryDl = downloads[userOS] || downloads.windows || { url: `https://github.com/storytold/${app.id}/releases/latest` };
-
-    const topbarDlBtn = document.getElementById('ws-topbar-download-btn');
-    if (topbarDlBtn) {
-        topbarDlBtn.href = primaryDl.url;
-        topbarDlBtn.title = `Last ned ${app.title} for ${OS_NAMES[userOS]}`;
-    }
-
-    const fallbackDlBtn = document.getElementById('ws-fallback-dl-btn');
-    const fallbackDlText = document.getElementById('ws-fallback-dl-text');
-    if (fallbackDlBtn) {
-        fallbackDlBtn.href = primaryDl.url;
-    }
-    if (fallbackDlText) {
-        fallbackDlText.textContent = `Last ned for ${OS_NAMES[userOS]} (${primaryDl.format || 'Desktop'})`;
-    }
-}
-
-function updateWorkspaceSelectOptions() {
-    const select = document.getElementById('ws-switch-select');
-    if (!select) return;
-
-    const currentVal = select.value;
-    select.innerHTML = ARTCRAFT_APPS.map(app => {
-        const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
-        const tag = currentDisplayMode === 'adobe' ? app.adobeLetters : (currentDisplayMode === 'hybrid' ? app.hybridLetters : app.cfa.badgeText);
-        return `<option value="${app.id}">${title} (${tag})</option>`;
-    }).join('');
-
-    if (currentVal) select.value = currentVal;
-}
-
-function setupWorkspace() {
-    const workspace = document.getElementById('artcraft-workspace');
-    const closeBtn = document.getElementById('ws-close-btn');
-    const switchSelect = document.getElementById('ws-switch-select');
-    const openTabBtn = document.getElementById('ws-open-tab-btn');
-    const iframe = document.getElementById('artcraft-iframe');
-    const loader = document.getElementById('ws-loader');
-    const fallbackBox = document.getElementById('ws-loader-fallback');
-
-    updateWorkspaceSelectOptions();
-
-    if (closeBtn) {
-        closeBtn.onclick = () => closeWorkspace();
-    }
-
-    if (switchSelect) {
-        switchSelect.onchange = (e) => {
-            const nextId = e.target.value;
-            if (nextId) openApp(nextId);
-        };
-    }
-
-    if (openTabBtn) {
-        openTabBtn.onclick = () => {
-            const app = ARTCRAFT_APPS.find(a => a.id === currentAppId);
-            if (app) {
-                window.open(resolveAppUrl(app.path), '_blank');
-            }
-        };
-    }
-
-    if (iframe && loader) {
-        iframe.onload = () => {
-            if (wasmTimeoutTimer) {
-                clearTimeout(wasmTimeoutTimer);
-                wasmTimeoutTimer = null;
-            }
-            loader.style.display = 'none';
-            if (fallbackBox) fallbackBox.style.display = 'none';
-        };
-
-        iframe.onerror = () => {
-            if (fallbackBox) fallbackBox.style.display = 'block';
-        };
-    }
-
-    // Lukk med ESC
-    window.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape' && workspace && !workspace.classList.contains('hidden')) {
-            closeWorkspace();
-        }
-    });
-}
-
 function openApp(appId) {
     const app = ARTCRAFT_APPS.find(a => a.id === appId);
     if (!app) return;
-
-    currentAppId = appId;
-
-    const workspace = document.getElementById('artcraft-workspace');
-    const iframe = document.getElementById('artcraft-iframe');
-    const loader = document.getElementById('ws-loader');
-    const loaderText = document.getElementById('ws-loader-text');
-    const selectEl = document.getElementById('ws-switch-select');
-    const fallbackBox = document.getElementById('ws-loader-fallback');
-
-    updateWorkspaceHeader(appId);
-
-    if (selectEl) selectEl.value = app.id;
-    const title = currentDisplayMode === 'adobe' ? app.adobeName : app.title;
-    if (loaderText) loaderText.textContent = `Laster inn ${title} (WebAssembly)...`;
-
-    if (fallbackBox) fallbackBox.style.display = 'none';
-    if (loader) loader.style.display = 'flex';
-
-    if (wasmTimeoutTimer) clearTimeout(wasmTimeoutTimer);
-    // Hvis WebAssembly bruker mer enn 7 sekunder på å starte, vis direkte Desktop-nedlastingsknapp
-    wasmTimeoutTimer = setTimeout(() => {
-        if (fallbackBox) fallbackBox.style.display = 'block';
-    }, 7000);
-
-    if (iframe) {
-        iframe.src = resolveAppUrl(app.path);
-    }
-
-    if (workspace) {
-        workspace.classList.remove('hidden');
-        document.body.style.overflow = 'hidden';
-    }
-
-    try {
-        const url = new URL(window.location.href);
-        url.searchParams.set('app', appId);
-        window.history.replaceState({ app: appId }, title, url.toString());
-    } catch (e) {}
+    const url = resolveAppUrl(app.path);
+    window.open(url, '_blank', 'noopener,noreferrer');
 }
 
-function closeWorkspace() {
-    const workspace = document.getElementById('artcraft-workspace');
-    const iframe = document.getElementById('artcraft-iframe');
-    const fallbackBox = document.getElementById('ws-loader-fallback');
+function updateWorkspaceHeader() {}
+function updateWorkspaceSelectOptions() {}
+function setupWorkspace() {}
+function closeWorkspace() {}
 
-    if (wasmTimeoutTimer) {
-        clearTimeout(wasmTimeoutTimer);
-        wasmTimeoutTimer = null;
-    }
-
-    if (workspace) {
-        workspace.classList.add('hidden');
-        document.body.style.overflow = '';
-    }
-
-    if (iframe) {
-        iframe.src = 'about:blank';
-    }
-
-    if (fallbackBox) fallbackBox.style.display = 'none';
-
-    currentAppId = null;
-
-    try {
-        const url = new URL(window.location.href);
-        url.searchParams.delete('app');
-        window.history.replaceState({}, document.title, url.pathname);
-    } catch (e) {}
-}
 
 // -------------------------------------------------------------
 // Admin-funksjonalitet: "Se etter og hent nyeste oppdateringer"
