@@ -8,12 +8,12 @@ DirectoryIndex pages/index.html index.html index.php
     RewriteEngine On
     RewriteBase /
 
-    # Unnta /artcraft/ og /.well-known/ direkte fra all omskriving og omdirigering
+    # Unnta /artcraft/ direkte fra all omskriving og omdirigering
     RewriteRule ^artcraft(/.*)?$ - [L]
-    RewriteRule ^\.well-known(/.*)?$ - [L]
 
-    # Direkte servering av SEO, AI og standard metadata-filer i roten
-    RewriteRule ^(robots\.txt|sitemap\.xml|ai\.txt|llms\.txt|ads\.txt|humans\.txt|security\.txt)$ - [L]
+    # Server SEO, AI og standard metadata-filer fra seo/
+    RewriteRule ^\.well-known/(.*)$ seo/.well-known/$1 [L]
+    RewriteRule ^(robots\.txt|sitemap\.xml|ai\.txt|llms\.txt|ads\.txt|humans\.txt|security\.txt)$ seo/$1 [L]
 
     # Aliaser for personvern og vilkår
     RewriteRule ^privacy/?$ pages/personvern.html [L]

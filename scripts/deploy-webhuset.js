@@ -152,7 +152,14 @@ uploadFile('.htaccess', '.htaccess');
 if (fs.existsSync(path.join(rootDir, 'favicon.ico'))) {
   uploadFile('favicon.ico', 'favicon.ico');
 }
-const rootMetaFiles = [
+if (fs.existsSync(path.join(rootDir, 'manifest.json'))) {
+  uploadFile('manifest.json', 'manifest.json');
+}
+if (fs.existsSync(path.join(rootDir, 'service-worker.js'))) {
+  uploadFile('service-worker.js', 'service-worker.js');
+}
+
+const seoMetaFiles = [
   'sitemap.xml',
   'robots.txt',
   'ai.txt',
@@ -160,13 +167,13 @@ const rootMetaFiles = [
   'ads.txt',
   'humans.txt',
   'security.txt',
-  '.well-known/security.txt',
-  'manifest.json',
-  'service-worker.js'
+  '.well-known/security.txt'
 ];
-for (const rmf of rootMetaFiles) {
-  if (fs.existsSync(path.join(rootDir, rmf))) {
-    uploadFile(rmf, rmf);
+for (const smf of seoMetaFiles) {
+  const localPath = `seo/${smf}`;
+  if (fs.existsSync(path.join(rootDir, localPath))) {
+    uploadFile(localPath, localPath);
+    uploadFile(localPath, smf);
   }
 }
 
