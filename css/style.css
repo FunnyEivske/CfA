@@ -534,7 +534,8 @@ p {
 .footer-logo {
   height: 3rem;
   width: 3rem;
-  object-fit: contain;
+  border-radius: 50%;
+  object-fit: cover;
 }
 
 .logo-text {

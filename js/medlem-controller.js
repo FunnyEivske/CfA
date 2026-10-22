@@ -32,8 +32,18 @@ export async function initMedlemPage() {
         console.warn("Auth check failed:", err);
     }
 
+    if (authRes && authRes.networkError) {
+        await new Promise(r => setTimeout(r, 1000));
+        try {
+            authRes = await AuthAPI.getAuthState();
+        } catch (err) {}
+    }
+
     if (!authRes || !authRes.authenticated || !authRes.user) {
-        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+        if (!authRes?.networkError) {
+            try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+            try { localStorage.removeItem('cfa_auth_token'); } catch (e) {}
+        }
         const isHtml = window.location.pathname.endsWith('.html');
         window.location.replace(isHtml ? 'login.html' : 'login');
         return;

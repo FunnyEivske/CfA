@@ -41,7 +41,7 @@ function deferAuthUI() {
 
     let hasSession = false;
     try {
-        hasSession = localStorage.getItem('cfa_has_session') === '1';
+        hasSession = localStorage.getItem('cfa_has_session') === '1' || !!localStorage.getItem('cfa_auth_token');
     } catch (e) {}
 
     // 1. Umiddelbar synkron UI-oppdatering for å unngå layout-forsinkelse
@@ -67,14 +67,15 @@ async function setupAuthUI() {
             if (isLoginPage && (res.must_accept_tos || res.must_change_password)) {
                 handlePostLoginFlow(res);
             }
+        } else if (res.networkError) {
+            console.warn("Midlertidig nettverksfeil ved autentiseringssjekk; bevarer tilstand.");
         } else {
             try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+            try { localStorage.removeItem('cfa_auth_token'); } catch (e) {}
             updateHeaderUI(null);
         }
     } catch (e) {
         console.warn("Could not fetch auth state:", e);
-        try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
-        updateHeaderUI(null);
     }
 }
 

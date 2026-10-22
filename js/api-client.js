@@ -372,6 +372,12 @@ export async function request(action, method = 'GET', data = null, isFormData = 
         credentials: 'include'
     };
 
+    const token = (typeof localStorage !== 'undefined') ? localStorage.getItem('cfa_auth_token') : null;
+    if (token) {
+        options.headers['Authorization'] = `Bearer ${token}`;
+        options.headers['X-CFA-Token'] = token;
+    }
+
     let url = `${API_BASE}?action=${action}`;
 
     if (data && !isForm) {
@@ -504,6 +510,9 @@ export const AuthAPI = {
     login: async (email, password) => {
         const res = await request('login', 'POST', { email, password });
         if (res && res.success) {
+            if (res.token) {
+                try { localStorage.setItem('cfa_auth_token', res.token); } catch (e) {}
+            }
             try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
         }
         return res;
@@ -511,11 +520,15 @@ export const AuthAPI = {
     register: async (email, password, name) => {
         const res = await request('register', 'POST', { email, password, name });
         if (res && res.success) {
+            if (res.token) {
+                try { localStorage.setItem('cfa_auth_token', res.token); } catch (e) {}
+            }
             try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
         }
         return res;
     },
     logout: async () => {
+        try { localStorage.removeItem('cfa_auth_token'); } catch (e) {}
         try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
         return request('logout', 'POST');
     },
@@ -526,10 +539,11 @@ export const AuthAPI = {
                 try { localStorage.setItem('cfa_has_session', '1'); } catch (e) {}
             } else {
                 try { localStorage.removeItem('cfa_has_session'); } catch (e) {}
+                try { localStorage.removeItem('cfa_auth_token'); } catch (e) {}
             }
             return res;
         } catch (err) {
-            return { authenticated: false };
+            return { authenticated: false, networkError: true };
         }
     },
     updateProfile: (displayName, phone, contactEmail) => {

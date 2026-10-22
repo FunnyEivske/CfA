@@ -3,9 +3,15 @@
 require_once 'config.php';
 require_once 'webpush.php';
 
-header("Access-Control-Allow-Origin: *");
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (!empty($origin)) {
+    header("Access-Control-Allow-Origin: $origin");
+    header("Access-Control-Allow-Credentials: true");
+} else {
+    header("Access-Control-Allow-Origin: *");
+}
 header("Access-Control-Allow-Methods: GET, POST, OPTIONS, PUT, DELETE");
-header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Headers: Content-Type, Authorization, X-CFA-Token");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -118,12 +124,61 @@ try {
     $pdo->exec("ALTER TABLE users ADD COLUMN roles TEXT DEFAULT NULL");
 } catch (Exception $e) {}
 try {
-    $pdo->exec("CREATE TABLE IF NOT EXISTS site_settings (
-        setting_key VARCHAR(100) PRIMARY KEY,
-        setting_value LONGTEXT NOT NULL,
-        updated_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP
-    )");
+    $pdo->exec("CREATE TABLE IF NOT EXISTS auth_tokens (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id VARCHAR(128) NOT NULL,
+        token_hash VARCHAR(64) NOT NULL UNIQUE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        expires_at DATETIME NOT NULL,
+        last_used_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+        user_agent VARCHAR(255) DEFAULT NULL,
+        INDEX idx_token_hash (token_hash),
+        INDEX idx_user_id (user_id)
+    ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4");
 } catch (Exception $e) {}
+
+function getClientToken() {
+    $headers = function_exists('getallheaders') ? getallheaders() : [];
+    if (!empty($headers['Authorization'])) {
+        if (preg_match('/Bearer\s+(\S+)/i', $headers['Authorization'], $m)) {
+            return trim($m[1]);
+        }
+    }
+    if (!empty($_SERVER['HTTP_AUTHORIZATION'])) {
+        if (preg_match('/Bearer\s+(\S+)/i', $_SERVER['HTTP_AUTHORIZATION'], $m)) {
+            return trim($m[1]);
+        }
+    }
+    if (!empty($headers['X-CFA-Token'])) {
+        return trim($headers['X-CFA-Token']);
+    }
+    if (!empty($_SERVER['HTTP_X_CFA_TOKEN'])) {
+        return trim($_SERVER['HTTP_X_CFA_TOKEN']);
+    }
+    if (!empty($_COOKIE['cfa_auth_token'])) {
+        return trim($_COOKIE['cfa_auth_token']);
+    }
+    return null;
+}
+
+// Gjenopprett sesjon automatisk fra gyldig auth-token (opptil 90 dager)
+if (empty($_SESSION['user_id'])) {
+    $token = getClientToken();
+    if ($token) {
+        $tokenHash = hash('sha256', $token);
+        try {
+            $tStmt = $pdo->prepare('SELECT user_id, expires_at FROM auth_tokens WHERE token_hash = ? AND expires_at > NOW()');
+            $tStmt->execute([$tokenHash]);
+            $tRow = $tStmt->fetch();
+            if ($tRow) {
+                $_SESSION['user_id'] = $tRow['user_id'];
+                // Forleng levetid ved aktiv bruk (rullende 90 dager)
+                $updStmt = $pdo->prepare('UPDATE auth_tokens SET expires_at = DATE_ADD(NOW(), INTERVAL 90 DAY), last_used_at = NOW() WHERE token_hash = ?');
+                $updStmt->execute([$tokenHash]);
+            }
+        } catch (Exception $e) {}
+    }
+}
 
 function normalizeUser(&$user) {
     if (!$user) return;
@@ -197,9 +252,29 @@ switch ($action) {
             $_SESSION['display_role'] = $user['display_role'];
             $mustChange = (int)($user['must_change_password'] ?? 0) === 1;
             $mustAcceptTos = (int)($user['tos_accepted'] ?? 0) === 0;
+
+            // Opprett en sikker 90-dagers persistent sesjonstoken
+            $rawToken = bin2hex(random_bytes(32));
+            $tokenHash = hash('sha256', $rawToken);
+            $ua = substr($_SERVER['HTTP_USER_AGENT'] ?? '', 0, 255);
+            try {
+                $tIns = $pdo->prepare('INSERT INTO auth_tokens (user_id, token_hash, expires_at, user_agent) VALUES (?, ?, DATE_ADD(NOW(), INTERVAL 90 DAY), ?)');
+                $tIns->execute([$user['id'], $tokenHash, $ua]);
+            } catch (Exception $e) {}
+
+            // Sett cookie for 90 dager
+            setcookie('cfa_auth_token', $rawToken, [
+                'expires' => time() + (86400 * 90),
+                'path' => '/',
+                'secure' => $isHttps,
+                'httponly' => true,
+                'samesite' => 'Lax'
+            ]);
+
             unset($user['password_hash']);
             jsonResponse([
                 'success' => true,
+                'token' => $rawToken,
                 'user' => $user,
                 'must_change_password' => $mustChange,
                 'must_accept_tos' => $mustAcceptTos
@@ -294,6 +369,21 @@ switch ($action) {
         break;
         
     case 'logout':
+        $token = getClientToken();
+        if ($token) {
+            $tokenHash = hash('sha256', $token);
+            try {
+                $tDel = $pdo->prepare('DELETE FROM auth_tokens WHERE token_hash = ?');
+                $tDel->execute([$tokenHash]);
+            } catch (Exception $e) {}
+        }
+        setcookie('cfa_auth_token', '', [
+            'expires' => time() - 3600,
+            'path' => '/',
+            'secure' => $isHttps,
+            'httponly' => true,
+            'samesite' => 'Lax'
+        ]);
         session_destroy();
         jsonResponse(['success' => true]);
         break;

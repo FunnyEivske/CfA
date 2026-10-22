@@ -82,9 +82,12 @@ for (const file of jsFiles) {
   uploadFile(`js/${file}`, file);
 }
 
-// 3. Upload Backend API
+// 3. Upload Backend API & Config
 if (fs.existsSync(path.join(rootDir, 'backend/api.php'))) {
   uploadFile('backend/api.php', 'backend/api.php');
+}
+if (fs.existsSync(path.join(rootDir, 'backend/config.php'))) {
+  uploadFile('backend/config.php', 'backend/config.php');
 }
 
 // 4. Upload Locales

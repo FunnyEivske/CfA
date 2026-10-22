@@ -1,11 +1,31 @@
 <?php
 // backend/config.php
+$isHttps = (
+    (!empty($_SERVER['HTTPS']) && strtolower($_SERVER['HTTPS']) !== 'off') ||
+    (!empty($_SERVER['HTTP_X_FORWARDED_PROTO']) && strtolower($_SERVER['HTTP_X_FORWARDED_PROTO']) === 'https') ||
+    (!empty($_SERVER['SERVER_PORT']) && (int)$_SERVER['SERVER_PORT'] === 443)
+);
+
+// Øk PHP session levetid til 90 dager og bruk isolert sessions-mappe for å unngå /tmp-tømming
+$sessLifetime = 86400 * 90; // 90 dager
+ini_set('session.gc_maxlifetime', $sessLifetime);
+ini_set('session.cookie_lifetime', $sessLifetime);
+
+$sessDir = __DIR__ . '/sessions';
+if (!file_exists($sessDir)) {
+    @mkdir($sessDir, 0700, true);
+    @file_put_contents($sessDir . '/.htaccess', "Order allow,deny\nDeny from all\n");
+}
+if (is_dir($sessDir) && is_writable($sessDir)) {
+    ini_set('session.save_path', $sessDir);
+}
+
 if (session_status() === PHP_SESSION_NONE) {
     session_set_cookie_params([
-        'lifetime' => 86400 * 30,
+        'lifetime' => $sessLifetime,
         'path' => '/',
         'domain' => '',
-        'secure' => isset($_SERVER['HTTPS']) && $_SERVER['HTTPS'] === 'on',
+        'secure' => $isHttps,
         'httponly' => true,
         'samesite' => 'Lax'
     ]);
