@@ -1,0 +1,12 @@
+# ai.txt for cosplayforalle.no
+# Permissions and policy for AI bots and crawlers
+
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /uploads/private/
+
+# Organization Information
+Organization: Cosplay for alle (CfA)
+Website: https://cosplayforalle.no
+Contact: kontakt@cosplayforalle.no

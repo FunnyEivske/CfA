@@ -1,0 +1,8 @@
+# robots.txt for cosplayforalle.no
+User-agent: *
+Allow: /
+Disallow: /backend/
+Disallow: /uploads/private/
+
+# Sitemap
+Sitemap: https://cosplayforalle.no/sitemap.xml

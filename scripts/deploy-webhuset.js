@@ -133,6 +133,8 @@ const htmlFiles = [
   'medlem.html',
   'login.html',
   'creative-tools.html',
+  'personvern.html',
+  'vilkar.html',
   'app.html',
   'app-start.html'
 ];
@@ -142,10 +144,27 @@ for (const file of htmlFiles) {
   uploadFile(pagePath, file);
 }
 
-// 7. Upload .htaccess and favicon.ico
+// 7. Upload .htaccess, metadata, SEO & AI discoverability files
 uploadFile('.htaccess', '.htaccess');
 if (fs.existsSync(path.join(rootDir, 'favicon.ico'))) {
   uploadFile('favicon.ico', 'favicon.ico');
+}
+const rootMetaFiles = [
+  'sitemap.xml',
+  'robots.txt',
+  'ai.txt',
+  'llms.txt',
+  'ads.txt',
+  'humans.txt',
+  'security.txt',
+  '.well-known/security.txt',
+  'manifest.json',
+  'service-worker.js'
+];
+for (const rmf of rootMetaFiles) {
+  if (fs.existsSync(path.join(rootDir, rmf))) {
+    uploadFile(rmf, rmf);
+  }
 }
 
 // 8. Upload Merkeverktøy

@@ -106,6 +106,8 @@ syncHtmlPage('profil.html');
 syncHtmlPage('login.html');
 syncHtmlPage('app-start.html');
 syncHtmlPage('creative-tools.html');
+syncHtmlPage('personvern.html');
+syncHtmlPage('vilkar.html');
 
 // 7. Create App Entry Point (index.html)
 const appIndexHtml = `<!DOCTYPE html>

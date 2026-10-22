@@ -8,8 +8,17 @@ DirectoryIndex pages/index.html index.html index.php
     RewriteEngine On
     RewriteBase /
 
-    # Unnta /artcraft/ direkte fra all omskriving og omdirigering
+    # Unnta /artcraft/ og /.well-known/ direkte fra all omskriving og omdirigering
     RewriteRule ^artcraft(/.*)?$ - [L]
+    RewriteRule ^\.well-known(/.*)?$ - [L]
+
+    # Direkte servering av SEO, AI og standard metadata-filer i roten
+    RewriteRule ^(robots\.txt|sitemap\.xml|ai\.txt|llms\.txt|ads\.txt|humans\.txt|security\.txt)$ - [L]
+
+    # Aliaser for personvern og vilkår
+    RewriteRule ^privacy/?$ pages/personvern.html [L]
+    RewriteRule ^terms/?$ pages/vilkar.html [L]
+    RewriteRule ^vilkar/?$ pages/vilkar.html [L]
 
     # Server pages/index.html ved rot-forespørsel (/)
     RewriteRule ^$ pages/index.html [L]
@@ -119,12 +128,14 @@ DirectoryIndex pages/index.html index.html index.php
 
 # Sikkerhets- og Cache-headere
 <IfModule mod_headers.c>
-    # HSTS (HTTP Strict Transport Security) - Tvinger HTTPS
+    # Sikkerhets- og personvernheadere
     Header always set Strict-Transport-Security "max-age=31536000; includeSubDomains; preload"
     Header set X-Content-Type-Options "nosniff"
     Header set X-Frame-Options "SAMEORIGIN"
     Header set X-XSS-Protection "1; mode=block"
     Header set Referrer-Policy "strict-origin-when-cross-origin"
+    Header set Content-Security-Policy "default-src 'self' https: data: blob:; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://fonts.googleapis.com blob:; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com data:; img-src 'self' data: blob: https:; connect-src 'self' https://cosplayforalle.no https://www.google-analytics.com https://analytics.google.com https://region1.google-analytics.com; media-src 'self' data: blob: https:; object-src 'none'; base-uri 'self'; form-action 'self';"
+    Header set Permissions-Policy "accelerometer=(), camera=(self), geolocation=(), gyroscope=(), magnetometer=(), microphone=(), payment=(), usb=()"
 
     # Aggressiv caching for statiske medier
     <FilesMatch "\.(ico|jpe?g|png|gif|webp|svg|woff2?|ttf|otf)$">
